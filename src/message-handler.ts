@@ -1,7 +1,11 @@
 import {Message} from 'discord.js'
+import {MarketCache} from './market-cache'
 
 class BotMessageHandler {
-  constructor() {
+  private _marketCache: MarketCache
+
+  constructor(marketCache: MarketCache) {
+    this._marketCache = marketCache
   }
 
   public process(message: Message): void {

@@ -2,9 +2,11 @@ import * as Discord from 'discord.js'
 import {BOT_CONFIG} from './constants/configs'
 import {Message} from 'discord.js'
 import {BotMessageHandler} from './message-handler'
+import {MarketCache} from './market-cache'
 
 const client = new Discord.Client()
-const msgHandler = new BotMessageHandler()
+const marketCache = new MarketCache()
+const msgHandler = new BotMessageHandler(marketCache)
 
 
 client.on('ready', () => {
