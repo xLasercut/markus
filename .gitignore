@@ -1,0 +1,9 @@
+node_modules
+dist
+
+# editor configs
+.vscode
+.idea
+
+# bot config
+data/config.json
