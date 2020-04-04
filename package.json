@@ -2,13 +2,17 @@
   "name": "ashal-market-bot",
   "version": "1.0.0",
   "description": "Discord bot for ashal's market",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "tsc -b",
+    "start": "node dist/index.js",
+    "serve": "npm run compile && npm run start"
   },
   "author": "xLasercut",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.19.2",
+    "discord.js": "^12.1.1",
     "typescript": "^3.8.3"
   }
 }
