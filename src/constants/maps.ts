@@ -80,3 +80,6 @@ const RARITY_MAP = {
   'Unique': 5,
   'Legendary': 6
 }
+
+
+export {RARITY_MAP, SERVER_MAP, CHARACTER_MAP, SLOT_MAP}

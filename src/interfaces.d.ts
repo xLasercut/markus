@@ -35,4 +35,12 @@ interface ITear {
   usercode: string
 }
 
-export {IItem, ITear}
+interface IUserItems {
+  [key: string]: Array<IItem>
+}
+
+interface IUserElTears {
+  [key: string]: Array<ITear>
+}
+
+export {IItem, ITear, IUserItems, IUserElTears}
