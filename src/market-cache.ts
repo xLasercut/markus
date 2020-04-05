@@ -62,9 +62,9 @@ class MarketCache {
 
         this._userItemPosts = {}
         this._itemPosts = {}
-        this._itemIndex = this._generateItemIndex(itemPostsData)
 
         for (let i = 0, n = itemPostsData.length; i < n; i++) {
+          this._replaceValues(itemPostsData[i])
           let itemPost = itemPostsData[i]
           let userId = itemPost.usercode
           this._itemPosts[itemPost.id] = itemPost
@@ -76,23 +76,13 @@ class MarketCache {
             this._userItemPosts[userId] = [itemPost]
           }
         }
+
+        this._itemIndex = this._generateSearchIndex(itemPostsData, ['name', 'type', 'displayname', 'slot', 'character', 'detail', 'price'])
         this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'finish'})
       })
       .catch((response) => {
         this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
       })
-  }
-
-  protected _generateItemIndex(itemPostsData: Array<IItem>): lunr.Index {
-    return lunr(function() {
-      this.ref('id')
-      this.field('name')
-      this.field('displayname')
-
-      for (let i = 0, n = itemPostsData.length; i < n; i++) {
-        this.add(itemPostsData[i])
-      }
-    })
   }
 
   private _reloadElTearPosts(body: string): void {
@@ -103,9 +93,9 @@ class MarketCache {
 
         this._userElTearPosts = {}
         this._elTearPosts = {}
-        this._tearIndex = this._generateTearIndex(tearPostsData)
 
         for (let i = 0, n = tearPostsData.length; i < n; i++) {
+          this._replaceValues(tearPostsData[i])
           let elTearPost = tearPostsData[i]
           this._elTearPosts[elTearPost.id] = elTearPost
 
@@ -118,6 +108,8 @@ class MarketCache {
             this._userElTearPosts[userId] = [elTearPost]
           }
         }
+
+        this._tearIndex = this._generateSearchIndex(tearPostsData, ['name', 'type', 'displayname', 'slot', 'shape', 'color', 'value', 'character', 'price'])
         this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'finish'})
       })
       .catch((response) => {
@@ -125,16 +117,21 @@ class MarketCache {
       })
   }
 
-  protected _generateTearIndex(tearPostsData: Array<ITear>): lunr.Index {
+  protected _generateSearchIndex(postsData: Array<ITear|IItem>, searchFields: Array<string>): lunr.Index {
     return lunr(function() {
       this.ref('id')
-      this.field('name')
-      this.field('displayname')
+      for (let field of searchFields) {
+        this.field(field)
+      }
 
-      for (let i = 0, n = tearPostsData.length; i < n; i++) {
-        this.add(tearPostsData[i])
+      for (let i = 0, n = postsData.length; i < n; i++) {
+        this.add(postsData[i])
       }
     })
+  }
+
+  protected _replaceValues(post: ITear | IItem): void {
+    post.type = post.type.replace('B>', 'Buy').replace('S>', 'Sell')
   }
 }
 

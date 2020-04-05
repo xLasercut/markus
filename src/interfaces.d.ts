@@ -1,14 +1,14 @@
 interface IItem {
   id: number
-  server_id: number
-  type: number
-  state_id: number
+  server: string
+  type: string
+  state: string
   item_id: number
   name: string
-  rarity_id: number
-  slot_id: number
-  category_id: number
-  character_id: number
+  rarity: string
+  slot: string
+  category: string
+  character: string
   detail: string
   price: string
   displayname: string
@@ -17,19 +17,17 @@ interface IItem {
 
 interface ITear {
   id: number
-  server_id: number
-  type: number
-  state_id: number
+  server: string
+  type: string
+  state: string
   tear_id: number
   name: string
-  rarity_id: number
-  slot_id: number
-  shape_id: number
-  color_id: number
-  value_id: number
-  percent_flag: number
-  negative_flag: number
-  character_id: number
+  rarity: string
+  slot: string
+  shape: string
+  color: string
+  value: string
+  character: string
   price: string
   displayname: string
   usercode: string
