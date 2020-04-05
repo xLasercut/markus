@@ -43,4 +43,14 @@ interface IUserElTears {
   [key: string]: Array<ITear>
 }
 
-export {IItem, ITear, IUserItems, IUserElTears}
+interface ILog {
+  code: string
+  level: string
+  template: string
+}
+
+interface ILogBase {
+  [key: string]: ILog
+}
+
+export {IItem, ITear, IUserItems, IUserElTears, ILog, ILogBase}
