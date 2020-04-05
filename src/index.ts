@@ -7,7 +7,7 @@ import {BotLogger, LOG_BASE} from './logging'
 
 const client = new Discord.Client()
 const logger = new BotLogger()
-const marketCache = new MarketCache()
+const marketCache = new MarketCache(logger)
 const msgHandler = new BotMessageHandler(marketCache)
 
 

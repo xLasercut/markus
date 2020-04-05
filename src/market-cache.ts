@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {IItem, ITear, IUserElTears, IUserItems} from './interfaces'
 import {BOT_CONFIG, ELTEAR_API_ENDPOINT, ITEM_API_ENDPOINT} from './constants/configs'
+import {BotLogger, LOG_BASE} from './logging'
 
 class MarketCache {
 
@@ -9,8 +10,10 @@ class MarketCache {
   private _userItemPosts: IUserItems
   private _userElTearPosts: IUserElTears
   private _cacheTimer: NodeJS.Timer
+  private _logger: BotLogger
 
-  constructor() {
+  constructor(logger: BotLogger) {
+    this._logger = logger
     this.reloadCache()
   }
 
@@ -39,6 +42,7 @@ class MarketCache {
   }
 
   private _reloadItemPosts(body: string): void {
+    this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'start'})
     axios.post(ITEM_API_ENDPOINT, body)
       .then((response) => {
         this._userItemPosts = {}
@@ -54,10 +58,15 @@ class MarketCache {
             this._userItemPosts[userId] = [itemPost]
           }
         }
+        this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'finish'})
+      })
+      .catch((response) => {
+        this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
       })
   }
 
   private _reloadElTearPosts(body: string): void {
+    this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'start'})
     axios.post(ELTEAR_API_ENDPOINT, body)
       .then((response) => {
         this._userElTearPosts = {}
@@ -73,6 +82,10 @@ class MarketCache {
             this._userElTearPosts[userId] = [elTearPost]
           }
         }
+        this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'finish'})
+      })
+      .catch((response) => {
+        this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
       })
   }
 }

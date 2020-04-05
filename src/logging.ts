@@ -2,7 +2,7 @@ import * as winston from 'winston'
 import * as DailyRotateFile from 'winston-daily-rotate-file'
 import * as mustache from 'mustache'
 import {LOG_DIR} from './constants/paths'
-import {ILog, ILogBase} from './interfaces'
+import {ILog} from './interfaces'
 
 let {combine, timestamp, printf} = winston.format
 
@@ -39,11 +39,21 @@ const LOG_LEVEL = {
   DEBUG: 'DEBUG'
 }
 
-const LOG_BASE: ILogBase = {
+const LOG_BASE = {
   SERVER001: {
     code: 'SERVER001',
     level: LOG_LEVEL.INFO,
     template: 'Logged in as {{user}}'
+  },
+  CACHE001: {
+    code: 'CACHE001',
+    level: LOG_LEVEL.INFO,
+    template: 'market cache reload - type="{{type}}" stage="{{stage}}"'
+  },
+  CACHE002: {
+    code: 'CACHE0002',
+    level: LOG_LEVEL.ERROR,
+    template: 'market cache reload failed - status="{{status}}" error="{{error}}"'
   }
 }
 
