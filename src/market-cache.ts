@@ -1,16 +1,19 @@
 import axios from 'axios'
-import {IItem, ITear, IUserElTears, IUserItems} from './interfaces'
+import {IItem, IItems, ITear, ITears, IUserElTears, IUserItems} from './interfaces'
 import {BOT_CONFIG, ELTEAR_API_ENDPOINT, ITEM_API_ENDPOINT} from './constants/configs'
 import {BotLogger, LOG_BASE} from './logging'
+import * as lunr from 'lunr'
 
 class MarketCache {
 
-  private _itemPosts: Array<IItem>
-  private _elTearPosts: Array<ITear>
+  private _itemPosts: IItems
+  private _elTearPosts: ITears
   private _userItemPosts: IUserItems
   private _userElTearPosts: IUserElTears
   private _cacheTimer: NodeJS.Timer
   private _logger: BotLogger
+  private _itemIndex: lunr.Index
+  private _tearIndex: lunr.Index
 
   constructor(logger: BotLogger) {
     this._logger = logger
@@ -25,14 +28,6 @@ class MarketCache {
     this._reloadItemPosts(body)
   }
 
-  public get itemPosts(): Array<IItem> {
-    return this._itemPosts
-  }
-
-  public get elTearPosts(): Array<ITear> {
-    return this._elTearPosts
-  }
-
   public get userItemPosts(): IUserItems {
     return this._userItemPosts
   }
@@ -41,15 +36,38 @@ class MarketCache {
     return this._userElTearPosts
   }
 
+  public searchItem(query: string): Array<IItem> {
+    let results = this._itemIndex.search(query)
+    let output = []
+    for (let result of results) {
+      output.push(this._itemPosts[result.ref])
+    }
+    return output
+  }
+
+  public searchTear(query: string): Array<ITear> {
+    let results = this._tearIndex.search(query)
+    let output = []
+    for (let result of results) {
+      output.push(this._elTearPosts[result.ref])
+    }
+    return output
+  }
+
   private _reloadItemPosts(body: string): void {
     this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'start'})
     axios.post(ITEM_API_ENDPOINT, body)
       .then((response) => {
+        let itemPostsData = response.data.posts
+
         this._userItemPosts = {}
-        this._itemPosts = response.data.posts
-        for (let i = 0; i < this._itemPosts.length; i++) {
-          let itemPost = this._itemPosts[i]
+        this._itemPosts = {}
+        this._itemIndex = this._generateItemIndex(itemPostsData)
+
+        for (let i = 0, n = itemPostsData.length; i < n; i++) {
+          let itemPost = itemPostsData[i]
           let userId = itemPost.usercode
+          this._itemPosts[itemPost.id] = itemPost
 
           if (userId in this._userItemPosts) {
             this._userItemPosts[userId].push(itemPost)
@@ -65,14 +83,32 @@ class MarketCache {
       })
   }
 
+  protected _generateItemIndex(itemPostsData: Array<IItem>): lunr.Index {
+    return lunr(function() {
+      this.ref('id')
+      this.field('name')
+      this.field('displayname')
+
+      for (let i = 0, n = itemPostsData.length; i < n; i++) {
+        this.add(itemPostsData[i])
+      }
+    })
+  }
+
   private _reloadElTearPosts(body: string): void {
     this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'start'})
     axios.post(ELTEAR_API_ENDPOINT, body)
       .then((response) => {
+        let tearPostsData = response.data.posts_tears
+
         this._userElTearPosts = {}
-        this._elTearPosts = response.data.posts_tears
-        for (let i = 0; i < this._elTearPosts.length; i++) {
-          let elTearPost = this._elTearPosts[i]
+        this._elTearPosts = {}
+        this._tearIndex = this._generateTearIndex(tearPostsData)
+
+        for (let i = 0, n = tearPostsData.length; i < n; i++) {
+          let elTearPost = tearPostsData[i]
+          this._elTearPosts[elTearPost.id] = elTearPost
+
           let userId = elTearPost.usercode
 
           if (userId in this._userElTearPosts) {
@@ -87,6 +123,18 @@ class MarketCache {
       .catch((response) => {
         this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
       })
+  }
+
+  protected _generateTearIndex(tearPostsData: Array<ITear>): lunr.Index {
+    return lunr(function() {
+      this.ref('id')
+      this.field('name')
+      this.field('displayname')
+
+      for (let i = 0, n = tearPostsData.length; i < n; i++) {
+        this.add(tearPostsData[i])
+      }
+    })
   }
 }
 

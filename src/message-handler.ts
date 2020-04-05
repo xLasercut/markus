@@ -9,8 +9,40 @@ class BotMessageHandler {
   }
 
   public process(message: Message): void {
-    let content = message.content
-    console.log(content)
+    if (message.content.match(/^\+searchitem (.*)/i)) {
+      this._searchItemAll(message)
+    }
+    else if (message.content.match(/^\+searchtear (.*)/)) {
+      this._searchTearAll(message)
+    }
+  }
+
+  private _searchItemAll(message: Message): void {
+    let results = this._marketCache.searchItem(message.content.split(' ')[1])
+    if (results.length > 0) {
+      let output = ['']
+      for (let result of results) {
+        output.push(`${result.name} - ${result.price} - ${result.displayname}`)
+      }
+      message.reply(output.join(`\n`))
+    }
+    else {
+      message.reply('No results found')
+    }
+  }
+
+  private _searchTearAll(message: Message): void {
+    let results = this._marketCache.searchTear(message.content.split(' ')[1])
+    if (results.length > 0) {
+      let output = ['']
+      for (let result of results) {
+        output.push(`${result.name} - ${result.price} - ${result.displayname}`)
+      }
+      message.reply(output.join(`\n`))
+    }
+    else {
+      message.reply('No results found')
+    }
   }
 }
 

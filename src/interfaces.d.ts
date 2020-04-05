@@ -49,4 +49,12 @@ interface ILog {
   template: string
 }
 
-export {IItem, ITear, IUserItems, IUserElTears, ILog}
+interface IItems {
+  [key: number]: IItem
+}
+
+interface ITears {
+  [key: number]: ITear
+}
+
+export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears}

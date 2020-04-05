@@ -1,3 +1,11 @@
+function reverseMap(map: {[key: string]: number}): {[key: number]: string} {
+  let reverseMap = {}
+  for (let key in map) {
+    reverseMap[map[key]] = key
+  }
+  return reverseMap
+}
+
 const CATEGORY_MAP = {
   'Any Category': 0,
   'IM Costume': 1,
@@ -80,6 +88,12 @@ const RARITY_MAP = {
   'Unique': 5,
   'Legendary': 6
 }
+
+const REV_CATEGORY_MAP = reverseMap(CATEGORY_MAP)
+const REV_SERVER_MAP = reverseMap(SERVER_MAP)
+const REV_RARITY_MAP = reverseMap(RARITY_MAP)
+const REV_SLOT_MAP = reverseMap(SLOT_MAP)
+const REV_CHARACTER_MAP = reverseMap(CHARACTER_MAP)
 
 
 export {RARITY_MAP, SERVER_MAP, CHARACTER_MAP, SLOT_MAP}
