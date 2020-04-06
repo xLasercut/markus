@@ -6,8 +6,8 @@ import {BotLogger, LOG_BASE} from './logging'
 class BotMessageHandler {
   private _marketCache: MarketCache
   private _logger: BotLogger
-  private _tearRegex = new RegExp('^\\+searchtear ([0-9a-z *+:]+)', 'i')
-  private _itemRegex = new RegExp('^\\+searchitem ([0-9a-z *+:]+)', 'i')
+  private _tearRegex = new RegExp('^searchtear ([0-9a-z *+:]+)', 'i')
+  private _itemRegex = new RegExp('^searchitem ([0-9a-z *+:]+)', 'i')
 
   constructor(logger: BotLogger, marketCache: MarketCache) {
     this._logger = logger
