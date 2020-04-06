@@ -1,72 +1,81 @@
 import {Message} from 'discord.js'
 import {MarketCache} from './market-cache'
+import {IItem, ITear} from './interfaces'
+import {BotLogger, LOG_BASE} from './logging'
 
 class BotMessageHandler {
   private _marketCache: MarketCache
-  private _map = {
-    '^\\+searchitem ([0-9a-z *+:]+)': 'item',
-    '^\\+searchtear ([0-9a-z *+:]+)': 'tear'
-  }
+  private _logger: BotLogger
+  private _tearRegex = new RegExp('^`searchtear ([0-9a-z *+:]+)', 'i')
+  private _itemRegex = new RegExp('^`searchitem ([0-9a-z *+:]+)', 'i')
 
-  constructor(marketCache: MarketCache) {
+  constructor(logger: BotLogger, marketCache: MarketCache) {
+    this._logger = logger
     this._marketCache = marketCache
   }
 
   public process(message: Message): void {
-    for (let key in this._map) {
-      let regex = new RegExp(key, 'i')
-      let type = this._map[key]
-      let match = regex.exec(message.content)
-      if (match) {
-        if (type === 'tear') {
-          message.reply(this._searchTearAll(match[1]))
-        }
-        else if (type === 'item') {
-          message.reply(this._searchItemAll(match[1]))
-        }
-        break
-      }
+    let input = message.content
+    if (this._itemRegex.exec(input)) {
+      message.reply(this._searchItemAll(this._itemRegex.exec(input)[1]))
+        .catch((error) => {
+          this._logger.writeLog(LOG_BASE.SERVER002, {type: 'item search', reason: error})
+        })
+    }
+    else if (this._tearRegex.exec(input)) {
+      message.reply(this._searchTearAll(this._itemRegex.exec(input)[1]))
+        .catch((error) => {
+          this._logger.writeLog(LOG_BASE.SERVER002, {type: 'tear search', reason: error})
+        })
     }
   }
 
   private _searchItemAll(query: string): string {
-    console.log(query)
     let results = this._marketCache.searchItem(query)
-    if (results.length > 0) {
-      let output = ['']
-      let charcount = 0
-      for (let result of results) {
-        let row = `${result.type.replace('Sell', 'S>').replace('Buy', 'B>')} **${result.name}**`
-        if (result.detail) {
-          row += ` _${result.detail}_`
-        }
-
-        if (result.price) {
-          row += ` ${result.price}`
-        }
-        row += ` - __${result.displayname}__`
-        charcount += row.length
-        output.push(row)
-        if (charcount > 1500) {
-          output.push('...')
-          break
-        }
-      }
-      return output.join(`\n`)
-    }
-    return 'No results found'
+    return this._generateOutput(results, ['name', 'slot'], {detail: '', price: '**'})
   }
 
   private _searchTearAll(query: string): string {
     let results = this._marketCache.searchTear(query)
+    return this._generateOutput(results, ['name', 'value', 'color', 'slot'], {price: '**'})
+  }
+
+  private _generateOutput(results: Array<ITear | IItem>, mandatoryFields: Array<string>, optionalFields: { [key: string]: string } = {}): string {
     if (results.length > 0) {
       let output = ['']
+      let charcount = 0
       for (let result of results) {
-        output.push(`${result.type} - ${result.name} ${result.value} - ${result.price} - ${result.displayname}`)
+        let row = this._generateRow(result, mandatoryFields, optionalFields)
+        charcount += row.length
+        output.push(row)
+        if (charcount > 1500) {
+          output.push('...')
+          output.push('Too many results to load, please use more specific search terms')
+          break
+        }
       }
-      return output.join(`\n`)
+      return output.join('\n')
     }
     return 'No results found'
+  }
+
+  protected _generateRow(result: ITear | IItem, mandatoryFields: Array<string>, optionalFields: { [key: string]: string }): string {
+    let row = `${result.type.replace('Sell', 'S>').replace('Buy', 'B>')}`
+
+    for (let field of mandatoryFields) {
+      row += ` \`${result[field]}\``
+    }
+
+    for (let field in optionalFields) {
+      let trimmedField = result[field].trim()
+      if (trimmedField) {
+        row += ` ${optionalFields[field]}${trimmedField}${optionalFields[field]} `
+      }
+    }
+
+    row += ` - __${result.displayname}__`
+
+    return row
   }
 }
 

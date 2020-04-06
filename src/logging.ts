@@ -54,6 +54,11 @@ const LOG_BASE = {
     code: 'CACHE0002',
     level: LOG_LEVEL.ERROR,
     template: 'market cache reload failed - status="{{status}}" error="{{error}}"'
+  },
+  SERVER002: {
+    code: 'SERVER002',
+    level: LOG_LEVEL.ERROR,
+    template: 'send message to discord failed - type="{{type}}" reason="{{reason}}"'
   }
 }
 
