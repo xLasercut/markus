@@ -54,9 +54,9 @@ class BotMessageHandler {
         let row = this._generateRow(result, mandatoryFields, optionalFields)
         charcount += row.length
         output.push(row)
-        if (charcount > 1500) {
+        if (charcount > 1700) {
           output.push('...')
-          output.push('Too many results to load, please use more specific search terms')
+          output.push('Too many results to display, please use more specific search terms')
           break
         }
       }
