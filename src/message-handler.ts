@@ -31,11 +31,17 @@ class BotMessageHandler {
   }
 
   private _searchItemAll(query: string): string {
+    if (this._marketCache.loading.item) {
+      return 'Updating item cache, please try again later'
+    }
     let results = this._marketCache.searchItem(query)
     return this._generateOutput(results, ['name', 'slot'], {detail: '', price: '**'})
   }
 
   private _searchTearAll(query: string): string {
+    if (this._marketCache.loading.tear) {
+      return 'Updating tear cache, please try again later'
+    }
     let results = this._marketCache.searchTear(query)
     return this._generateOutput(results, ['name', 'value', 'color', 'slot'], {price: '**'})
   }

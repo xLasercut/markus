@@ -14,6 +14,10 @@ class MarketCache {
   private _logger: BotLogger
   private _itemIndex: lunr.Index
   private _tearIndex: lunr.Index
+  private _loading = {
+    item: false,
+    tear: false
+  }
 
   constructor(logger: BotLogger) {
     this._logger = logger
@@ -30,6 +34,10 @@ class MarketCache {
     })
     this._reloadElTearPosts(body)
     this._reloadItemPosts(body)
+  }
+
+  public get loading(): {item: boolean, tear: boolean} {
+    return this._loading
   }
 
   public get userItemPosts(): IUserItems {
@@ -60,6 +68,7 @@ class MarketCache {
 
   private _reloadItemPosts(body: string): void {
     this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'start'})
+    this._loading.item = true
     axios.post(ITEM_API_ENDPOINT, body)
       .then((response) => {
         let itemPostsData = response.data.posts
@@ -83,13 +92,16 @@ class MarketCache {
 
         this._itemIndex = this._generateSearchIndex(itemPostsData, ['name', 'type', 'displayname', 'slot', 'character', 'detail', 'price'])
         this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'finish'})
+        this._loading.item = false
       })
       .catch((response) => {
         this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
+        this._loading.item = false
       })
   }
 
   private _reloadElTearPosts(body: string): void {
+    this._loading.tear = true
     this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'start'})
     axios.post(ELTEAR_API_ENDPOINT, body)
       .then((response) => {
@@ -115,9 +127,11 @@ class MarketCache {
 
         this._tearIndex = this._generateSearchIndex(tearPostsData, ['name', 'type', 'displayname', 'slot', 'shape', 'color', 'value', 'character', 'price'])
         this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'finish'})
+        this._loading.tear = false
       })
       .catch((response) => {
         this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
+        this._loading.tear = false
       })
   }
 
