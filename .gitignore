@@ -7,7 +7,7 @@ log/*
 .idea
 
 # bot config
-config.json
+config.env
 
 
 !.gitkeep

@@ -1,0 +1,13 @@
+version: '3'
+services:
+  ashal_market_bot:
+    build:
+      context: '.'
+    restart: unless-stopped
+    volumes:
+      - ./log/:/home/ashal_market_bot/log
+    env_file:
+      - config.env
+    logging:
+      options:
+        max-size: 50m

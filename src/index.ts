@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js'
 import {Message} from 'discord.js'
-import {BOT_CONFIG} from './constants/configs'
+import {DISCORD_TOKEN} from './constants/configs'
 import {BotMessageHandler} from './message-handler'
 import {MarketCache} from './market-cache'
 import {BotLogger, LOG_BASE} from './logging'
@@ -21,7 +21,7 @@ client.on('message', (message: Message) => {
   }
 })
 
-client.login(BOT_CONFIG.token)
+client.login(DISCORD_TOKEN)
   .catch((reason) => {
     logger.writeLog(LOG_BASE.SERVER003, {reason: reason})
   })

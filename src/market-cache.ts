@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {IItem, IItems, ITear, ITears, IUserElTears, IUserItems} from './interfaces'
-import {BOT_CONFIG, ELTEAR_API_ENDPOINT, ITEM_API_ENDPOINT} from './constants/configs'
+import {API_PASSWORD, CACHE_REFRESH_RATE, ELTEAR_API_ENDPOINT, ITEM_API_ENDPOINT} from './constants/configs'
 import {BotLogger, LOG_BASE} from './logging'
 import * as lunr from 'lunr'
 
@@ -17,12 +17,14 @@ class MarketCache {
 
   constructor(logger: BotLogger) {
     this._logger = logger
-    this.reloadCache()
+    this._cacheTimer = setInterval(() => {
+      this.reloadCache()
+    }, CACHE_REFRESH_RATE)
   }
 
   public reloadCache(): void {
     const body = JSON.stringify({
-      password: BOT_CONFIG.api_password
+      password: API_PASSWORD
     })
     this._reloadElTearPosts(body)
     this._reloadItemPosts(body)
