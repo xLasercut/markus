@@ -51,6 +51,9 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
 - to search for all top items for Elsword: `+searchitem +character:elsword +slot:top`
 - to search for all purple shoe tears: `+searchtear +color:purple +slot:shoes`
 
+
+**For all search combinations, please see [lunr docs](https://lunrjs.com/guides/searching.html)**
+
 ## Running locally
 ### Prerequisites
 - [Docker](https://docs.docker.com/install/)
