@@ -6,8 +6,8 @@ import {BotLogger, LOG_BASE} from './logging'
 class BotMessageHandler {
   private _marketCache: MarketCache
   private _logger: BotLogger
-  private _tearRegex = new RegExp('^`searchtear ([0-9a-z *+:]+)', 'i')
-  private _itemRegex = new RegExp('^`searchitem ([0-9a-z *+:]+)', 'i')
+  private _tearRegex = new RegExp('^\\+searchtear ([0-9a-z *+:]+)', 'i')
+  private _itemRegex = new RegExp('^\\+searchitem ([0-9a-z *+:]+)', 'i')
 
   constructor(logger: BotLogger, marketCache: MarketCache) {
     this._logger = logger
@@ -23,7 +23,7 @@ class BotMessageHandler {
         })
     }
     else if (this._tearRegex.exec(input)) {
-      message.reply(this._searchTearAll(this._itemRegex.exec(input)[1]))
+      message.reply(this._searchTearAll(this._tearRegex.exec(input)[1]))
         .catch((error) => {
           this._logger.writeLog(LOG_BASE.SERVER002, {type: 'tear search', reason: error})
         })
@@ -60,7 +60,7 @@ class BotMessageHandler {
   }
 
   protected _generateRow(result: ITear | IItem, mandatoryFields: Array<string>, optionalFields: { [key: string]: string }): string {
-    let row = `${result.type.replace('Sell', 'S>').replace('Buy', 'B>')}`
+    let row = `${result.server} ${result.type.replace('Sell', 'S>').replace('Buy', 'B>')}`
 
     for (let field of mandatoryFields) {
       row += ` \`${result[field]}\``

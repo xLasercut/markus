@@ -17,9 +17,11 @@ class MarketCache {
 
   constructor(logger: BotLogger) {
     this._logger = logger
+    this.reloadCache()
     this._cacheTimer = setInterval(() => {
       this.reloadCache()
     }, CACHE_REFRESH_RATE)
+    this._logger.writeLog(LOG_BASE.CACHE003, {rate: CACHE_REFRESH_RATE})
   }
 
   public reloadCache(): void {
