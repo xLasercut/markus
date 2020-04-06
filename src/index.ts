@@ -15,10 +15,13 @@ client.on('ready', () => {
   logger.writeLog(LOG_BASE.SERVER001, {user: client.user.tag})
 })
 
-client.login(BOT_CONFIG.token)
-
 client.on('message', (message: Message) => {
   if (!message.author.bot) {
     msgHandler.process(message)
   }
 })
+
+client.login(BOT_CONFIG.token)
+  .catch((reason) => {
+    logger.writeLog(LOG_BASE.SERVER003, {reason: reason})
+  })
