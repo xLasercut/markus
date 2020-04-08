@@ -71,22 +71,24 @@ class MarketCache {
     this._loading.item = true
     axios.post(ITEM_API_ENDPOINT, body)
       .then((response) => {
-        let itemPostsData = response.data.posts
-
+        let itemPostsData = response.data.posts.reverse()
         this._userItemPosts = {}
         this._itemPosts = {}
 
         for (let i = 0, n = itemPostsData.length; i < n; i++) {
           this._replaceValues(itemPostsData[i])
-          let itemPost = itemPostsData[i]
-          let userId = itemPost.usercode
+          let itemPost: IItem = itemPostsData[i]
+          let state = itemPost.state
           this._itemPosts[itemPost.id] = itemPost
 
-          if (userId in this._userItemPosts) {
-            this._userItemPosts[userId].push(itemPost)
-          }
-          else {
-            this._userItemPosts[userId] = [itemPost]
+          if (state === 'Highlighted') {
+            let userId = itemPost.usercode
+            if (userId in this._userItemPosts) {
+              this._userItemPosts[userId].push(itemPost)
+            }
+            else {
+              this._userItemPosts[userId] = [itemPost]
+            }
           }
         }
 
@@ -105,23 +107,24 @@ class MarketCache {
     this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'start'})
     axios.post(ELTEAR_API_ENDPOINT, body)
       .then((response) => {
-        let tearPostsData = response.data.posts_tears
-
+        let tearPostsData = response.data.posts_tears.reverse()
         this._userElTearPosts = {}
         this._elTearPosts = {}
 
         for (let i = 0, n = tearPostsData.length; i < n; i++) {
           this._replaceValues(tearPostsData[i])
-          let elTearPost = tearPostsData[i]
+          let elTearPost: ITear = tearPostsData[i]
+          let state = elTearPost.state
           this._elTearPosts[elTearPost.id] = elTearPost
 
-          let userId = elTearPost.usercode
-
-          if (userId in this._userElTearPosts) {
-            this._userElTearPosts[userId].push(elTearPost)
-          }
-          else {
-            this._userElTearPosts[userId] = [elTearPost]
+          if (state === 'Highlighted') {
+            let userId = elTearPost.usercode
+            if (userId in this._userElTearPosts) {
+              this._userElTearPosts[userId].push(elTearPost)
+            }
+            else {
+              this._userElTearPosts[userId] = [elTearPost]
+            }
           }
         }
 
