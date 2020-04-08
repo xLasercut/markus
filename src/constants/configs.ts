@@ -3,7 +3,6 @@ const ELTEAR_API_ENDPOINT = process.env.ELTEAR_API_ENDPOINT || 'https://www.asha
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
 const API_PASSWORD = process.env.API_PASSWORD
 
-let refresh_rate = process.env.CACHE_REFRESH_RATE || '600000'
-const CACHE_REFRESH_RATE = parseInt(refresh_rate)
+const CACHE_REFRESH_RATE = process.env.CACHE_REFRESH_RATE || '*/10 * * * *'
 
 export {DISCORD_TOKEN, API_PASSWORD, ITEM_API_ENDPOINT, ELTEAR_API_ENDPOINT, CACHE_REFRESH_RATE}

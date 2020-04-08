@@ -67,7 +67,7 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
 ```
 DISCORD_TOKEN=<your discord bot token - MANDATORY>
 API_PASSWORD=<api password to ashal's market - MANDATORY>
-CACHE_REFRESH_RATE=<time in milliseconds - OPTIONAL>
+CACHE_REFRESH_RATE=<cron tab - OPTIONAL>
 ITEM_API_ENDPOINT=<api endpoint for item posts - OPTIONAL>
 ELTEAR_API_ENDPOINT=<api endpoint for el tear posts - OPTIONAL>
 ```
@@ -83,7 +83,7 @@ ELTEAR_API_ENDPOINT=<api endpoint for el tear posts - OPTIONAL>
 ```
 DISCORD_TOKEN=<your discord bot token - MANDATORY>
 API_PASSWORD=<api password to ashal's market - MANDATORY>
-CACHE_REFRESH_RATE=<time in milliseconds - OPTIONAL>
+CACHE_REFRESH_RATE=<cron tab - OPTIONAL>
 ITEM_API_ENDPOINT=<api endpoint for item posts - OPTIONAL>
 ELTEAR_API_ENDPOINT=<api endpoint for el tear posts - OPTIONAL>
 ```

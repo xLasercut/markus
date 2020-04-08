@@ -1,4 +1,5 @@
 import axios from 'axios'
+import * as cron from 'node-cron'
 import {IItem, IItems, ITear, ITears, IUserElTears, IUserItems} from './interfaces'
 import {API_PASSWORD, CACHE_REFRESH_RATE, ELTEAR_API_ENDPOINT, ITEM_API_ENDPOINT} from './constants/configs'
 import {BotLogger, LOG_BASE} from './logging'
@@ -10,7 +11,7 @@ class MarketCache {
   private _elTearPosts: ITears
   private _userItemPosts: IUserItems
   private _userElTearPosts: IUserElTears
-  private _cacheTimer: NodeJS.Timer
+  private _cacheSchedule: cron.ScheduledTask
   private _logger: BotLogger
   private _itemIndex: lunr.Index
   private _tearIndex: lunr.Index
@@ -22,9 +23,9 @@ class MarketCache {
   constructor(logger: BotLogger) {
     this._logger = logger
     this.reloadCache()
-    this._cacheTimer = setInterval(() => {
+    this._cacheSchedule = cron.schedule(CACHE_REFRESH_RATE,() => {
       this.reloadCache()
-    }, CACHE_REFRESH_RATE)
+    })
     this._logger.writeLog(LOG_BASE.CACHE003, {rate: CACHE_REFRESH_RATE})
   }
 
