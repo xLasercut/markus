@@ -72,7 +72,7 @@ const LOG_BASE = {
   }
 }
 
-class BotLogger {
+class Logger {
 
   public writeLog(logConfig: ILog, variables: object = {}): void {
     let logMsg = `${logConfig.code} | ${mustache.render(logConfig.template, variables)}`
@@ -93,4 +93,4 @@ class BotLogger {
   }
 }
 
-export {BotLogger, LOG_BASE}
+export {Logger, LOG_BASE}

@@ -1,160 +1,178 @@
-import axios from 'axios'
+import axios, {AxiosResponse} from 'axios'
 import * as cron from 'node-cron'
 import {IItem, IItems, ITear, ITears, IUserElTears, IUserItems} from './interfaces'
 import {API_PASSWORD, CACHE_REFRESH_RATE, ELTEAR_API_ENDPOINT, ITEM_API_ENDPOINT} from './constants/configs'
-import {BotLogger, LOG_BASE} from './logging'
+import {LOG_BASE, Logger} from './logging'
 import * as lunr from 'lunr'
 
-class MarketCache {
+class AbstractMarketCache {
+  protected _name: string
+  protected _logger: Logger
+  protected _searchIndex: lunr.Index
+  protected _loading = false
+  protected _reloadSchedule: cron.ScheduledTask
+  protected _posts
+  protected _userPosts
+  protected _apiUrl: string
 
-  private _itemPosts: IItems
-  private _elTearPosts: ITears
-  private _userItemPosts: IUserItems
-  private _userElTearPosts: IUserElTears
-  private _cacheSchedule: cron.ScheduledTask
-  private _logger: BotLogger
-  private _itemIndex: lunr.Index
-  private _tearIndex: lunr.Index
-  private _loading = {
-    item: false,
-    tear: false
-  }
-
-  constructor(logger: BotLogger) {
+  constructor(logger: Logger, name: string, apiUrl: string) {
     this._logger = logger
-    this.reloadCache()
-    this._cacheSchedule = cron.schedule(CACHE_REFRESH_RATE,() => {
-      this.reloadCache()
+    this._name = name
+    this._apiUrl = apiUrl
+    this._reloadCache()
+    this._reloadSchedule = cron.schedule(CACHE_REFRESH_RATE, () => {
+      this._reloadCache()
     })
-    this._logger.writeLog(LOG_BASE.CACHE003, {rate: CACHE_REFRESH_RATE})
   }
 
-  public reloadCache(): void {
-    const body = JSON.stringify({
-      password: API_PASSWORD
-    })
-    this._reloadElTearPosts(body)
-    this._reloadItemPosts(body)
-  }
-
-  public get loading(): {item: boolean, tear: boolean} {
+  public isLoading(): boolean {
     return this._loading
   }
 
-  public get userItemPosts(): IUserItems {
-    return this._userItemPosts
-  }
-
-  public get userElTearPosts(): IUserElTears {
-    return this._userElTearPosts
-  }
-
-  public searchItem(query: string): Array<IItem> {
-    let results = this._itemIndex.search(query)
+  public search(query: string): Array<any> {
+    let results = this._searchIndex.search(query)
     let output = []
     for (let result of results) {
-      output.push(this._itemPosts[result.ref])
+      output.push(this._posts[result.ref])
     }
     return output
   }
 
-  public searchTear(query: string): Array<ITear> {
-    let results = this._tearIndex.search(query)
-    let output = []
-    for (let result of results) {
-      output.push(this._elTearPosts[result.ref])
+  protected _reloadCache() {
+    this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'start'})
+    this._loading = true
+    const body = JSON.stringify({
+      password: API_PASSWORD
+    })
+    axios.post(this._apiUrl, body)
+      .then((response) => {
+        let apiData = this._getApiData(response)
+        this._userPosts = {}
+        this._posts = {}
+
+        for (let post of apiData) {
+          this._posts[post.id] = post
+          this._addToUserPosts(post)
+        }
+
+        this._searchIndex = this._generateSearchIndex(apiData)
+        this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'finish'})
+        this._loading = false
+      })
+      .catch((response) => {
+        this._logger.writeLog(LOG_BASE.CACHE002, {
+          error: response.response.statusText,
+          status: response.response.status
+        })
+        this._loading = false
+      })
+  }
+
+  protected _getApiData(response: AxiosResponse): Array<ITear | IItem> {
+    throw new Error('Not implemented')
+  }
+
+  protected _generateSearchIndex(apiData: Array<IItem | ITear>): lunr.Index {
+    throw new Error('Not implemented')
+  }
+
+  protected _addToUserPosts(post: IItem | ITear): void {
+    if (post.state === 'Normal') {
+      let userId = post.usercode
+      if (userId in this._userPosts) {
+        if (this._userPosts[userId].length < 12) {
+          this._userPosts[userId].push(post)
+        }
+      }
+      else {
+        this._userPosts[userId] = [post]
+      }
     }
-    return output
+  }
+}
+
+class ItemCache extends AbstractMarketCache {
+  protected _posts: IItems
+  protected _userPosts: IUserItems
+
+  constructor(logger: Logger) {
+    super(logger, 'item', ITEM_API_ENDPOINT)
   }
 
-  private _reloadItemPosts(body: string): void {
-    this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'start'})
-    this._loading.item = true
-    axios.post(ITEM_API_ENDPOINT, body)
-      .then((response) => {
-        let itemPostsData = response.data.posts.reverse()
-        this._userItemPosts = {}
-        this._itemPosts = {}
-
-        for (let i = 0, n = itemPostsData.length; i < n; i++) {
-          this._replaceValues(itemPostsData[i])
-          let itemPost: IItem = itemPostsData[i]
-          let state = itemPost.state
-          this._itemPosts[itemPost.id] = itemPost
-
-          if (state === 'Highlighted') {
-            let userId = itemPost.usercode
-            if (userId in this._userItemPosts) {
-              this._userItemPosts[userId].push(itemPost)
-            }
-            else {
-              this._userItemPosts[userId] = [itemPost]
-            }
-          }
-        }
-
-        this._itemIndex = this._generateSearchIndex(itemPostsData, ['name', 'type', 'displayname', 'slot', 'character', 'detail', 'price'])
-        this._logger.writeLog(LOG_BASE.CACHE001, {type: 'item', stage: 'finish'})
-        this._loading.item = false
-      })
-      .catch((response) => {
-        this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
-        this._loading.item = false
-      })
+  public search(query: string): Array<IItem> {
+    return super.search(query)
   }
 
-  private _reloadElTearPosts(body: string): void {
-    this._loading.tear = true
-    this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'start'})
-    axios.post(ELTEAR_API_ENDPOINT, body)
-      .then((response) => {
-        let tearPostsData = response.data.posts_tears.reverse()
-        this._userElTearPosts = {}
-        this._elTearPosts = {}
-
-        for (let i = 0, n = tearPostsData.length; i < n; i++) {
-          this._replaceValues(tearPostsData[i])
-          let elTearPost: ITear = tearPostsData[i]
-          let state = elTearPost.state
-          this._elTearPosts[elTearPost.id] = elTearPost
-
-          if (state === 'Highlighted') {
-            let userId = elTearPost.usercode
-            if (userId in this._userElTearPosts) {
-              this._userElTearPosts[userId].push(elTearPost)
-            }
-            else {
-              this._userElTearPosts[userId] = [elTearPost]
-            }
-          }
-        }
-
-        this._tearIndex = this._generateSearchIndex(tearPostsData, ['name', 'type', 'displayname', 'slot', 'shape', 'color', 'value', 'character', 'price'])
-        this._logger.writeLog(LOG_BASE.CACHE001, {type: 'tear', stage: 'finish'})
-        this._loading.tear = false
-      })
-      .catch((response) => {
-        this._logger.writeLog(LOG_BASE.CACHE002, {error: response.response.statusText, status: response.response.status})
-        this._loading.tear = false
-      })
+  protected _getApiData(response: AxiosResponse): Array<IItem> {
+    return response.data.posts
   }
 
-  protected _generateSearchIndex(postsData: Array<ITear|IItem>, searchFields: Array<string>): lunr.Index {
-    return lunr(function() {
+  protected _generateSearchIndex(apiData: Array<IItem>): lunr.Index {
+    let searchFields = ['name', 'type', 'user', 'slot', 'character', 'detail', 'price', 'discord']
+    return lunr(function () {
       this.ref('id')
       for (let field of searchFields) {
         this.field(field)
       }
 
-      for (let i = 0, n = postsData.length; i < n; i++) {
-        this.add(postsData[i])
+      for (let post of apiData) {
+        this.add({
+          id: post.id,
+          name: post.name,
+          type: post.type.replace('B>', 'Buy').replace('S>', 'Sell'),
+          slot: post.slot,
+          character: post.character,
+          detail: post.detail,
+          price: post.price,
+          user: post.displayname,
+          discord: post.contact_discord
+        })
       }
     })
   }
+}
 
-  protected _replaceValues(post: ITear | IItem): void {
-    post.type = post.type.replace('B>', 'Buy').replace('S>', 'Sell')
+class TearCache extends AbstractMarketCache {
+  protected _posts: ITears
+  protected _userPosts: IUserElTears
+
+  constructor(logger: Logger) {
+    super(logger, 'tear', ELTEAR_API_ENDPOINT)
+  }
+
+  public search(query: string): Array<ITear> {
+    return super.search(query)
+  }
+
+  protected _getApiData(response: AxiosResponse): Array<ITear> {
+    return response.data.posts_tears
+  }
+
+  protected _generateSearchIndex(apiData: Array<ITear>): lunr.Index {
+    let searchFields = ['name', 'type', 'user', 'slot', 'shape', 'color', 'value', 'character', 'price', 'discord']
+    return lunr(function () {
+      this.ref('id')
+      for (let field of searchFields) {
+        this.field(field)
+      }
+
+      for (let post of apiData) {
+        this.add({
+          id: post.id,
+          name: post.name,
+          type: post.type.replace('B>', 'Buy').replace('S>', 'Sell'),
+          slot: post.slot,
+          character: post.character,
+          price: post.price,
+          user: post.displayname,
+          discord: post.contact_discord,
+          color: post.color,
+          shape: post.shape,
+          value: post.value
+        })
+      }
+    })
   }
 }
 
-export {MarketCache}
+export {ItemCache, TearCache, AbstractMarketCache}

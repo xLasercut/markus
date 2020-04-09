@@ -1,3 +1,5 @@
+import * as cron from 'node-cron'
+
 interface IItem {
   id: number
   server: string
@@ -11,6 +13,7 @@ interface IItem {
   character: string
   detail: string
   price: string
+  contact_discord: string
   displayname: string
   usercode: string
 }
@@ -30,6 +33,7 @@ interface ITear {
   character: string
   price: string
   displayname: string
+  contact_discord: string
   usercode: string
 }
 
@@ -55,4 +59,8 @@ interface ITears {
   [key: number]: ITear
 }
 
-export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears}
+interface IAutoPosterList {
+  [key: string]: Array<string>
+}
+
+export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList}
