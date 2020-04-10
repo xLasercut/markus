@@ -63,7 +63,7 @@ const LOG_BASE = {
   SERVER002: {
     code: 'SERVER002',
     level: LOG_LEVEL.ERROR,
-    template: 'send message to discord failed - type="{{type}}" reason="{{reason}}"'
+    template: 'server error - type="{{type}}" reason="{{reason}}"'
   },
   SERVER003: {
     code: 'SERVER003',

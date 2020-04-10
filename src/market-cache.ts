@@ -38,6 +38,10 @@ class AbstractMarketCache {
     return output
   }
 
+  public getUserPosts(): {[key: string]: any} {
+    return this._userPosts
+  }
+
   protected _reloadCache() {
     this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'start'})
     this._loading = true
@@ -103,6 +107,10 @@ class ItemCache extends AbstractMarketCache {
     return super.search(query)
   }
 
+  getUserPosts(): IUserItems {
+    return super.getUserPosts()
+  }
+
   protected _getApiData(response: AxiosResponse): Array<IItem> {
     return response.data.posts
   }
@@ -142,6 +150,10 @@ class TearCache extends AbstractMarketCache {
 
   public search(query: string): Array<ITear> {
     return super.search(query)
+  }
+
+  getUserPosts(): IUserElTears {
+    return super.getUserPosts()
   }
 
   protected _getApiData(response: AxiosResponse): Array<ITear> {

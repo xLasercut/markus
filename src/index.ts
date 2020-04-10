@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js'
 import {Message} from 'discord.js'
 import {DISCORD_TOKEN} from './constants/configs'
-import {ItemSearchHandler, TearSearchHandler} from './message-handler'
+import {AutoPostItemHandler, AutoPostTearHandler, ItemSearchHandler, TearSearchHandler} from './message-handler'
 import {ItemCache, TearCache} from './market-cache'
 import {LOG_BASE, Logger} from './logging'
 
@@ -11,6 +11,8 @@ const itemCache = new ItemCache(logger)
 const tearCache = new TearCache(logger)
 const itemSearchHandler = new ItemSearchHandler(logger, itemCache)
 const tearSearchHandler = new TearSearchHandler(logger, tearCache)
+const autoPostItemHandler = new AutoPostItemHandler(logger, itemCache)
+const autoPostTearHandler = new AutoPostTearHandler(logger, tearCache)
 
 
 client.on('ready', () => {
@@ -21,6 +23,8 @@ client.on('message', (message: Message) => {
   if (!message.author.bot) {
     itemSearchHandler.processMessage(message)
     tearSearchHandler.processMessage(message)
+    autoPostItemHandler.processMessage(message)
+    autoPostTearHandler.processMessage(message)
   }
 })
 

@@ -1,7 +1,15 @@
 import {Message} from 'discord.js'
 import {AbstractMarketCache, ItemCache, TearCache} from './market-cache'
 import {LOG_BASE, Logger} from './logging'
-import {AbstractFormatter, ItemSearchFormatter, TearSearchFormatter} from './formatter'
+import {
+  AbstractFormatter,
+  AutoPostItemFormatter,
+  AutoPostTearFormatter,
+  ItemSearchFormatter,
+  TearSearchFormatter
+} from './formatter'
+import * as cron from 'node-cron'
+import {IAutoPosterList} from './interfaces'
 
 
 class AbstractHandler {
@@ -11,18 +19,28 @@ class AbstractHandler {
   protected _name: string
   protected _logger: Logger
 
-  constructor(logger: Logger, cache: ItemCache|TearCache) {
+  constructor(logger: Logger, cache: AbstractMarketCache, name: string, regex: RegExp, formatter: AbstractFormatter) {
     this._logger = logger
     this._cache = cache
+    this._name = name
+    this._regex = regex
+    this._formatter = formatter
   }
 
   public processMessage(message: Message): void {
-    if (this._regex.exec(message.content)) {
+    if (this._isTriggerWorkflow(message)) {
       this._runWorkflow(message)
         .catch((error) => {
           this._logger.writeLog(LOG_BASE.SERVER002, {type: this._name, reason: error})
         })
     }
+  }
+
+  protected _isTriggerWorkflow(message: Message): boolean {
+    if (this._regex.exec(message.content)) {
+      return true
+    }
+    return false
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -38,10 +56,14 @@ class ItemSearchHandler extends AbstractHandler {
   protected _cache: ItemCache
 
   constructor(logger: Logger, cache: ItemCache) {
-    super(logger, cache)
-    this._name = 'item search'
-    this._regex = new RegExp('^searchitem ([0-9a-z *+:#]+)', 'i')
-    this._formatter = new ItemSearchFormatter()
+    super(
+      logger,
+      cache,
+      'item search',
+      new RegExp('^searchitem ([0-9a-z *+:#]+)', 'i'),
+      new ItemSearchFormatter()
+    )
+
   }
 }
 
@@ -49,75 +71,150 @@ class TearSearchHandler extends AbstractHandler {
   protected _cache: TearCache
 
   constructor(logger: Logger, cache: TearCache) {
-    super(logger, cache)
-    this._name = 'tear search'
-    this._regex = new RegExp('^searchtear ([0-9a-z *+:#]+)', 'i')
-    this._formatter = new TearSearchFormatter()
+    super(
+      logger,
+      cache,
+      'tear search',
+      new RegExp('^searchtear ([0-9a-z *+:#]+)', 'i'),
+      new TearSearchFormatter()
+    )
   }
 }
 
-class AutoPostItemHandler extends AbstractHandler {
+class AbstractAutoPostHandler extends AbstractHandler {
+  protected _message: Message
+  protected _postSchedule: cron.ScheduledTask
+  protected _refreshSchedule: cron.ScheduledTask
+  protected _autoPostList: IAutoPosterList
+  protected _addedUsers: Set<string>
+  protected _offset: number
+
+  constructor(logger: Logger, cache: AbstractMarketCache, name: string, formatter: AbstractFormatter, offset: number) {
+    super(
+      logger,
+      cache,
+      name,
+      new RegExp('^(enable|disable)autopost$', 'i'),
+      formatter
+    )
+    this._offset = offset
+  }
+
+  protected async _runWorkflow(message: Message): Promise<any> {
+    let command = this._regex.exec(message.content)[1]
+    if (command === 'enable') {
+      await this._startAutoPost(message)
+    }
+    else if (command === 'disable') {
+      await this._stopAutoPost()
+    }
+  }
+
+  protected async _startAutoPost(message: Message): Promise<any> {
+    this._message = message
+    this._generateBuckets()
+    this._refreshList()
+    this._postSchedule = cron.schedule('*/5 * * * *', async () => {
+      await this._postItemList()
+    })
+    this._refreshSchedule = cron.schedule('7-59/10 * * * *', () => {
+      this._refreshList()
+    })
+    await this._message.reply(`${this._name} enabled`)
+  }
+
+  protected async _stopAutoPost(): Promise<any> {
+    this._refreshSchedule.stop()
+    this._postSchedule.stop()
+    await this._message.reply(`${this._name} disabled`)
+  }
+
+  protected _generateBuckets(): void {
+    this._addedUsers = new Set()
+    this._autoPostList = {}
+    for (let hour = 0; hour < 12; hour++) {
+      for (let minute = 0; minute < 60; minute += 10) {
+        this._autoPostList[`${hour}:${minute + this._offset}`] = []
+      }
+    }
+  }
+
+  protected _refreshList(): void {
+    for (let userId in this._cache.getUserPosts()) {
+      if (!this._addedUsers.has(userId)) {
+        this._addedUsers.add(userId)
+        let minKey = this._findMinKey()
+        this._autoPostList[minKey].push(userId)
+      }
+    }
+  }
+
+  protected _findMinKey(): string {
+    let maxLength = 0
+    for (let key in this._autoPostList) {
+      let listLength = this._autoPostList[key].length
+      if (listLength < maxLength) {
+        return key
+      }
+      else {
+        maxLength = listLength
+      }
+    }
+    return `0:${this._offset}`
+  }
+
+  protected async _postItemList(): Promise<any> {
+    let bucket = this._getBucketToPost()
+    if (bucket in this._autoPostList) {
+      for (let user of this._autoPostList[bucket]) {
+        let posts = this._cache.getUserPosts()[user]
+        if (posts && posts.length > 0) {
+          await this._message.channel.send(this._formatter.generateOutput(posts))
+        }
+      }
+    }
+  }
+
+  protected _getBucketToPost(): string {
+    let datetime = new Date()
+
+    let hours = datetime.getHours()
+    if (hours >= 12) {
+      hours -= 12
+    }
+
+    return `${hours}:${datetime.getMinutes()}`
+  }
+}
+
+class AutoPostItemHandler extends AbstractAutoPostHandler {
   protected _cache: ItemCache
-  protected _regex = new RegExp('^')
-}
+  protected _formatter: AutoPostItemFormatter
 
-/*
-class MessageHandler {
-  private _itemCache: ItemCache
-  private _tearCache: TearCache
-  private _logger: Logger
-  private _tearRegex = new RegExp('^searchtear ([0-9a-z *+:#]+)', 'i')
-  private _itemRegex = new RegExp('^searchitem ([0-9a-z *+:#]+)', 'i')
-  private _autoPoster: MarketAutoPoster
-  private _formatter: Formatter
-
-  constructor(logger: Logger, itemCache: ItemCache, tearCache: TearCache, formatter: Formatter) {
-    this._logger = logger
-    this._itemCache = itemCache
-    this._tearCache = tearCache
-    this._formatter = formatter
-  }
-
-  public process(message: Message): void {
-    let input = message.content
-    if (this._itemRegex.exec(input)) {
-      message.reply(this._searchItemAll(this._itemRegex.exec(input)[1]))
-
-        .catch((error) => {
-          this._logger.writeLog(LOG_BASE.SERVER002, {type: 'item search', reason: error})
-        })
-    }
-    else if (this._tearRegex.exec(input)) {
-      message.reply(this._searchTearAll(this._tearRegex.exec(input)[1]))
-        .catch((error) => {
-          this._logger.writeLog(LOG_BASE.SERVER002, {type: 'tear search', reason: error})
-        })
-    }
-    else if (input === 'enableautopost') {
-      this._autoPoster = new MarketAutoPoster(this._logger, this._marketCache, message, this._formatter)
-      this._autoPoster.startAutoPost()
-    }
-    else if (input === 'disableautopost') {
-      this._autoPoster.stopAutoPost()
-    }
-  }
-
-  private _searchItemAll(query: string): string {
-    if (this._marketCache.loading.item) {
-      return 'Updating item cache, please try again later'
-    }
-    let results = this._marketCache.searchItem(query)
-    return this._formatter.generateSearchOutput(results, ['name', 'slot'], {detail: '', price: '**'})
-  }
-
-  private _searchTearAll(query: string): string {
-    if (this._marketCache.loading.tear) {
-      return 'Updating tear cache, please try again later'
-    }
-    let results = this._marketCache.searchTear(query)
-    return this._formatter.generateSearchOutput(results, ['name', 'value', 'color', 'slot'], {price: '**'})
+  constructor(logger: Logger, cache: ItemCache) {
+    super(
+      logger,
+      cache,
+      'item autopost',
+      new AutoPostItemFormatter(),
+      0
+    )
   }
 }
 
-*/
-export {ItemSearchHandler, TearSearchHandler}
+class AutoPostTearHandler extends AbstractAutoPostHandler {
+  protected _cache: TearCache
+  protected _formatter: AutoPostTearFormatter
+
+  constructor(logger: Logger, cache: TearCache) {
+    super(
+      logger,
+      cache,
+      'tear autopost',
+      new AutoPostTearFormatter(),
+      5
+    )
+  }
+}
+
+export {ItemSearchHandler, TearSearchHandler, AutoPostItemHandler, AutoPostTearHandler}
