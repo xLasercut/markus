@@ -31,7 +31,7 @@ To search for posts that include more than one terms, add a `+` in front of each
 - to search for posts that has both elsword **AND** top `searchitem +elsword +top`
 - to search for posts that has both elsword **AND** buy `searchitem +elsword +buy`
 
-#### Wild cards
+#### Wildcards
 
 You can search for partial words by appending or prepending the search terms with `*`
 
