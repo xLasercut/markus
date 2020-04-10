@@ -1,4 +1,4 @@
-import {Message} from 'discord.js'
+import {Client, Message} from 'discord.js'
 import {AbstractMarketCache, ItemCache, TearCache} from './market-cache'
 import {LOG_BASE, Logger} from './logging'
 import {
@@ -10,6 +10,7 @@ import {
 } from './formatter'
 import * as cron from 'node-cron'
 import {IAutoPosterList} from './interfaces'
+import {AUTO_POST_CHANNEL_ID} from './constants/configs'
 
 
 class AbstractHandler {
@@ -82,14 +83,14 @@ class TearSearchHandler extends AbstractHandler {
 }
 
 class AbstractAutoPostHandler extends AbstractHandler {
-  protected _message: Message
   protected _postSchedule: cron.ScheduledTask
   protected _refreshSchedule: cron.ScheduledTask
   protected _autoPostList: IAutoPosterList
   protected _addedUsers: Set<string>
   protected _offset: number
+  protected _client: Client
 
-  constructor(logger: Logger, cache: AbstractMarketCache, name: string, formatter: AbstractFormatter, offset: number) {
+  constructor(logger: Logger, cache: AbstractMarketCache, name: string, formatter: AbstractFormatter, offset: number, client: Client) {
     super(
       logger,
       cache,
@@ -98,6 +99,7 @@ class AbstractAutoPostHandler extends AbstractHandler {
       formatter
     )
     this._offset = offset
+    this._client = client
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -106,27 +108,33 @@ class AbstractAutoPostHandler extends AbstractHandler {
       await this._startAutoPost(message)
     }
     else if (command === 'disable') {
-      await this._stopAutoPost()
+      await this._stopAutoPost(message)
     }
   }
 
   protected async _startAutoPost(message: Message): Promise<any> {
-    this._message = message
-    this._generateBuckets()
-    this._refreshList()
-    this._postSchedule = cron.schedule('*/5 * * * *', async () => {
-      await this._postItemList()
-    })
-    this._refreshSchedule = cron.schedule('7-59/10 * * * *', () => {
+    if (!this._postSchedule) {
+      this._generateBuckets()
       this._refreshList()
-    })
-    await this._message.reply(`${this._name} enabled`)
+      this._postSchedule = cron.schedule('*/5 * * * *', async () => {
+        await this._postItemList()
+      })
+      this._refreshSchedule = cron.schedule('7-59/10 * * * *', () => {
+        this._refreshList()
+      })
+      await message.reply(`${this._name} enabled`)
+    }
+    else {
+      await message.reply(`${this._name} already enabled`)
+    }
   }
 
-  protected async _stopAutoPost(): Promise<any> {
+  protected async _stopAutoPost(message: Message): Promise<any> {
     this._refreshSchedule.destroy()
     this._postSchedule.destroy()
-    await this._message.reply(`${this._name} disabled`)
+    this._refreshSchedule = null
+    this._postSchedule = null
+    await message.reply(`${this._name} disabled`)
   }
 
   protected _generateBuckets(): void {
@@ -169,7 +177,8 @@ class AbstractAutoPostHandler extends AbstractHandler {
       for (let user of this._autoPostList[bucket]) {
         let posts = this._cache.getUserPosts()[user]
         if (posts && posts.length > 0) {
-          await this._message.channel.send(this._formatter.generateOutput(posts))
+          //@ts-ignore
+          await this._client.channels.cache.get(AUTO_POST_CHANNEL_ID).send(this._formatter.generateOutput(posts))
         }
       }
     }
@@ -191,13 +200,14 @@ class AutoPostItemHandler extends AbstractAutoPostHandler {
   protected _cache: ItemCache
   protected _formatter: AutoPostItemFormatter
 
-  constructor(logger: Logger, cache: ItemCache) {
+  constructor(logger: Logger, cache: ItemCache, client: Client) {
     super(
       logger,
       cache,
       'item autopost',
       new AutoPostItemFormatter(),
-      0
+      0,
+      client
     )
   }
 }
@@ -206,13 +216,14 @@ class AutoPostTearHandler extends AbstractAutoPostHandler {
   protected _cache: TearCache
   protected _formatter: AutoPostTearFormatter
 
-  constructor(logger: Logger, cache: TearCache) {
+  constructor(logger: Logger, cache: TearCache, client: Client) {
     super(
       logger,
       cache,
       'tear autopost',
       new AutoPostTearFormatter(),
-      5
+      5,
+      client
     )
   }
 }
