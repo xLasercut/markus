@@ -21,7 +21,7 @@ This will search the market for posts that contain any of the search terms
 
 ### Advanced Search
 
-The search indexer uses the lunr engine. it suports a few advanced search features.
+The search indexer uses the lunr engine. it supports a few advanced search features.
 
 #### AND operations
 
