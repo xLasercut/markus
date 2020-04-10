@@ -21,7 +21,7 @@ client.on('ready', () => {
 
 client.on('message', (message: Message) => {
   if (!message.author.bot) {
-    if (message.channel.id === SEARCH_CHANNEL_ID) {
+    if (message.channel.id === SEARCH_CHANNEL_ID || message.channel.type === 'dm') {
       itemSearchHandler.processMessage(message)
       tearSearchHandler.processMessage(message)
     }
