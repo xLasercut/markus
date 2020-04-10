@@ -124,8 +124,8 @@ class AbstractAutoPostHandler extends AbstractHandler {
   }
 
   protected async _stopAutoPost(): Promise<any> {
-    this._refreshSchedule.stop()
-    this._postSchedule.stop()
+    this._refreshSchedule.destroy()
+    this._postSchedule.destroy()
     await this._message.reply(`${this._name} disabled`)
   }
 
