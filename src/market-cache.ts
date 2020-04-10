@@ -55,6 +55,7 @@ class AbstractMarketCache {
         this._posts = {}
 
         for (let post of apiData) {
+          this._encodeHtml(post)
           this._posts[post.id] = post
           this._addToUserPosts(post)
         }
@@ -93,6 +94,27 @@ class AbstractMarketCache {
       }
     }
   }
+
+  protected _encodeHtml(post): void {
+    throw new Error('Not Implemented')
+  }
+
+  protected _encodeHtmlString(inputString: string): string {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      '\\/': '&sol;',
+      '\'': '&apos;'
+    }
+
+    let outputString = inputString
+    for (let key in map) {
+      outputString = outputString.replace(new RegExp(map[key], 'g'), key)
+    }
+    return outputString
+  }
 }
 
 class ItemCache extends AbstractMarketCache {
@@ -109,6 +131,11 @@ class ItemCache extends AbstractMarketCache {
 
   getUserPosts(): IUserItems {
     return super.getUserPosts()
+  }
+
+  protected _encodeHtml(post: IItem): void {
+    post.detail = this._encodeHtmlString(post.detail)
+    post.price = this._encodeHtmlString(post.price)
   }
 
   protected _getApiData(response: AxiosResponse): Array<IItem> {
@@ -154,6 +181,10 @@ class TearCache extends AbstractMarketCache {
 
   getUserPosts(): IUserElTears {
     return super.getUserPosts()
+  }
+
+  protected _encodeHtml(post: ITear): void {
+    post.price = this._encodeHtmlString(post.price)
   }
 
   protected _getApiData(response: AxiosResponse): Array<ITear> {
