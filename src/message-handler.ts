@@ -26,7 +26,7 @@ class AbstractHandler {
     if (this._isTriggerWorkflow(message)) {
       this._runWorkflow(message)
         .catch((error) => {
-          logger.writeLog(LOG_BASE.SERVER002, {type: this._name, reason: error})
+          logger.writeLog(LOG_BASE.SERVER002, {type: this._name, reason: error, message: message.content})
         })
     }
   }
@@ -58,8 +58,13 @@ class AbstractMarketHandler extends AbstractHandler {
     if (this._cache.isLoading()) {
       await message.reply('Updating list. Please try again later.')
     }
-    let results = this._cache.search(this._regex.exec(message.content)[1])
+    let results = this._cache.search(this._getSearchQuery(message))
     await message.reply(this._formatter.generateOutput(results))
+  }
+
+  protected _getSearchQuery(message: Message): string {
+    let searchQuery = this._regex.exec(message.content)[1]
+    return searchQuery.replace(new RegExp('[+]{2,}', 'g'), '+')
   }
 }
 
