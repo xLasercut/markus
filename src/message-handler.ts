@@ -1,6 +1,6 @@
-import {Client, Message} from 'discord.js'
+import {Message} from 'discord.js'
 import {AbstractMarketCache, ItemCache, TearCache} from './market-cache'
-import {LOG_BASE, Logger} from './logging'
+import {LOG_BASE} from './logging'
 import {
   AbstractFormatter,
   AutoPostItemFormatter,
@@ -10,29 +10,23 @@ import {
 } from './formatter'
 import * as cron from 'node-cron'
 import {IAutoPosterList} from './interfaces'
-import {AUTO_POST_CHANNEL_ID} from './constants/configs'
+import {client, config, itemCache, logger, tearCache} from './init'
 
 
 class AbstractHandler {
-  protected _cache: AbstractMarketCache
-  protected _formatter: AbstractFormatter
   protected _regex: RegExp
   protected _name: string
-  protected _logger: Logger
 
-  constructor(logger: Logger, cache: AbstractMarketCache, name: string, regex: RegExp, formatter: AbstractFormatter) {
-    this._logger = logger
-    this._cache = cache
+  constructor(name: string, regex: RegExp) {
     this._name = name
     this._regex = regex
-    this._formatter = formatter
   }
 
   public processMessage(message: Message): void {
     if (this._isTriggerWorkflow(message)) {
       this._runWorkflow(message)
         .catch((error) => {
-          this._logger.writeLog(LOG_BASE.SERVER002, {type: this._name, reason: error})
+          logger.writeLog(LOG_BASE.SERVER002, {type: this._name, reason: error})
         })
     }
   }
@@ -45,6 +39,22 @@ class AbstractHandler {
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
+    throw new Error('Not implemented')
+  }
+}
+
+
+class AbstractMarketHandler extends AbstractHandler {
+  protected _cache: AbstractMarketCache
+  protected _formatter: AbstractFormatter
+
+  constructor(cache: AbstractMarketCache, name: string, regex: RegExp, formatter: AbstractFormatter) {
+    super(name, regex)
+    this._cache = cache
+    this._formatter = formatter
+  }
+
+  protected async _runWorkflow(message: Message): Promise<any> {
     if (this._cache.isLoading()) {
       await message.reply('Updating list. Please try again later.')
     }
@@ -53,13 +63,12 @@ class AbstractHandler {
   }
 }
 
-class ItemSearchHandler extends AbstractHandler {
+class ItemSearchHandler extends AbstractMarketHandler {
   protected _cache: ItemCache
 
-  constructor(logger: Logger, cache: ItemCache) {
+  constructor() {
     super(
-      logger,
-      cache,
+      itemCache,
       'item search',
       new RegExp('^searchitem ([0-9a-z *+:#]+)', 'i'),
       new ItemSearchFormatter()
@@ -68,13 +77,12 @@ class ItemSearchHandler extends AbstractHandler {
   }
 }
 
-class TearSearchHandler extends AbstractHandler {
+class TearSearchHandler extends AbstractMarketHandler {
   protected _cache: TearCache
 
-  constructor(logger: Logger, cache: TearCache) {
+  constructor() {
     super(
-      logger,
-      cache,
+      tearCache,
       'tear search',
       new RegExp('^searchtear ([0-9a-z *+:#]+)', 'i'),
       new TearSearchFormatter()
@@ -82,24 +90,21 @@ class TearSearchHandler extends AbstractHandler {
   }
 }
 
-class AbstractAutoPostHandler extends AbstractHandler {
+class AbstractAutoPostHandler extends AbstractMarketHandler {
   protected _postSchedule: cron.ScheduledTask
   protected _refreshSchedule: cron.ScheduledTask
   protected _autoPostList: IAutoPosterList
   protected _addedUsers: Set<string>
   protected _offset: number
-  protected _client: Client
 
-  constructor(logger: Logger, cache: AbstractMarketCache, name: string, formatter: AbstractFormatter, offset: number, client: Client) {
+  constructor(cache: AbstractMarketCache, name: string, formatter: AbstractFormatter, offset: number) {
     super(
-      logger,
       cache,
       name,
       new RegExp('^(enable|disable)autopost$', 'i'),
       formatter
     )
     this._offset = offset
-    this._client = client
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -116,12 +121,14 @@ class AbstractAutoPostHandler extends AbstractHandler {
     if (!this._postSchedule) {
       this._generateBuckets()
       this._refreshList()
-      this._postSchedule = cron.schedule('*/5 * * * *', async () => {
+      this._postSchedule = cron.schedule(config.dict.autoPostRate, async () => {
         await this._postItemList()
       })
-      this._refreshSchedule = cron.schedule('7-59/10 * * * *', () => {
+      this._refreshSchedule = cron.schedule(config.dict.autoPostRefreshRate, () => {
         this._refreshList()
       })
+      logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} post`, status: 'enable', rate: config.dict.autoPostRate})
+      logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} refresh`, status: 'enable', rate: config.dict.autoPostRefreshRate})
       await message.reply(`${this._name} enabled`)
     }
     else {
@@ -132,6 +139,8 @@ class AbstractAutoPostHandler extends AbstractHandler {
   protected async _stopAutoPost(message: Message): Promise<any> {
     this._refreshSchedule.destroy()
     this._postSchedule.destroy()
+    logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} post`, status: 'disable', rate: config.dict.autoPostRate})
+    logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} refresh`, status: 'disable', rate: config.dict.autoPostRefreshRate})
     this._refreshSchedule = null
     this._postSchedule = null
     await message.reply(`${this._name} disabled`)
@@ -153,6 +162,7 @@ class AbstractAutoPostHandler extends AbstractHandler {
         this._addedUsers.add(userId)
         let minKey = this._findMinKey()
         this._autoPostList[minKey].push(userId)
+        logger.writeLog(LOG_BASE.AUTO002, {type: this._name, id: userId})
       }
     }
   }
@@ -178,7 +188,7 @@ class AbstractAutoPostHandler extends AbstractHandler {
         let posts = this._cache.getUserPosts()[user]
         if (posts && posts.length > 0) {
           //@ts-ignore
-          await this._client.channels.cache.get(AUTO_POST_CHANNEL_ID).send(this._formatter.generateOutput(posts))
+          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.generateOutput(posts))
         }
       }
     }
@@ -200,15 +210,8 @@ class AutoPostItemHandler extends AbstractAutoPostHandler {
   protected _cache: ItemCache
   protected _formatter: AutoPostItemFormatter
 
-  constructor(logger: Logger, cache: ItemCache, client: Client) {
-    super(
-      logger,
-      cache,
-      'item autopost',
-      new AutoPostItemFormatter(),
-      0,
-      client
-    )
+  constructor() {
+    super(itemCache, 'item autopost', new AutoPostItemFormatter(), 0)
   }
 }
 
@@ -216,16 +219,23 @@ class AutoPostTearHandler extends AbstractAutoPostHandler {
   protected _cache: TearCache
   protected _formatter: AutoPostTearFormatter
 
-  constructor(logger: Logger, cache: TearCache, client: Client) {
-    super(
-      logger,
-      cache,
-      'tear autopost',
-      new AutoPostTearFormatter(),
-      5,
-      client
-    )
+  constructor() {
+    super(tearCache, 'tear autopost', new AutoPostTearFormatter(), 5)
   }
 }
 
-export {ItemSearchHandler, TearSearchHandler, AutoPostItemHandler, AutoPostTearHandler}
+class AdminHandler extends AbstractHandler {
+  constructor() {
+    super('admin', new RegExp('^reloadall$', 'i'))
+  }
+
+  protected async _runWorkflow(message: Message): Promise<any> {
+    logger.writeLog(LOG_BASE.SERVER004, {command: message.content, user: message.author.username, id: message.author.id})
+    config.load()
+    itemCache.startCache()
+    tearCache.startCache()
+    await message.reply('Config reloaded')
+  }
+}
+
+export {ItemSearchHandler, TearSearchHandler, AutoPostItemHandler, AutoPostTearHandler, AdminHandler}

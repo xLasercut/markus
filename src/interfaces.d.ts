@@ -63,4 +63,17 @@ interface IAutoPosterList {
   [key: string]: Array<string>
 }
 
-export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList}
+interface IConfig {
+  discordToken: string
+  apiPassword: string
+  searchChannelId: string
+  autoPostChannelId: string
+  ownerUserId: string
+  itemApiUrl: string
+  tearApiUrl: string
+  cacheRefreshRate: string
+  autoPostRate: string
+  autoPostRefreshRate: string
+}
+
+export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList, IConfig}

@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./log/:/home/ashal_market_bot/log
+      - ./data/:/home/ashal_market_bot/data
     env_file:
       - config.env
     logging:

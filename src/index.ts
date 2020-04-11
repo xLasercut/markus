@@ -1,18 +1,19 @@
-import * as Discord from 'discord.js'
+import {client, config, logger} from './init'
 import {Message} from 'discord.js'
-import {AUTO_POST_CHANNEL_ID, DISCORD_TOKEN, SEARCH_CHANNEL_ID} from './constants/configs'
-import {AutoPostItemHandler, AutoPostTearHandler, ItemSearchHandler, TearSearchHandler} from './message-handler'
-import {ItemCache, TearCache} from './market-cache'
-import {LOG_BASE, Logger} from './logging'
+import {
+  AdminHandler,
+  AutoPostItemHandler,
+  AutoPostTearHandler,
+  ItemSearchHandler,
+  TearSearchHandler
+} from './message-handler'
+import {LOG_BASE} from './logging'
 
-const client = new Discord.Client()
-const logger = new Logger()
-const itemCache = new ItemCache(logger)
-const tearCache = new TearCache(logger)
-const itemSearchHandler = new ItemSearchHandler(logger, itemCache)
-const tearSearchHandler = new TearSearchHandler(logger, tearCache)
-const autoPostItemHandler = new AutoPostItemHandler(logger, itemCache, client)
-const autoPostTearHandler = new AutoPostTearHandler(logger, tearCache, client)
+const itemSearchHandler = new ItemSearchHandler()
+const tearSearchHandler = new TearSearchHandler()
+const autoPostItemHandler = new AutoPostItemHandler()
+const autoPostTearHandler = new AutoPostTearHandler()
+const adminHandler = new AdminHandler()
 
 
 client.on('ready', () => {
@@ -21,18 +22,23 @@ client.on('ready', () => {
 
 client.on('message', (message: Message) => {
   if (!message.author.bot) {
-    if (message.channel.id === SEARCH_CHANNEL_ID || message.channel.type === 'dm') {
+    if (message.channel.id === config.dict.searchChannelId || message.channel.type === 'dm') {
       itemSearchHandler.processMessage(message)
       tearSearchHandler.processMessage(message)
     }
-    else if (message.channel.id === AUTO_POST_CHANNEL_ID) {
+    if (message.channel.id === config.dict.autoPostChannelId) {
       autoPostItemHandler.processMessage(message)
       autoPostTearHandler.processMessage(message)
+    }
+    if (message.channel.type === 'dm' && message.author.id === config.dict.ownerUserId) {
+      autoPostTearHandler.processMessage(message)
+      autoPostItemHandler.processMessage(message)
+      adminHandler.processMessage(message)
     }
   }
 })
 
-client.login(DISCORD_TOKEN)
+client.login(config.dict.discordToken)
   .catch((reason) => {
     logger.writeLog(LOG_BASE.SERVER003, {reason: reason})
   })

@@ -1,7 +1,7 @@
 import * as winston from 'winston'
 import * as DailyRotateFile from 'winston-daily-rotate-file'
 import * as mustache from 'mustache'
-import {LOG_DIR} from './constants/paths'
+import {LOG_DIR} from './paths'
 import {ILog} from './interfaces'
 
 let {combine, timestamp, printf} = winston.format
@@ -48,17 +48,12 @@ const LOG_BASE = {
   CACHE001: {
     code: 'CACHE001',
     level: LOG_LEVEL.INFO,
-    template: 'market cache reload - type="{{type}}" stage="{{stage}}"'
+    template: 'market cache reload - type="{{type}}" stage="{{stage}}" rate="{{rate}}"'
   },
   CACHE002: {
     code: 'CACHE0002',
     level: LOG_LEVEL.ERROR,
     template: 'market cache reload failed - status="{{status}}" error="{{error}}"'
-  },
-  CACHE003: {
-    code: 'CACHE003',
-    level: LOG_LEVEL.INFO,
-    template: 'market cache started - rate="{{rate}}"'
   },
   SERVER002: {
     code: 'SERVER002',
@@ -69,6 +64,21 @@ const LOG_BASE = {
     code: 'SERVER003',
     level: LOG_LEVEL.ERROR,
     template: 'could not connect to discord - reason="{{reason}}"'
+  },
+  SERVER004: {
+    code: 'SERVER004',
+    level: LOG_LEVEL.INFO,
+    template: 'admin command - command="{{command}}" user="{{user}}" id="{{id}}"'
+  },
+  AUTO001: {
+    code: 'AUTO001',
+    level: LOG_LEVEL.INFO,
+    template: 'autopost operation - type="{{type}}" status="{{status}}" rate="{{rate}}"'
+  },
+  AUTO002: {
+    code: 'AUTO002',
+    level: LOG_LEVEL.INFO,
+    template: 'added user to autopost - type="{{type}}" id="{{id}}"'
   }
 }
 

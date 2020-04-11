@@ -1,28 +1,25 @@
 import axios, {AxiosResponse} from 'axios'
 import * as cron from 'node-cron'
 import {IItem, IItems, ITear, ITears, IUserElTears, IUserItems} from './interfaces'
-import {API_PASSWORD, CACHE_REFRESH_RATE, ELTEAR_API_ENDPOINT, ITEM_API_ENDPOINT} from './constants/configs'
 import {LOG_BASE, Logger} from './logging'
 import * as lunr from 'lunr'
+import {Config} from './config'
 
 class AbstractMarketCache {
   protected _name: string
   protected _logger: Logger
+  protected _config: Config
   protected _searchIndex: lunr.Index
   protected _loading = false
   protected _reloadSchedule: cron.ScheduledTask
   protected _posts
   protected _userPosts
-  protected _apiUrl: string
 
-  constructor(logger: Logger, name: string, apiUrl: string) {
+  constructor(logger: Logger, config: Config, name: string) {
     this._logger = logger
+    this._config = config
     this._name = name
-    this._apiUrl = apiUrl
-    this._reloadCache()
-    this._reloadSchedule = cron.schedule(CACHE_REFRESH_RATE, () => {
-      this._reloadCache()
-    })
+    this.startCache()
   }
 
   public isLoading(): boolean {
@@ -38,17 +35,27 @@ class AbstractMarketCache {
     return output
   }
 
-  public getUserPosts(): {[key: string]: any} {
+  public getUserPosts(): { [key: string]: any } {
     return this._userPosts
   }
 
-  protected _reloadCache() {
-    this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'start'})
+  public startCache(): void {
+    if (this._reloadSchedule) {
+      this._reloadSchedule.destroy()
+    }
+    this._reloadCache()
+    this._reloadSchedule = cron.schedule(this._config.dict.cacheRefreshRate, () => {
+      this._reloadCache()
+    })
+  }
+
+  protected _reloadCache(): void {
+    this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'start', rate: this._config.dict.cacheRefreshRate})
     this._loading = true
     const body = JSON.stringify({
-      password: API_PASSWORD
+      password: this._config.dict.apiPassword
     })
-    axios.post(this._apiUrl, body)
+    axios.post(this._getApiUrl(), body)
       .then((response) => {
         let apiData = this._getApiData(response)
         this._userPosts = {}
@@ -61,7 +68,7 @@ class AbstractMarketCache {
         }
 
         this._searchIndex = this._generateSearchIndex(apiData)
-        this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'finish'})
+        this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'finish', rate: this._config.dict.cacheRefreshRate})
         this._loading = false
       })
       .catch((response) => {
@@ -73,6 +80,10 @@ class AbstractMarketCache {
       })
   }
 
+  protected _getApiUrl(): string {
+    throw new Error('Not implemented')
+  }
+
   protected _getApiData(response: AxiosResponse): Array<ITear | IItem> {
     throw new Error('Not implemented')
   }
@@ -82,7 +93,7 @@ class AbstractMarketCache {
   }
 
   protected _addToUserPosts(post: IItem | ITear): void {
-    if (post.state === 'Normal') {
+    if (post.state === 'Highlighted') {
       let userId = post.usercode
       if (userId in this._userPosts) {
         if (this._userPosts[userId].length < 12) {
@@ -121,21 +132,25 @@ class ItemCache extends AbstractMarketCache {
   protected _posts: IItems
   protected _userPosts: IUserItems
 
-  constructor(logger: Logger) {
-    super(logger, 'item', ITEM_API_ENDPOINT)
+  constructor(logger: Logger, config: Config) {
+    super(logger, config, 'item')
   }
 
   public search(query: string): Array<IItem> {
     return super.search(query)
   }
 
-  getUserPosts(): IUserItems {
+  public getUserPosts(): IUserItems {
     return super.getUserPosts()
   }
 
   protected _encodeHtml(post: IItem): void {
     post.detail = this._encodeHtmlString(post.detail)
     post.price = this._encodeHtmlString(post.price)
+  }
+
+  protected _getApiUrl(): string {
+    return this._config.dict.itemApiUrl
   }
 
   protected _getApiData(response: AxiosResponse): Array<IItem> {
@@ -171,20 +186,24 @@ class TearCache extends AbstractMarketCache {
   protected _posts: ITears
   protected _userPosts: IUserElTears
 
-  constructor(logger: Logger) {
-    super(logger, 'tear', ELTEAR_API_ENDPOINT)
+  constructor(logger: Logger, config: Config) {
+    super(logger, config, 'tear')
   }
 
   public search(query: string): Array<ITear> {
     return super.search(query)
   }
 
-  getUserPosts(): IUserElTears {
+  public getUserPosts(): IUserElTears {
     return super.getUserPosts()
   }
 
   protected _encodeHtml(post: ITear): void {
     post.price = this._encodeHtmlString(post.price)
+  }
+
+  protected _getApiUrl(): string {
+    return this._config.dict.tearApiUrl
   }
 
   protected _getApiData(response: AxiosResponse): Array<ITear> {
