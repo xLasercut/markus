@@ -66,7 +66,7 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
 1. Create an environment file named `config.json` in the data directory
 ```json
 {
-  "discordToken": "<your discord bot token - MANDATORY>"
+  "discordToken": "<your discord bot token - MANDATORY>",
   "apiPassword": "<api password to ashal's market - MANDATORY>",
   "searchChannelId": "<channel id of search channel - MANDATORY>",
   "autoPostChannelId": "<channel id of autopost channel - MANDATORY>",
@@ -74,7 +74,7 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
   "itemApiUrl": "<api endpoint for item posts - OPTIONAL>",
   "tearApiUrl": "<api endpoint for el tear posts - OPTIONAL>",
   "cacheRefreshRate": "<refresh rate of cache - crontab - OPTIONAL>",
-  "autoPostRate": "<autopost check rate - crontab - OPTIONAL>"
+  "autoPostRate": "<autopost check rate - crontab - OPTIONAL>",
   "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>"
 }
 ```
@@ -89,7 +89,7 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
 1. Create an environment file named `config.json` in the data directory
 ```json
 {
-  "discordToken": "<your discord bot token - MANDATORY>"
+  "discordToken": "<your discord bot token - MANDATORY>",
   "apiPassword": "<api password to ashal's market - MANDATORY>",
   "searchChannelId": "<channel id of search channel - MANDATORY>",
   "autoPostChannelId": "<channel id of autopost channel - MANDATORY>",
@@ -97,7 +97,7 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
   "itemApiUrl": "<api endpoint for item posts - OPTIONAL>",
   "tearApiUrl": "<api endpoint for el tear posts - OPTIONAL>",
   "cacheRefreshRate": "<refresh rate of cache - crontab - OPTIONAL>",
-  "autoPostRate": "<autopost check rate - crontab - OPTIONAL>"
+  "autoPostRate": "<autopost check rate - crontab - OPTIONAL>",
   "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>"
 }
 ```
