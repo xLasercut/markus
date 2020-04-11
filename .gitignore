@@ -8,7 +8,6 @@ log/*
 
 # bot config
 data/*
-config.env
 
 
 !.gitkeep
