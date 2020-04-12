@@ -43,9 +43,9 @@ You can search for partial words by appending or prepending the search terms wit
 
 You can also search specific categories.
 
-For items, the available categories are: `name` (item name), `character`, `slot` (item slot), `user` (name of seller/buyer), `type` (buy or sell), `discord` (discord name of seller/buyer)
+For items, the available categories are: `name` (item name), `character`, `slot` (item slot), `user` (name of seller/buyer), `type` (buy or sell), `discord` (discord name of seller/buyer), `rarity`, `category`
 
-For el tears, the available categories are: `name` (tear name), `character`, `slot` (tear slot), `shape` (shape of tear), `color` (color of tear), `user` (name of seller/buyer), `type` (buy or sell), `discord` (discord name of seller/buyer)
+For el tears, the available categories are: `name` (tear name), `character`, `slot` (tear slot), `shape` (shape of tear), `color` (color of tear), `user` (name of seller/buyer), `type` (buy or sell), `discord` (discord name of seller/buyer), `rarity`
 
 ##### Examples:
 - to search for all top items for Elsword: `searchitem +character:elsword +slot:top`

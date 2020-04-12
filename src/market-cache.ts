@@ -50,7 +50,11 @@ class AbstractMarketCache {
   }
 
   protected _reloadCache(): void {
-    this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'start', rate: this._config.dict.cacheRefreshRate})
+    this._logger.writeLog(LOG_BASE.CACHE001, {
+      type: this._name,
+      stage: 'start',
+      rate: this._config.dict.cacheRefreshRate
+    })
     this._loading = true
     const body = JSON.stringify({
       password: this._config.dict.apiPassword
@@ -68,7 +72,11 @@ class AbstractMarketCache {
         }
 
         this._searchIndex = this._generateSearchIndex(apiData)
-        this._logger.writeLog(LOG_BASE.CACHE001, {type: this._name, stage: 'finish', rate: this._config.dict.cacheRefreshRate})
+        this._logger.writeLog(LOG_BASE.CACHE001, {
+          type: this._name,
+          stage: 'finish',
+          rate: this._config.dict.cacheRefreshRate
+        })
         this._loading = false
       })
       .catch((response) => {
@@ -158,7 +166,7 @@ class ItemCache extends AbstractMarketCache {
   }
 
   protected _generateSearchIndex(apiData: Array<IItem>): lunr.Index {
-    let searchFields = ['name', 'type', 'user', 'slot', 'character', 'detail', 'price', 'discord']
+    let searchFields = ['name', 'type', 'user', 'slot', 'character', 'detail', 'price', 'discord', 'rarity', 'category']
     return lunr(function () {
       this.ref('id')
       for (let field of searchFields) {
@@ -175,7 +183,9 @@ class ItemCache extends AbstractMarketCache {
           detail: post.detail,
           price: post.price,
           user: post.displayname,
-          discord: post.contact_discord
+          discord: post.contact_discord,
+          rarity: post.rarity,
+          category: post.category
         })
       }
     })
@@ -211,7 +221,7 @@ class TearCache extends AbstractMarketCache {
   }
 
   protected _generateSearchIndex(apiData: Array<ITear>): lunr.Index {
-    let searchFields = ['name', 'type', 'user', 'slot', 'shape', 'color', 'value', 'character', 'price', 'discord']
+    let searchFields = ['name', 'type', 'user', 'slot', 'shape', 'color', 'value', 'character', 'price', 'discord', 'rarity']
     return lunr(function () {
       this.ref('id')
       for (let field of searchFields) {
@@ -230,7 +240,8 @@ class TearCache extends AbstractMarketCache {
           discord: post.contact_discord,
           color: post.color,
           shape: post.shape,
-          value: post.value
+          value: post.value,
+          rarity: post.rarity
         })
       }
     })

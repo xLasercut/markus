@@ -76,11 +76,6 @@ interface IConfig {
   reactionExpireTime: number
 }
 
-interface IOutputList {
-  'B>': { [key: string]: Array<string> }
-  'S>': { [key: string]: Array<string> }
-}
-
 interface IEmbed {
   embed: {
     title: string
@@ -98,4 +93,4 @@ interface IEmbedFooter {
   text: string
 }
 
-export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList, IConfig, IOutputList, IEmbed}
+export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed}
