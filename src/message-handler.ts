@@ -9,7 +9,7 @@ import {
   TearSearchFormatter
 } from './formatter'
 import * as cron from 'node-cron'
-import {IAutoPosterList} from './interfaces'
+import {IAutoPosterList, IItem, ITear} from './interfaces'
 import {client, config, itemCache, logger, tearCache} from './init'
 
 
@@ -23,19 +23,12 @@ class AbstractHandler {
   }
 
   public processMessage(message: Message): void {
-    if (this._isTriggerWorkflow(message)) {
+    if (this._regex.exec(message.content)) {
       this._runWorkflow(message)
         .catch((error) => {
           logger.writeLog(LOG_BASE.SERVER002, {type: this._name, reason: error, message: message.content})
         })
     }
-  }
-
-  protected _isTriggerWorkflow(message: Message): boolean {
-    if (this._regex.exec(message.content)) {
-      return true
-    }
-    return false
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -56,10 +49,51 @@ class AbstractMarketHandler extends AbstractHandler {
 
   protected async _runWorkflow(message: Message): Promise<any> {
     if (this._cache.isLoading()) {
-      await message.reply('Updating list. Please try again later.')
+      await message.channel.send('Updating list. Please try again later.')
     }
     let results = this._cache.search(this._getSearchQuery(message))
-    await message.reply(this._formatter.generateOutput(results))
+    let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
+    let currentPage = 1
+
+    const slicedResults = (): Array<IItem | ITear> => {
+      let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage
+      let endIndex = startIndex + config.dict.searchResultsPerPage
+      return results.slice(startIndex, endIndex)
+    }
+
+    if (results.length > 0) {
+      await message.channel.send(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+        .then((m) => {
+          m.react('⬅️')
+          m.react('➡️')
+
+          const collector = m.createReactionCollector((reaction, user) => {
+            return user.id === message.author.id
+          }, {dispose: true, time: config.dict.reactionExpireTime})
+
+          const postEditor = (reaction) => {
+            if (currentPage > 1 && reaction.emoji.name === '⬅️') {
+              currentPage -= 1
+              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+            }
+            else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
+              currentPage += 1
+              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+            }
+          }
+
+          collector.on('collect', (reaction) => {
+            postEditor(reaction)
+          })
+
+          collector.on('remove', (reaction) => {
+            postEditor(reaction)
+          })
+        })
+    }
+    else {
+      await message.channel.send('No results found')
+    }
   }
 
   protected _getSearchQuery(message: Message): string {
@@ -106,7 +140,7 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     super(
       cache,
       name,
-      new RegExp('^(enable|disable)autopost$', 'i'),
+      new RegExp('^(enable|disable|test)autopost$', 'i'),
       formatter
     )
     this._offset = offset
@@ -119,6 +153,17 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     }
     else if (command === 'disable') {
       await this._stopAutoPost(message)
+    }
+    else if (command === 'test') {
+      this._generateBuckets()
+      this._refreshList()
+      for (let user of this._autoPostList[`0:${this._offset}`]) {
+        let posts = this._cache.getUserPosts()[user]
+        if (posts && posts.length > 0) {
+          //@ts-ignore
+          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.generateOutput(posts, 0, 0))
+        }
+      }
     }
   }
 
@@ -133,7 +178,11 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
         this._refreshList()
       })
       logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} post`, status: 'enable', rate: config.dict.autoPostRate})
-      logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} refresh`, status: 'enable', rate: config.dict.autoPostRefreshRate})
+      logger.writeLog(LOG_BASE.AUTO001, {
+        type: `${this._name} refresh`,
+        status: 'enable',
+        rate: config.dict.autoPostRefreshRate
+      })
       await message.reply(`${this._name} enabled`)
     }
     else {
@@ -145,7 +194,11 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     this._refreshSchedule.destroy()
     this._postSchedule.destroy()
     logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} post`, status: 'disable', rate: config.dict.autoPostRate})
-    logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} refresh`, status: 'disable', rate: config.dict.autoPostRefreshRate})
+    logger.writeLog(LOG_BASE.AUTO001, {
+      type: `${this._name} refresh`,
+      status: 'disable',
+      rate: config.dict.autoPostRefreshRate
+    })
     this._refreshSchedule = null
     this._postSchedule = null
     await message.reply(`${this._name} disabled`)
@@ -235,7 +288,11 @@ class AdminHandler extends AbstractHandler {
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
-    logger.writeLog(LOG_BASE.SERVER004, {command: message.content, user: message.author.username, id: message.author.id})
+    logger.writeLog(LOG_BASE.SERVER004, {
+      command: message.content,
+      user: message.author.username,
+      id: message.author.id
+    })
     config.load()
     itemCache.startCache()
     tearCache.startCache()

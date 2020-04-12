@@ -1,119 +1,129 @@
-import {IItem, ITear} from './interfaces'
+import {IEmbed, IItem, ITear} from './interfaces'
 
 class AbstractFormatter {
-  public generateOutput(inputs: Array<IItem|ITear>): string {
-    if (inputs.length > 0) {
-      let output = ['']
-      let charcount = 0
-      for (let post of inputs) {
-        let row = this._generateRow(post, true)
-        charcount += row.length
-        output.push(row)
-        if (charcount > 1700) {
-          output.push('...')
-          output.push('Too many results to display, please use more specific search terms')
-          break
+  protected _itemFields: Array<string>
+  protected _optionalFields: { [key: string]: string }
+
+  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string } = {}) {
+    this._itemFields = itemFields
+    this._optionalFields = optionalFields
+  }
+
+  public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
+    let fields = []
+    for (let post of inputs) {
+      fields.push({
+        name: this._getItemName(post),
+        value: this._getItemInfo(post, true)
+      })
+    }
+
+    return {
+      embed: {
+        title: '',
+        fields: fields,
+        footer: {
+          text: `Page ${currentPage} of ${maxPage}`
         }
       }
-      return output.join('\n')
     }
-    return 'No results found'
   }
 
-  protected _generateRow(post: IItem|ITear, userInfo: boolean): string {
-    throw new Error('Not implemented')
-  }
+  protected _getItemInfo(post: IItem | ITear, userInfo: boolean): string {
+    let info = []
 
-  protected _genericGenerateRow(post: IItem|ITear, mandatoryFields: Array<string>, optionalFields: { [key: string]: string }, userInfo: boolean): string {
-    let row = `${post.server} ${post.type}`
-
-    for (let field of mandatoryFields) {
-      row += ` \`${post[field]}\``
-    }
-
-    for (let field in optionalFields) {
+    for (let field in this._optionalFields) {
       let trimmedField = post[field].trim()
       if (trimmedField) {
-        row += ` ${optionalFields[field]}${trimmedField}${optionalFields[field]} `
+        info.push(`${this._optionalFields[field]}${trimmedField}${this._optionalFields[field]}`)
       }
     }
 
     if (userInfo) {
-      row += this._generateUserInfo(post)
+      info.push(this._getUserInfo(post))
     }
 
-    return row
+    return info.join(' ')
   }
 
-  protected _generateUserInfo(post: IItem|ITear): string {
-    if (post.contact_discord) {
-      return ` - __${post.contact_discord}__`
+  protected _getItemName(post: IItem | ITear): string {
+    let itemName = [post.type]
+    for (let field of this._itemFields) {
+      itemName.push(post[field])
     }
-    return ` - __${post.displayname}__`
+    return itemName.join(' ')
+  }
+
+  protected _getUserInfo(post: IItem | ITear): string {
+    if (post.contact_discord) {
+      return `- __${post.contact_discord}__`
+    }
+    return `- __${post.displayname}__`
   }
 }
 
 class ItemSearchFormatter extends AbstractFormatter {
-  protected _generateRow(post: IItem, userInfo: boolean): string {
-    return this._genericGenerateRow(post, ['name', 'slot'], {detail: '', price: '**'}, userInfo)
+  constructor() {
+    let itemFields = ['name']
+    let optionalFields = {detail: '', price: '**'}
+    super(itemFields, optionalFields)
   }
 }
 
 class TearSearchFormatter extends AbstractFormatter {
-  protected _generateRow(post: ITear, userInfo: boolean): string {
-    return this._genericGenerateRow(post, ['name', 'value', 'color', 'slot'], {price: '**'}, userInfo)
+  constructor() {
+    let itemFields = ['name', 'value', 'color', 'slot']
+    let optionalFields = {price: '**'}
+    super(itemFields, optionalFields)
   }
 }
 
-class AutoPostItemFormatter extends ItemSearchFormatter {
-  public generateOutput(inputs: Array<IItem>): string {
-    let output = []
-    let charcount = 0
+class AbstractAutoPostFormatter extends AbstractFormatter {
+  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string }) {
+    super(itemFields, optionalFields)
+  }
+
+  generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
     let firstPost = inputs[0]
-    let firstRow = `User: __${firstPost.displayname}__`
+    let title = `User: __${firstPost.displayname}__`
     if (firstPost.contact_discord) {
-      firstRow += ` Discord: __${firstPost.contact_discord}__`
+      title += ` Discord: __${firstPost.contact_discord}__`
     }
-    output.push(firstRow)
-    charcount += firstRow.length
+
+    let fields = []
+
     for (let post of inputs) {
-      let row = this._generateRow(post, false)
-      output.push(row)
-      charcount += row.length
-      if (charcount > 1700) {
-        output.push('...')
-        output.push('Too many items to display')
-        break
+      fields.push({
+        name: this._getItemName(post),
+        value: this._getItemInfo(post, false)
+      })
+    }
+
+    return {
+      embed: {
+        title: title,
+        fields: fields,
+        footer: {
+          text: ''
+        }
       }
     }
-    output.push('===========')
-    return output.join('\n')
   }
 }
 
-class AutoPostTearFormatter extends TearSearchFormatter {
-  public generateOutput(inputs: Array<ITear>): string {
-    let output = []
-    let charcount = 0
-    let firstPost = inputs[0]
-    let firstRow = `User: __${firstPost.displayname}__`
-    if (firstPost.contact_discord) {
-      firstRow += ` Discord: __${firstPost.contact_discord}__`
-    }
-    output.push(firstRow)
-    charcount += firstRow.length
-    for (let post of inputs) {
-      let row = this._generateRow(post, false)
-      output.push(row)
-      charcount += row.length
-      if (charcount > 1700) {
-        output.push('...')
-        output.push('Too many items to display')
-        break
-      }
-    }
-    output.push('===========')
-    return output.join('\n')
+class AutoPostItemFormatter extends AbstractAutoPostFormatter {
+  constructor() {
+    let itemFields = ['name']
+    let optionalFields = {detail: '', price: '**'}
+    super(itemFields, optionalFields)
+  }
+}
+
+class AutoPostTearFormatter extends AbstractAutoPostFormatter {
+  constructor() {
+    let itemFields = ['name', 'value', 'color', 'slot']
+    let optionalFields = {price: '**'}
+    super(itemFields, optionalFields)
   }
 }
 

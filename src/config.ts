@@ -25,7 +25,9 @@ class Config {
       tearApiUrl: rawConfig.tearApiUrl || 'https://www.ashal.eu/market/api/tears.php',
       cacheRefreshRate: rawConfig.cacheRefreshRate || '*/10 * * * *',
       autoPostRate: rawConfig.autoPostRate || '*/5 * * * *',
-      autoPostRefreshRate: rawConfig.autoPostRefreshRate || '7-59/10 * * * *'
+      autoPostRefreshRate: rawConfig.autoPostRefreshRate || '7-59/10 * * * *',
+      searchResultsPerPage: 10,
+      reactionExpireTime: 60000
     }
   }
 

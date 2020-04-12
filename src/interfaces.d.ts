@@ -1,5 +1,3 @@
-import * as cron from 'node-cron'
-
 interface IItem {
   id: number
   server: string
@@ -74,6 +72,30 @@ interface IConfig {
   cacheRefreshRate: string
   autoPostRate: string
   autoPostRefreshRate: string
+  searchResultsPerPage: number
+  reactionExpireTime: number
 }
 
-export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList, IConfig}
+interface IOutputList {
+  'B>': { [key: string]: Array<string> }
+  'S>': { [key: string]: Array<string> }
+}
+
+interface IEmbed {
+  embed: {
+    title: string
+    fields: Array<IEmbedField>
+    footer: IEmbedFooter
+  }
+}
+
+interface IEmbedField {
+  name: string
+  value: string
+}
+
+interface IEmbedFooter {
+  text: string
+}
+
+export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList, IConfig, IOutputList, IEmbed}
