@@ -111,20 +111,6 @@ class AbstractMarketCache {
     throw new Error('Not implemented')
   }
 
-  protected _addToUserPosts(post: IItem | ITear): void {
-    if (post.state === 'Highlighted') {
-      let userId = post.usercode
-      if (userId in this._userPosts) {
-        if (this._userPosts[userId].length < 12) {
-          this._userPosts[userId].push(post)
-        }
-      }
-      else {
-        this._userPosts[userId] = [post]
-      }
-    }
-  }
-
   protected _encodeHtml(post): void {
     for (let field of this._fieldsToEncode) {
       post[field] = this._encodeHtmlString(post[field])
