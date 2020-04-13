@@ -1,6 +1,6 @@
-import axios, {AxiosResponse} from 'axios'
+import axios from 'axios'
 import * as cron from 'node-cron'
-import {IItem, IItems, ITear, ITears, IUserElTears, IUserItems} from './interfaces'
+import {IItem, IItems, ITear, ITears, IUserPosts} from './interfaces'
 import {LOG_BASE, Logger} from './logging'
 import * as lunr from 'lunr'
 import {Config} from './config'
@@ -13,12 +13,14 @@ class AbstractMarketCache {
   protected _loading = false
   protected _reloadSchedule: cron.ScheduledTask
   protected _posts
-  protected _userPosts
+  protected _userPosts: IUserPosts
+  protected _fieldsToEncode: Array<string>
 
-  constructor(logger: Logger, config: Config, name: string) {
+  constructor(logger: Logger, config: Config, name: string, fieldsToEncode: Array<string>) {
     this._logger = logger
     this._config = config
     this._name = name
+    this._fieldsToEncode = fieldsToEncode
     this.startCache()
   }
 
@@ -35,8 +37,22 @@ class AbstractMarketCache {
     return output
   }
 
-  public getUserPosts(): { [key: string]: any } {
-    return this._userPosts
+  public getUserPosts(userId: number): Array<any> {
+    let posts = []
+    if (userId in this._userPosts) {
+      for (let post of this._userPosts[userId].slice(0, 11)) {
+        posts.push(this._posts[post.id])
+      }
+    }
+    return posts
+  }
+
+  public getUserList(): Array<number> {
+    let userList = []
+    for (let userId in this._userPosts) {
+      userList.push(userId)
+    }
+    return userList
   }
 
   public startCache(): void {
@@ -59,16 +75,14 @@ class AbstractMarketCache {
     const body = JSON.stringify({
       password: this._config.dict.apiPassword
     })
-    axios.post(this._getApiUrl(), body)
+    axios.post(this._config.dict[`${this._name}ApiUrl`], body)
       .then((response) => {
-        let apiData = this._getApiData(response)
-        this._userPosts = {}
+        let apiData = response.data.posts
         this._posts = {}
 
         for (let post of apiData) {
           this._encodeHtml(post)
           this._posts[post.id] = post
-          this._addToUserPosts(post)
         }
 
         this._searchIndex = this._generateSearchIndex(apiData)
@@ -77,6 +91,11 @@ class AbstractMarketCache {
           stage: 'finish',
           rate: this._config.dict.cacheRefreshRate
         })
+
+        return axios.post(this._config.dict[`${this._name}UserApiUrl`], body)
+      })
+      .then((response) => {
+        this._userPosts = response.data.users
         this._loading = false
       })
       .catch((response) => {
@@ -86,14 +105,6 @@ class AbstractMarketCache {
         })
         this._loading = false
       })
-  }
-
-  protected _getApiUrl(): string {
-    throw new Error('Not implemented')
-  }
-
-  protected _getApiData(response: AxiosResponse): Array<ITear | IItem> {
-    throw new Error('Not implemented')
   }
 
   protected _generateSearchIndex(apiData: Array<IItem | ITear>): lunr.Index {
@@ -115,7 +126,9 @@ class AbstractMarketCache {
   }
 
   protected _encodeHtml(post): void {
-    throw new Error('Not Implemented')
+    for (let field of this._fieldsToEncode) {
+      post[field] = this._encodeHtmlString(post[field])
+    }
   }
 
   protected _encodeHtmlString(inputString: string): string {
@@ -138,31 +151,17 @@ class AbstractMarketCache {
 
 class ItemCache extends AbstractMarketCache {
   protected _posts: IItems
-  protected _userPosts: IUserItems
 
   constructor(logger: Logger, config: Config) {
-    super(logger, config, 'item')
+    super(logger, config, 'item', ['detail', 'price'])
   }
 
   public search(query: string): Array<IItem> {
     return super.search(query)
   }
 
-  public getUserPosts(): IUserItems {
-    return super.getUserPosts()
-  }
-
-  protected _encodeHtml(post: IItem): void {
-    post.detail = this._encodeHtmlString(post.detail)
-    post.price = this._encodeHtmlString(post.price)
-  }
-
-  protected _getApiUrl(): string {
-    return this._config.dict.itemApiUrl
-  }
-
-  protected _getApiData(response: AxiosResponse): Array<IItem> {
-    return response.data.posts
+  public getUserPosts(userId: number): Array<IItem> {
+    return super.getUserPosts(userId)
   }
 
   protected _generateSearchIndex(apiData: Array<IItem>): lunr.Index {
@@ -194,30 +193,17 @@ class ItemCache extends AbstractMarketCache {
 
 class TearCache extends AbstractMarketCache {
   protected _posts: ITears
-  protected _userPosts: IUserElTears
 
   constructor(logger: Logger, config: Config) {
-    super(logger, config, 'tear')
+    super(logger, config, 'tear', ['price'])
   }
 
   public search(query: string): Array<ITear> {
     return super.search(query)
   }
 
-  public getUserPosts(): IUserElTears {
-    return super.getUserPosts()
-  }
-
-  protected _encodeHtml(post: ITear): void {
-    post.price = this._encodeHtmlString(post.price)
-  }
-
-  protected _getApiUrl(): string {
-    return this._config.dict.tearApiUrl
-  }
-
-  protected _getApiData(response: AxiosResponse): Array<ITear> {
-    return response.data.posts_tears
+  public getUserPosts(userId: number): Array<ITear> {
+    return super.getUserPosts(userId)
   }
 
   protected _generateSearchIndex(apiData: Array<ITear>): lunr.Index {

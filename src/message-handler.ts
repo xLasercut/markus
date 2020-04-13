@@ -133,7 +133,7 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
   protected _postSchedule: cron.ScheduledTask
   protected _refreshSchedule: cron.ScheduledTask
   protected _autoPostList: IAutoPosterList
-  protected _addedUsers: Set<string>
+  protected _addedUsers: Set<number>
   protected _offset: number
 
   constructor(cache: AbstractMarketCache, name: string, formatter: AbstractFormatter, offset: number) {
@@ -157,8 +157,8 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     else if (command === 'test') {
       this._generateBuckets()
       this._refreshList()
-      for (let user of this._autoPostList[`0:${this._offset}`]) {
-        let posts = this._cache.getUserPosts()[user]
+      for (let userId of this._autoPostList[`0:${this._offset}`]) {
+        let posts = this._cache.getUserPosts(userId)
         if (posts && posts.length > 0) {
           //@ts-ignore
           await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.generateOutput(posts, 0, 0))
@@ -215,7 +215,7 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
   }
 
   protected _refreshList(): void {
-    for (let userId in this._cache.getUserPosts()) {
+    for (let userId of this._cache.getUserList()) {
       if (!this._addedUsers.has(userId)) {
         this._addedUsers.add(userId)
         let minKey = this._findMinKey()
@@ -242,8 +242,8 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
   protected async _postItemList(): Promise<any> {
     let bucket = this._getBucketToPost()
     if (bucket in this._autoPostList) {
-      for (let user of this._autoPostList[bucket]) {
-        let posts = this._cache.getUserPosts()[user]
+      for (let userId of this._autoPostList[bucket]) {
+        let posts = this._cache.getUserPosts(userId)
         if (posts && posts.length > 0) {
           //@ts-ignore
           await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.generateOutput(posts))

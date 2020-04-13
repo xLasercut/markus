@@ -35,12 +35,13 @@ interface ITear {
   usercode: string
 }
 
-interface IUserItems {
-  [key: string]: Array<IItem>
+interface IUserPost {
+  id: number
+  state: string
 }
 
-interface IUserElTears {
-  [key: string]: Array<ITear>
+interface IUserPosts {
+  [key: string]: Array<IUserPost>
 }
 
 interface ILog {
@@ -58,7 +59,7 @@ interface ITears {
 }
 
 interface IAutoPosterList {
-  [key: string]: Array<string>
+  [key: string]: Array<number>
 }
 
 interface IConfig {
@@ -74,6 +75,8 @@ interface IConfig {
   autoPostRefreshRate: string
   searchResultsPerPage: number
   reactionExpireTime: number
+  itemUserApiUrl: string
+  tearUserApiUrl: string
 }
 
 interface IEmbed {
@@ -93,4 +96,4 @@ interface IEmbedFooter {
   text: string
 }
 
-export {IItem, ITear, IUserItems, IUserElTears, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed}
+export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed}

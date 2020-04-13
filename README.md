@@ -75,7 +75,9 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
   "tearApiUrl": "<api endpoint for el tear posts - OPTIONAL>",
   "cacheRefreshRate": "<refresh rate of cache - crontab - OPTIONAL>",
   "autoPostRate": "<autopost check rate - crontab - OPTIONAL>",
-  "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>"
+  "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>",
+  "itemUserApiUrl": "<api endpoint for user item posts - OPTIONAL>",
+  "tearUserApiUrl": "<api endpoint for user tear posts - OPTIONAL>"
 }
 ```
 2. run `docker-compose build`
@@ -98,7 +100,9 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
   "tearApiUrl": "<api endpoint for el tear posts - OPTIONAL>",
   "cacheRefreshRate": "<refresh rate of cache - crontab - OPTIONAL>",
   "autoPostRate": "<autopost check rate - crontab - OPTIONAL>",
-  "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>"
+  "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>",
+  "itemUserApiUrl": "<api endpoint for user item posts - OPTIONAL>",
+  "tearUserApiUrl": "<api endpoint for user tear posts - OPTIONAL>"
 }
 ```
 2. run `npm run serve`

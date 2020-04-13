@@ -43,7 +43,7 @@ class AbstractFormatter {
       info.push(this._getUserInfo(post))
     }
 
-    return info.join(' ')
+    return info.join(' ') || '\u200B'
   }
 
   protected _getItemName(post: IItem | ITear): string {
