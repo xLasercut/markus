@@ -300,4 +300,36 @@ class AdminHandler extends AbstractHandler {
   }
 }
 
-export {ItemSearchHandler, TearSearchHandler, AutoPostItemHandler, AutoPostTearHandler, AdminHandler}
+class UserHandler extends AbstractHandler {
+  constructor() {
+    super('userinfo', new RegExp('^userinfo (.*)', 'i'))
+  }
+
+  protected async _runWorkflow(message: Message): Promise<any> {
+    let userToSearch = this._regex.exec(message.content)[1].split('#')
+    let username = userToSearch[0]
+    let discriminator = userToSearch[1]
+
+    let server = client.guilds.cache.toJSON()[0]
+    let userIds = server.members
+    let serverId = server.id
+    let members = client.guilds.cache.get(serverId).members
+
+    for (let userId of userIds) {
+      let user = members.cache.get(userId).user
+      if (user.username === username && user.discriminator === discriminator) {
+        await message.channel.send(`user: ${user.username}#${user.discriminator} id: ${user.id}`)
+        break
+      }
+    }
+  }
+}
+
+export {
+  ItemSearchHandler,
+  TearSearchHandler,
+  AutoPostItemHandler,
+  AutoPostTearHandler,
+  AdminHandler,
+  UserHandler
+}
