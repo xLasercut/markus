@@ -1,13 +1,17 @@
 import {IEmbed, IItem, ITear} from './interfaces'
 import {client, config} from './init'
+import {UserCache} from './user-cache'
+import {User} from 'discord.js'
 
 class AbstractFormatter {
   protected _itemFields: Array<string>
   protected _optionalFields: { [key: string]: string }
+  protected _userCache: UserCache
 
-  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string } = {}) {
+  constructor(itemFields: Array<string>, userCache: UserCache, optionalFields: { [key: string]: string } = {}) {
     this._itemFields = itemFields
     this._optionalFields = optionalFields
+    this._userCache = userCache
   }
 
   public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
@@ -65,7 +69,7 @@ class AbstractFormatter {
 
   protected _getUserInfo(post: IItem | ITear): string {
     if (post.contact_discord) {
-      let userId = this._getUserId(post.contact_discord)
+      let userId = this._userCache.getUserId(post.contact_discord)
       if (userId) {
         return `- <@${userId}>`
       }
@@ -73,53 +77,34 @@ class AbstractFormatter {
     }
     return `- __${post.displayname}__`
   }
-
-  protected _getUserId(usercode: string): string {
-    let userToSearch = usercode.split('#')
-    let username = userToSearch[0]
-    let discriminator = userToSearch[1]
-
-    let server = client.guilds.cache.get(config.dict.serverId)
-    let onlineUsers = server.presences.cache.toJSON()
-
-    for (let key in onlineUsers) {
-      let onlineUser = onlineUsers[key]
-      let userId = onlineUser.userID
-      let user = client.guilds.cache.get(config.dict.serverId).members.cache.get(userId).user
-      if (user.username === username && user.discriminator === discriminator) {
-        return user.id
-      }
-    }
-    return ''
-  }
 }
 
 class ItemSearchFormatter extends AbstractFormatter {
-  constructor() {
+  constructor(userCache: UserCache) {
     let itemFields = ['name']
     let optionalFields = {detail: '', price: '**'}
-    super(itemFields, optionalFields)
+    super(itemFields, userCache, optionalFields)
   }
 }
 
 class TearSearchFormatter extends AbstractFormatter {
-  constructor() {
+  constructor(userCache: UserCache) {
     let itemFields = ['name', 'value', 'color', 'slot']
     let optionalFields = {price: '**'}
-    super(itemFields, optionalFields)
+    super(itemFields, userCache, optionalFields)
   }
 }
 
 class AbstractAutoPostFormatter extends AbstractFormatter {
-  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string }) {
-    super(itemFields, optionalFields)
+  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string }, userCache: UserCache) {
+    super(itemFields, userCache, optionalFields)
   }
 
   generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
     let firstPost = inputs[0]
     let title = `User: __${firstPost.displayname}__`
     if (firstPost.contact_discord) {
-      let userId = this._getUserId(firstPost.contact_discord)
+      let userId = this._userCache.getUserId(firstPost.contact_discord)
       if (userId) {
         title += ` Discord: <@${userId}>`
       }
@@ -150,18 +135,18 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
 }
 
 class AutoPostItemFormatter extends AbstractAutoPostFormatter {
-  constructor() {
+  constructor(userCache: UserCache) {
     let itemFields = ['name']
     let optionalFields = {detail: '', price: '**'}
-    super(itemFields, optionalFields)
+    super(itemFields, optionalFields, userCache)
   }
 }
 
 class AutoPostTearFormatter extends AbstractAutoPostFormatter {
-  constructor() {
+  constructor(userCache: UserCache) {
     let itemFields = ['name', 'value', 'color', 'slot']
     let optionalFields = {price: '**'}
-    super(itemFields, optionalFields)
+    super(itemFields, optionalFields, userCache)
   }
 }
 

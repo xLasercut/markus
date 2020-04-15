@@ -11,6 +11,7 @@ import {
 import * as cron from 'node-cron'
 import {IAutoPosterList, IItem, ITear} from './interfaces'
 import {client, config, itemCache, logger, tearCache} from './init'
+import {UserCache} from './user-cache'
 
 
 class AbstractHandler {
@@ -65,7 +66,9 @@ class AbstractMarketHandler extends AbstractHandler {
     if (results.length > 0) {
       await message.channel.send(this._formatter.loadingScreen())
         .then((m) => {
-          m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+          return m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+        })
+        .then((m) => {
           for (let emoji of this._reactionList) {
             m.react(emoji)
           }
@@ -108,12 +111,12 @@ class AbstractMarketHandler extends AbstractHandler {
 class ItemSearchHandler extends AbstractMarketHandler {
   protected _cache: ItemCache
 
-  constructor() {
+  constructor(userCache: UserCache) {
     super(
       itemCache,
       'item search',
       new RegExp('^searchitem ([0-9a-z *+:#]+)', 'i'),
-      new ItemSearchFormatter()
+      new ItemSearchFormatter(userCache)
     )
 
   }
@@ -122,12 +125,12 @@ class ItemSearchHandler extends AbstractMarketHandler {
 class TearSearchHandler extends AbstractMarketHandler {
   protected _cache: TearCache
 
-  constructor() {
+  constructor(userCache: UserCache) {
     super(
       tearCache,
       'tear search',
       new RegExp('^searchtear ([0-9a-z *+:#]+)', 'i'),
-      new TearSearchFormatter()
+      new TearSearchFormatter(userCache)
     )
   }
 }
@@ -277,8 +280,8 @@ class AutoPostItemHandler extends AbstractAutoPostHandler {
   protected _cache: ItemCache
   protected _formatter: AutoPostItemFormatter
 
-  constructor() {
-    super(itemCache, 'item autopost', new AutoPostItemFormatter(), 0)
+  constructor(userCache: UserCache) {
+    super(itemCache, 'item autopost', new AutoPostItemFormatter(userCache), 0)
   }
 }
 
@@ -286,14 +289,17 @@ class AutoPostTearHandler extends AbstractAutoPostHandler {
   protected _cache: TearCache
   protected _formatter: AutoPostTearFormatter
 
-  constructor() {
-    super(tearCache, 'tear autopost', new AutoPostTearFormatter(), 5)
+  constructor(userCache: UserCache) {
+    super(tearCache, 'tear autopost', new AutoPostTearFormatter(userCache), 5)
   }
 }
 
 class AdminHandler extends AbstractHandler {
-  constructor() {
+  protected _userCache: UserCache
+
+  constructor(userCache: UserCache) {
     super('admin', new RegExp('^reloadall$', 'i'))
+    this._userCache = userCache
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -305,6 +311,7 @@ class AdminHandler extends AbstractHandler {
     config.load()
     itemCache.startCache()
     tearCache.startCache()
+    this._userCache.startCache()
     await message.reply('Config reloaded')
   }
 }
