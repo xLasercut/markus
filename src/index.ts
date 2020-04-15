@@ -5,7 +5,8 @@ import {
   AutoPostItemHandler,
   AutoPostTearHandler,
   ItemSearchHandler,
-  TearSearchHandler
+  TearSearchHandler,
+  TestHandler
 } from './message-handler'
 import {LOG_BASE} from './logging'
 
@@ -14,6 +15,7 @@ const tearSearchHandler = new TearSearchHandler()
 const autoPostItemHandler = new AutoPostItemHandler()
 const autoPostTearHandler = new AutoPostTearHandler()
 const adminHandler = new AdminHandler()
+const testHandler = new TestHandler()
 
 
 client.on('ready', () => {
@@ -34,6 +36,7 @@ client.on('message', (message: Message) => {
       autoPostTearHandler.processMessage(message)
       autoPostItemHandler.processMessage(message)
       adminHandler.processMessage(message)
+      testHandler.processMessage(message)
     }
   }
 })

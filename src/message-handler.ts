@@ -11,7 +11,6 @@ import {
 import * as cron from 'node-cron'
 import {IAutoPosterList, IItem, ITear} from './interfaces'
 import {client, config, itemCache, logger, tearCache} from './init'
-import {DiscordUserParser} from './discord-user-parser'
 
 
 class AbstractHandler {
@@ -56,7 +55,6 @@ class AbstractMarketHandler extends AbstractHandler {
     let results = this._cache.search(this._getSearchQuery(message))
     let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
     let currentPage = 1
-    const userParser = new DiscordUserParser()
 
     const slicedResults = (): Array<IItem | ITear> => {
       let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage
@@ -67,7 +65,7 @@ class AbstractMarketHandler extends AbstractHandler {
     if (results.length > 0) {
       await message.channel.send(this._formatter.loadingScreen())
         .then((m) => {
-          m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage, userParser))
+          m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
           for (let emoji of this._reactionList) {
             m.react(emoji)
           }
@@ -79,11 +77,11 @@ class AbstractMarketHandler extends AbstractHandler {
           const postEditor = (reaction) => {
             if (currentPage > 1 && reaction.emoji.name === '⬅️') {
               currentPage -= 1
-              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage, userParser))
+              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
             }
             else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
               currentPage += 1
-              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage, userParser))
+              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
             }
           }
 
@@ -162,14 +160,13 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     else if (command === 'test') {
       this._generateBuckets()
       this._refreshList()
-      const userParser = new DiscordUserParser()
       for (let userId of this._autoPostList[`0:${this._offset}`]) {
         let posts = this._cache.getUserPosts(userId)
         if (posts && posts.length > 0) {
           //@ts-ignore
           await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
             .then((m) => {
-              m.edit(this._formatter.generateOutput(posts, 0, 0, userParser))
+              m.edit(this._formatter.generateOutput(posts, 0, 0))
             })
         }
       }
@@ -251,14 +248,13 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
   protected async _postItemList(): Promise<any> {
     let bucket = this._getBucketToPost()
     if (bucket in this._autoPostList) {
-      const userParser = new DiscordUserParser()
       for (let userId of this._autoPostList[bucket]) {
         let posts = this._cache.getUserPosts(userId)
         if (posts && posts.length > 0) {
           //@ts-ignore
           await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
             .then((m) => {
-              m.edit(this._formatter.generateOutput(posts, 0, 0, userParser))
+              m.edit(this._formatter.generateOutput(posts, 0, 0))
             })
         }
       }
@@ -313,10 +309,28 @@ class AdminHandler extends AbstractHandler {
   }
 }
 
+class TestHandler extends AbstractHandler {
+  constructor() {
+    super('test', new RegExp('^test$', 'i'))
+  }
+
+  protected async _runWorkflow(message: Message): Promise<any> {
+    let server = client.guilds.cache.get(config.dict.serverId)
+    let members = server.members
+    let onlineUsers = server.presences.cache.toJSON()
+
+    for (let key in onlineUsers) {
+      let onlineUser = onlineUsers[key]
+      console.log(onlineUser)
+    }
+  }
+}
+
 export {
   ItemSearchHandler,
   TearSearchHandler,
   AutoPostItemHandler,
   AutoPostTearHandler,
-  AdminHandler
+  AdminHandler,
+  TestHandler
 }

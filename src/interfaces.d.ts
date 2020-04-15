@@ -77,11 +77,12 @@ interface IConfig {
   reactionExpireTime: number
   itemUserApiUrl: string
   tearUserApiUrl: string
+  serverId: string
 }
 
 interface IEmbed {
   embed: {
-    title: string
+    description: string
     fields: Array<IEmbedField>
     footer: IEmbedFooter
   }
