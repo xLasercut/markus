@@ -55,6 +55,11 @@ const LOG_BASE = {
     level: LOG_LEVEL.ERROR,
     template: 'market cache reload failed - status="{{status}}" error="{{error}}"'
   },
+  CACHE003: {
+    code: 'CACHE003',
+    level: LOG_LEVEL.INFO,
+    template: 'user cache reload - stage="{{stage}}" rate="{{rate}}"'
+  },
   SERVER002: {
     code: 'SERVER002',
     level: LOG_LEVEL.ERROR,

@@ -1,4 +1,4 @@
-import {Logger} from './logging'
+import {LOG_BASE, Logger} from './logging'
 import {Client} from 'discord.js'
 import {Config} from './config'
 import * as cron from 'node-cron'
@@ -29,6 +29,7 @@ class UserCache {
   }
 
   protected _loadCache(): void {
+    this._logger.writeLog(LOG_BASE.CACHE003, {stage: 'start', rate: this._config.dict.cacheRefreshRate})
     this._userList = {}
 
     let server = client.guilds.cache.get(config.dict.serverId)
@@ -38,6 +39,7 @@ class UserCache {
       let user = member.user
       this._userList[`${user.username}#${user.discriminator}`] = user.id
     })
+    this._logger.writeLog(LOG_BASE.CACHE003, {stage: 'finish', rate: this._config.dict.cacheRefreshRate})
   }
 
   public getUserId(usercode: string): string {
