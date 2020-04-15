@@ -5,8 +5,7 @@ import {
   AutoPostItemHandler,
   AutoPostTearHandler,
   ItemSearchHandler,
-  TearSearchHandler,
-  UserHandler
+  TearSearchHandler
 } from './message-handler'
 import {LOG_BASE} from './logging'
 
@@ -15,7 +14,6 @@ const tearSearchHandler = new TearSearchHandler()
 const autoPostItemHandler = new AutoPostItemHandler()
 const autoPostTearHandler = new AutoPostTearHandler()
 const adminHandler = new AdminHandler()
-const userHandler = new UserHandler()
 
 
 client.on('ready', () => {
@@ -36,10 +34,6 @@ client.on('message', (message: Message) => {
       autoPostTearHandler.processMessage(message)
       autoPostItemHandler.processMessage(message)
       adminHandler.processMessage(message)
-      userHandler.processMessage(message)
-    }
-    if (message.channel.id === '324040443211808770') {
-      userHandler.processMessage(message)
     }
   }
 })

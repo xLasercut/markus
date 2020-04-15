@@ -1,4 +1,5 @@
 import {IEmbed, IItem, ITear} from './interfaces'
+import {DiscordUserParser} from './discord-user-parser'
 
 class AbstractFormatter {
   protected _itemFields: Array<string>
@@ -9,12 +10,12 @@ class AbstractFormatter {
     this._optionalFields = optionalFields
   }
 
-  public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
+  public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number, discordUserParser: DiscordUserParser): IEmbed {
     let fields = []
     for (let post of inputs) {
       fields.push({
         name: this._getItemName(post),
-        value: this._getItemInfo(post, true)
+        value: this._getItemInfo(post, true, discordUserParser)
       })
     }
 
@@ -29,7 +30,15 @@ class AbstractFormatter {
     }
   }
 
-  protected _getItemInfo(post: IItem | ITear, userInfo: boolean): string {
+  public loadingScreen() {
+    return {
+      embed: {
+        description: 'Processing...'
+      }
+    }
+  }
+
+  protected _getItemInfo(post: IItem | ITear, userInfo: boolean, discordUserParser: DiscordUserParser): string {
     let info = []
 
     for (let field in this._optionalFields) {
@@ -40,7 +49,7 @@ class AbstractFormatter {
     }
 
     if (userInfo) {
-      info.push(this._getUserInfo(post))
+      info.push(this._getUserInfo(post, discordUserParser))
     }
 
     return info.join(' ') || '\u200B'
@@ -54,8 +63,12 @@ class AbstractFormatter {
     return itemName.join(' ')
   }
 
-  protected _getUserInfo(post: IItem | ITear): string {
+  protected _getUserInfo(post: IItem | ITear, discordUserParser: DiscordUserParser): string {
     if (post.contact_discord) {
+      let userId = discordUserParser.getUserId(post.contact_discord)
+      if (userId) {
+        return `- <@${userId}>`
+      }
       return `- __${post.contact_discord}__`
     }
     return `- __${post.displayname}__`
@@ -83,11 +96,17 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
     super(itemFields, optionalFields)
   }
 
-  generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
+  generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number, discordUserParser: DiscordUserParser): IEmbed {
     let firstPost = inputs[0]
     let title = `User: __${firstPost.displayname}__`
     if (firstPost.contact_discord) {
-      title += ` Discord: __${firstPost.contact_discord}__`
+      let userId = discordUserParser.getUserId(firstPost.contact_discord)
+      if (userId) {
+        title += ` Discord: <@${userId}>`
+      }
+      else {
+        title += ` Discord: __${firstPost.contact_discord}__`
+      }
     }
 
     let fields = []
@@ -95,7 +114,7 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
     for (let post of inputs) {
       fields.push({
         name: this._getItemName(post),
-        value: this._getItemInfo(post, false)
+        value: this._getItemInfo(post, false, discordUserParser)
       })
     }
 

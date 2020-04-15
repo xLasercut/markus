@@ -11,6 +11,7 @@ import {
 import * as cron from 'node-cron'
 import {IAutoPosterList, IItem, ITear} from './interfaces'
 import {client, config, itemCache, logger, tearCache} from './init'
+import {DiscordUserParser} from './discord-user-parser'
 
 
 class AbstractHandler {
@@ -40,6 +41,7 @@ class AbstractHandler {
 class AbstractMarketHandler extends AbstractHandler {
   protected _cache: AbstractMarketCache
   protected _formatter: AbstractFormatter
+  protected _reactionList = ['⬅️', '➡️']
 
   constructor(cache: AbstractMarketCache, name: string, regex: RegExp, formatter: AbstractFormatter) {
     super(name, regex)
@@ -54,6 +56,7 @@ class AbstractMarketHandler extends AbstractHandler {
     let results = this._cache.search(this._getSearchQuery(message))
     let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
     let currentPage = 1
+    const userParser = new DiscordUserParser()
 
     const slicedResults = (): Array<IItem | ITear> => {
       let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage
@@ -62,10 +65,12 @@ class AbstractMarketHandler extends AbstractHandler {
     }
 
     if (results.length > 0) {
-      await message.channel.send(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+      await message.channel.send(this._formatter.loadingScreen())
         .then((m) => {
-          m.react('⬅️')
-          m.react('➡️')
+          m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage, userParser))
+          for (let emoji of this._reactionList) {
+            m.react(emoji)
+          }
 
           const collector = m.createReactionCollector((reaction, user) => {
             return user.id === message.author.id
@@ -74,11 +79,11 @@ class AbstractMarketHandler extends AbstractHandler {
           const postEditor = (reaction) => {
             if (currentPage > 1 && reaction.emoji.name === '⬅️') {
               currentPage -= 1
-              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage, userParser))
             }
             else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
               currentPage += 1
-              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage, userParser))
             }
           }
 
@@ -157,11 +162,15 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     else if (command === 'test') {
       this._generateBuckets()
       this._refreshList()
+      const userParser = new DiscordUserParser()
       for (let userId of this._autoPostList[`0:${this._offset}`]) {
         let posts = this._cache.getUserPosts(userId)
         if (posts && posts.length > 0) {
           //@ts-ignore
-          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.generateOutput(posts, 0, 0))
+          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
+            .then((m) => {
+              m.edit(this._formatter.generateOutput(posts, 0, 0, userParser))
+            })
         }
       }
     }
@@ -242,11 +251,15 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
   protected async _postItemList(): Promise<any> {
     let bucket = this._getBucketToPost()
     if (bucket in this._autoPostList) {
+      const userParser = new DiscordUserParser()
       for (let userId of this._autoPostList[bucket]) {
         let posts = this._cache.getUserPosts(userId)
         if (posts && posts.length > 0) {
           //@ts-ignore
-          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.generateOutput(posts))
+          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
+            .then((m) => {
+              m.edit(this._formatter.generateOutput(posts, 0, 0, userParser))
+            })
         }
       }
     }
@@ -300,36 +313,10 @@ class AdminHandler extends AbstractHandler {
   }
 }
 
-class UserHandler extends AbstractHandler {
-  constructor() {
-    super('userinfo', new RegExp('^userinfo (.*)', 'i'))
-  }
-
-  protected async _runWorkflow(message: Message): Promise<any> {
-    let userToSearch = this._regex.exec(message.content)[1].split('#')
-    let username = userToSearch[0]
-    let discriminator = userToSearch[1]
-
-    let server = client.guilds.cache.toJSON()[0]
-    let userIds = server.members
-    let serverId = server.id
-    let members = client.guilds.cache.get(serverId).members
-
-    for (let userId of userIds) {
-      let user = members.cache.get(userId).user
-      if (user.username === username && user.discriminator === discriminator) {
-        await message.channel.send(`user: ${user.username}#${user.discriminator} id: ${user.id}`)
-        break
-      }
-    }
-  }
-}
-
 export {
   ItemSearchHandler,
   TearSearchHandler,
   AutoPostItemHandler,
   AutoPostTearHandler,
-  AdminHandler,
-  UserHandler
+  AdminHandler
 }
