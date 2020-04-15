@@ -317,19 +317,20 @@ class AdminHandler extends AbstractHandler {
 }
 
 class TestHandler extends AbstractHandler {
-  constructor() {
+  protected _userCache: UserCache
+
+  constructor(userCache: UserCache) {
     super('test', new RegExp('^test$', 'i'))
+    this._userCache = userCache
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
     let server = client.guilds.cache.get(config.dict.serverId)
     let members = server.members
-    let onlineUsers = server.presences.cache.toJSON()
 
-    for (let key in onlineUsers) {
-      let onlineUser = onlineUsers[key]
-      console.log(onlineUser)
-    }
+    members.cache.mapValues((member, value) => {
+
+    })
   }
 }
 

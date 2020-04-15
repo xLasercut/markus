@@ -27,7 +27,7 @@ client.on('ready', () => {
   autoPostItemHandler = new AutoPostItemHandler(userCache)
   autoPostTearHandler = new AutoPostTearHandler(userCache)
   adminHandler = new AdminHandler(userCache)
-  testHandler = new TestHandler()
+  testHandler = new TestHandler(userCache)
   logger.writeLog(LOG_BASE.SERVER001, {user: client.user.tag})
 })
 

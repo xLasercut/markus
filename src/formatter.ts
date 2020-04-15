@@ -71,7 +71,7 @@ class AbstractFormatter {
     if (post.contact_discord) {
       let userId = this._userCache.getUserId(post.contact_discord)
       if (userId) {
-        return `- <@${userId}>`
+        return `- <@${userId}> __${post.contact_discord}__`
       }
       return `- __${post.contact_discord}__`
     }
@@ -106,7 +106,7 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
     if (firstPost.contact_discord) {
       let userId = this._userCache.getUserId(firstPost.contact_discord)
       if (userId) {
-        title += ` Discord: <@${userId}>`
+        title += ` Discord: <@${userId}> __${firstPost.contact_discord}__`
       }
       else {
         title += ` Discord: __${firstPost.contact_discord}__`
