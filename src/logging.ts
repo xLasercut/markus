@@ -84,6 +84,11 @@ const LOG_BASE = {
     code: 'AUTO002',
     level: LOG_LEVEL.INFO,
     template: 'added user to autopost - type="{{type}}" id="{{id}}"'
+  },
+  SEARCH001: {
+    code: 'SEARCH001',
+    level: LOG_LEVEL.INFO,
+    template: 'search - type="{{type}}" user="{{user}}" message="{{message}}"'
   }
 }
 

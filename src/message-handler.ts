@@ -50,6 +50,7 @@ class AbstractMarketHandler extends AbstractHandler {
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
+    logger.writeLog(LOG_BASE.SEARCH001, {type: this._name, user: message.author.username, message: message.content})
     if (this._cache.isLoading()) {
       await message.channel.send('Updating list. Please try again later.')
     }
