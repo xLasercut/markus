@@ -14,6 +14,8 @@ interface IItem {
   contact_discord: string
   displayname: string
   usercode: string
+  discord_id: string
+  user_id: number
 }
 
 interface ITear {
@@ -33,6 +35,8 @@ interface ITear {
   displayname: string
   contact_discord: string
   usercode: string
+  discord_id: string
+  user_id: number
 }
 
 interface IUserPost {
@@ -78,6 +82,7 @@ interface IConfig {
   itemUserApiUrl: string
   tearUserApiUrl: string
   serverId: string
+  updateIdApiUrl: string
 }
 
 interface IEmbed {

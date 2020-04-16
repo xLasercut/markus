@@ -30,7 +30,8 @@ class Config {
       reactionExpireTime: 60000,
       itemUserApiUrl: rawConfig.itemUserApiUrl || 'https://www.ashal.eu/market/api/items_by_user.php',
       tearUserApiUrl: rawConfig.tearUserApiUrl || 'https://www.ashal.eu/market/api/tears_by_user.php',
-      serverId: rawConfig.serverId
+      serverId: rawConfig.serverId,
+      updateIdApiUrl: rawConfig.updateIdApiUrl || 'https://www.ashal.eu/market/api/update_discord_id.php'
     }
   }
 
