@@ -50,7 +50,12 @@ class AbstractMarketHandler extends AbstractHandler {
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
-    logger.writeLog(LOG_BASE.SEARCH001, {type: this._name, user: message.author.username, message: message.content})
+    logger.writeLog(LOG_BASE.SEARCH001, {
+      type: this._name,
+      user: message.author.username,
+      message: message.content,
+      channel: message.channel.type
+    })
     if (this._cache.isLoading()) {
       await message.channel.send('Updating list. Please try again later.')
     }
@@ -326,12 +331,7 @@ class TestHandler extends AbstractHandler {
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
-    let server = client.guilds.cache.get(config.dict.serverId)
-    let members = server.members
-
-    members.cache.mapValues((member, value) => {
-
-    })
+    console.log(message.channel)
   }
 }
 

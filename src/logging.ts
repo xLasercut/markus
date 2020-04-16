@@ -88,7 +88,7 @@ const LOG_BASE = {
   SEARCH001: {
     code: 'SEARCH001',
     level: LOG_LEVEL.INFO,
-    template: 'search - type="{{type}}" user="{{user}}" message="{{message}}"'
+    template: 'search - type="{{type}}" user="{{user}}" message="{{message}}" channel="{{channel}}"'
   }
 }
 
