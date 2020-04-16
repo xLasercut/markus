@@ -65,7 +65,7 @@ class AbstractFormatter {
   protected _getUserInfo(post: IItem | ITear): string {
     if (post.contact_discord || post.discord_id) {
       let row = ['-']
-      if (post.discord_id) {
+      if (post.discord_id && post.discord_id != '0') {
         row.push(`<@${post.discord_id}>`)
       }
 
@@ -105,7 +105,7 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
     let title = [`User: __${firstPost.displayname}__`]
     if (firstPost.contact_discord || firstPost.discord_id) {
       title.push('Discord:')
-      if (firstPost.discord_id) {
+      if (firstPost.discord_id && firstPost.discord_id != '0') {
         title.push(`<@${firstPost.discord_id}>`)
       }
 
