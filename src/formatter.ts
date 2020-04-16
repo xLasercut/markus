@@ -1,17 +1,12 @@
 import {IEmbed, IItem, ITear} from './interfaces'
-import {client, config} from './init'
-import {UserCache} from './user-cache'
-import {User} from 'discord.js'
 
 class AbstractFormatter {
   protected _itemFields: Array<string>
   protected _optionalFields: { [key: string]: string }
-  protected _userCache: UserCache
 
-  constructor(itemFields: Array<string>, userCache: UserCache, optionalFields: { [key: string]: string } = {}) {
+  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string } = {}) {
     this._itemFields = itemFields
     this._optionalFields = optionalFields
-    this._userCache = userCache
   }
 
   public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
@@ -68,48 +63,54 @@ class AbstractFormatter {
   }
 
   protected _getUserInfo(post: IItem | ITear): string {
-    if (post.contact_discord) {
-      let userId = this._userCache.getUserId(post.contact_discord)
-      if (userId) {
-        return `- <@${userId}> __${post.contact_discord}__`
+    if (post.contact_discord || post.discord_id) {
+      let row = ['-']
+      if (post.discord_id) {
+        row.push(`<@${post.discord_id}>`)
       }
-      return `- __${post.contact_discord}__`
+
+      if (post.contact_discord) {
+        row.push(`__${post.contact_discord}__`)
+      }
+
+      return row.join(' ')
     }
     return `- __${post.displayname}__`
   }
 }
 
 class ItemSearchFormatter extends AbstractFormatter {
-  constructor(userCache: UserCache) {
+  constructor() {
     let itemFields = ['name']
     let optionalFields = {detail: '', price: '**'}
-    super(itemFields, userCache, optionalFields)
+    super(itemFields, optionalFields)
   }
 }
 
 class TearSearchFormatter extends AbstractFormatter {
-  constructor(userCache: UserCache) {
+  constructor() {
     let itemFields = ['name', 'value', 'color', 'slot']
     let optionalFields = {price: '**'}
-    super(itemFields, userCache, optionalFields)
+    super(itemFields, optionalFields)
   }
 }
 
 class AbstractAutoPostFormatter extends AbstractFormatter {
-  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string }, userCache: UserCache) {
-    super(itemFields, userCache, optionalFields)
+  constructor(itemFields: Array<string>, optionalFields: { [key: string]: string }) {
+    super(itemFields, optionalFields)
   }
 
   generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
     let firstPost = inputs[0]
-    let title = `User: __${firstPost.displayname}__`
-    if (firstPost.contact_discord) {
-      let userId = this._userCache.getUserId(firstPost.contact_discord)
-      if (userId) {
-        title += ` Discord: <@${userId}> __${firstPost.contact_discord}__`
+    let title = [`User: __${firstPost.displayname}__`]
+    if (firstPost.contact_discord || firstPost.discord_id) {
+      title.push('Discord:')
+      if (firstPost.discord_id) {
+        title.push(`<@${firstPost.discord_id}>`)
       }
-      else {
-        title += ` Discord: __${firstPost.contact_discord}__`
+
+      if (firstPost.contact_discord) {
+        title.push(`__${firstPost.contact_discord}__`)
       }
     }
 
@@ -124,7 +125,7 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
 
     return {
       embed: {
-        description: title,
+        description: title.join(' '),
         fields: fields,
         footer: {
           text: ''
@@ -135,18 +136,18 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
 }
 
 class AutoPostItemFormatter extends AbstractAutoPostFormatter {
-  constructor(userCache: UserCache) {
+  constructor() {
     let itemFields = ['name']
     let optionalFields = {detail: '', price: '**'}
-    super(itemFields, optionalFields, userCache)
+    super(itemFields, optionalFields)
   }
 }
 
 class AutoPostTearFormatter extends AbstractAutoPostFormatter {
-  constructor(userCache: UserCache) {
+  constructor() {
     let itemFields = ['name', 'value', 'color', 'slot']
     let optionalFields = {price: '**'}
-    super(itemFields, optionalFields, userCache)
+    super(itemFields, optionalFields)
   }
 }
 

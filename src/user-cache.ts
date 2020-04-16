@@ -7,7 +7,6 @@ import axios from 'axios'
 import {IItem} from './interfaces'
 
 class UserCache {
-  protected _userList: { [key: string]: string }
   protected _logger: Logger
   protected _client: Client
   protected _config: Config
@@ -32,14 +31,14 @@ class UserCache {
 
   protected _loadCache(): void {
     this._logger.writeLog(LOG_BASE.CACHE003, {stage: 'start', rate: this._config.dict.cacheRefreshRate})
-    this._userList = {}
+    let userList = {}
 
     let server = client.guilds.cache.get(config.dict.serverId)
     let members = server.members
 
-    members.cache.mapValues((member, value) => {
+    members.cache.mapValues((member, _value) => {
       let user = member.user
-      this._userList[`${user.username}#${user.discriminator}`] = user.id
+      userList[`${user.username}#${user.discriminator}`] = user.id
     })
 
     axios.post(this._config.dict.itemApiUrl, {password: this._config.dict.apiPassword})
@@ -48,7 +47,7 @@ class UserCache {
         let idsToUpdate = []
 
         for (let item of items) {
-          let newDiscordId = this.getUserId(item.contact_discord)
+          let newDiscordId = userList[item.contact_discord] || ''
           if (newDiscordId && newDiscordId != item.discord_id) {
             idsToUpdate.push({
               user_id: item.user_id,
@@ -73,13 +72,6 @@ class UserCache {
           status: response.response.status
         })
       })
-  }
-
-  public getUserId(usercode: string): string {
-    if (usercode in this._userList) {
-      return this._userList[usercode]
-    }
-    return ''
   }
 }
 

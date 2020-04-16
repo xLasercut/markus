@@ -12,22 +12,18 @@ import {LOG_BASE} from './logging'
 import {UserCache} from './user-cache'
 
 let userCache
-let itemSearchHandler
-let tearSearchHandler
-let autoPostItemHandler
-let autoPostTearHandler
+const itemSearchHandler = new ItemSearchHandler()
+const tearSearchHandler = new TearSearchHandler()
+const autoPostItemHandler = new AutoPostItemHandler()
+const autoPostTearHandler = new AutoPostTearHandler()
 let adminHandler
 let testHandler
 
 
 client.on('ready', () => {
   userCache = new UserCache(logger, client, config)
-  itemSearchHandler = new ItemSearchHandler(userCache)
-  tearSearchHandler = new TearSearchHandler(userCache)
-  autoPostItemHandler = new AutoPostItemHandler(userCache)
-  autoPostTearHandler = new AutoPostTearHandler(userCache)
   adminHandler = new AdminHandler(userCache)
-  testHandler = new TestHandler(userCache)
+  testHandler = new TestHandler()
   logger.writeLog(LOG_BASE.SERVER001, {user: client.user.tag})
 })
 

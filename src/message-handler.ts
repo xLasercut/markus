@@ -32,7 +32,7 @@ class AbstractHandler {
     }
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
+  protected _runWorkflow(message: Message): Promise<any> {
     throw new Error('Not implemented')
   }
 }
@@ -49,7 +49,7 @@ class AbstractMarketHandler extends AbstractHandler {
     this._formatter = formatter
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
+  protected _runWorkflow(message: Message): Promise<any> {
     logger.writeLog(LOG_BASE.SEARCH001, {
       type: this._name,
       user: message.author.username,
@@ -57,7 +57,7 @@ class AbstractMarketHandler extends AbstractHandler {
       channel: message.channel.type
     })
     if (this._cache.isLoading()) {
-      await message.channel.send('Updating list. Please try again later.')
+      return message.channel.send('Updating list. Please try again later.')
     }
     let results = this._cache.search(this._getSearchQuery(message))
     let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
@@ -70,13 +70,13 @@ class AbstractMarketHandler extends AbstractHandler {
     }
 
     if (results.length > 0) {
-      await message.channel.send(this._formatter.loadingScreen())
+      return message.channel.send(this._formatter.loadingScreen())
         .then((m) => {
           return m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
         })
-        .then((m) => {
+        .then(async (m) => {
           for (let emoji of this._reactionList) {
-            m.react(emoji)
+            await m.react(emoji)
           }
 
           const collector = m.createReactionCollector((reaction, user) => {
@@ -103,9 +103,7 @@ class AbstractMarketHandler extends AbstractHandler {
           })
         })
     }
-    else {
-      await message.channel.send('No results found')
-    }
+    return message.channel.send('No results found')
   }
 
   protected _getSearchQuery(message: Message): string {
@@ -117,12 +115,12 @@ class AbstractMarketHandler extends AbstractHandler {
 class ItemSearchHandler extends AbstractMarketHandler {
   protected _cache: ItemCache
 
-  constructor(userCache: UserCache) {
+  constructor() {
     super(
       itemCache,
       'item search',
       new RegExp('^searchitem ([0-9a-z *+:#]+)', 'i'),
-      new ItemSearchFormatter(userCache)
+      new ItemSearchFormatter()
     )
 
   }
@@ -131,12 +129,12 @@ class ItemSearchHandler extends AbstractMarketHandler {
 class TearSearchHandler extends AbstractMarketHandler {
   protected _cache: TearCache
 
-  constructor(userCache: UserCache) {
+  constructor() {
     super(
       tearCache,
       'tear search',
       new RegExp('^searchtear ([0-9a-z *+:#]+)', 'i'),
-      new TearSearchFormatter(userCache)
+      new TearSearchFormatter()
     )
   }
 }
@@ -158,13 +156,13 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     this._offset = offset
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
+  protected _runWorkflow(message: Message): Promise<any> {
     let command = this._regex.exec(message.content)[1]
     if (command === 'enable') {
-      await this._startAutoPost(message)
+      return this._startAutoPost(message)
     }
     else if (command === 'disable') {
-      await this._stopAutoPost(message)
+      return this._stopAutoPost(message)
     }
     else if (command === 'test') {
       this._generateBuckets()
@@ -173,9 +171,9 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
         let posts = this._cache.getUserPosts(userId)
         if (posts && posts.length > 0) {
           //@ts-ignore
-          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
+          return client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
             .then((m) => {
-              m.edit(this._formatter.generateOutput(posts, 0, 0))
+              return m.edit(this._formatter.generateOutput(posts, 0, 0))
             })
         }
       }
@@ -198,14 +196,13 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
         status: 'enable',
         rate: config.dict.autoPostRefreshRate
       })
-      await message.reply(`${this._name} enabled`)
+      return message.reply(`${this._name} enabled`)
     }
-    else {
-      await message.reply(`${this._name} already enabled`)
-    }
+
+    return message.reply(`${this._name} already enabled`)
   }
 
-  protected async _stopAutoPost(message: Message): Promise<any> {
+  protected _stopAutoPost(message: Message): Promise<any> {
     this._refreshSchedule.destroy()
     this._postSchedule.destroy()
     logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} post`, status: 'disable', rate: config.dict.autoPostRate})
@@ -216,7 +213,7 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     })
     this._refreshSchedule = null
     this._postSchedule = null
-    await message.reply(`${this._name} disabled`)
+    return message.reply(`${this._name} disabled`)
   }
 
   protected _generateBuckets(): void {
@@ -286,8 +283,8 @@ class AutoPostItemHandler extends AbstractAutoPostHandler {
   protected _cache: ItemCache
   protected _formatter: AutoPostItemFormatter
 
-  constructor(userCache: UserCache) {
-    super(itemCache, 'item autopost', new AutoPostItemFormatter(userCache), 0)
+  constructor() {
+    super(itemCache, 'item autopost', new AutoPostItemFormatter(), 0)
   }
 }
 
@@ -295,8 +292,8 @@ class AutoPostTearHandler extends AbstractAutoPostHandler {
   protected _cache: TearCache
   protected _formatter: AutoPostTearFormatter
 
-  constructor(userCache: UserCache) {
-    super(tearCache, 'tear autopost', new AutoPostTearFormatter(userCache), 5)
+  constructor() {
+    super(tearCache, 'tear autopost', new AutoPostTearFormatter(), 5)
   }
 }
 
@@ -308,7 +305,7 @@ class AdminHandler extends AbstractHandler {
     this._userCache = userCache
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
+  protected _runWorkflow(message: Message): Promise<any> {
     logger.writeLog(LOG_BASE.SERVER004, {
       command: message.content,
       user: message.author.username,
@@ -318,20 +315,18 @@ class AdminHandler extends AbstractHandler {
     itemCache.startCache()
     tearCache.startCache()
     this._userCache.startCache()
-    await message.reply('Config reloaded')
+    return message.reply('Config reloaded')
   }
 }
 
 class TestHandler extends AbstractHandler {
-  protected _userCache: UserCache
 
-  constructor(userCache: UserCache) {
+  constructor() {
     super('test', new RegExp('^test$', 'i'))
-    this._userCache = userCache
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
-    console.log(message.channel)
+  protected _runWorkflow(message: Message): Promise<any> {
+    return message.channel.send('test')
   }
 }
 
