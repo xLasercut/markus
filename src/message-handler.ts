@@ -119,7 +119,7 @@ class ItemSearchHandler extends AbstractMarketHandler {
     super(
       itemCache,
       'item search',
-      new RegExp('^searchitem ([0-9a-z *+:#.]+)', 'i'),
+      new RegExp('^searchitem ([0-9a-z *+:#.\'\^]+)', 'i'),
       new ItemSearchFormatter()
     )
 
@@ -133,7 +133,7 @@ class TearSearchHandler extends AbstractMarketHandler {
     super(
       tearCache,
       'tear search',
-      new RegExp('^searchtear ([0-9a-z *+:#.]+)', 'i'),
+      new RegExp('^searchtear ([0-9a-z *+:#.\'\^]+)', 'i'),
       new TearSearchFormatter()
     )
   }
