@@ -9,21 +9,17 @@ import {
   TestHandler
 } from './message-handler'
 import {LOG_BASE} from './logging'
-import {UserCache} from './user-cache'
 
-let userCache
+
 const itemSearchHandler = new ItemSearchHandler()
 const tearSearchHandler = new TearSearchHandler()
 const autoPostItemHandler = new AutoPostItemHandler()
 const autoPostTearHandler = new AutoPostTearHandler()
-let adminHandler
-let testHandler
+const adminHandler = new AdminHandler()
+const testHandler = new TestHandler()
 
 
 client.on('ready', () => {
-  userCache = new UserCache(logger, client, config)
-  adminHandler = new AdminHandler(userCache)
-  testHandler = new TestHandler()
   logger.writeLog(LOG_BASE.SERVER001, {user: client.user.tag})
 })
 

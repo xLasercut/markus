@@ -11,7 +11,6 @@ import {
 import * as cron from 'node-cron'
 import {IAutoPosterList, IItem, ITear} from './interfaces'
 import {client, config, itemCache, logger, tearCache} from './init'
-import {UserCache} from './user-cache'
 
 
 class AbstractHandler {
@@ -298,11 +297,8 @@ class AutoPostTearHandler extends AbstractAutoPostHandler {
 }
 
 class AdminHandler extends AbstractHandler {
-  protected _userCache: UserCache
-
-  constructor(userCache: UserCache) {
+  constructor() {
     super('admin', new RegExp('^reloadall$', 'i'))
-    this._userCache = userCache
   }
 
   protected _runWorkflow(message: Message): Promise<any> {
@@ -314,7 +310,6 @@ class AdminHandler extends AbstractHandler {
     config.load()
     itemCache.startCache()
     tearCache.startCache()
-    this._userCache.startCache()
     return message.reply('Config reloaded')
   }
 }
