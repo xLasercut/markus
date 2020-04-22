@@ -39,13 +39,23 @@ interface ITear {
   user_id: number
 }
 
-interface IUserPost {
+interface IRawUserPost {
   id: number
   state: string
+  type: string
+}
+
+interface IRawUserPosts {
+  [key: string]: Array<IRawUserPost>
+}
+
+interface IUserPost {
+  buy: Array<number>
+  sell: Array<number>
 }
 
 interface IUserPosts {
-  [key: string]: Array<IUserPost>
+  [key: string]: IUserPost
 }
 
 interface ILog {
@@ -63,14 +73,15 @@ interface ITears {
 }
 
 interface IAutoPosterList {
-  [key: string]: Array<number>
+  [key: string]: Array<string>
 }
 
 interface IConfig {
   discordToken: string
   apiPassword: string
   searchChannelId: string
-  autoPostChannelId: string
+  autoPostBuyChannelId: string
+  autoPostSellChannelId: string
   ownerUserId: string
   itemApiUrl: string
   tearApiUrl: string
@@ -102,4 +113,4 @@ interface IEmbedFooter {
   text: string
 }
 
-export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed}
+export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed, IRawUserPosts}

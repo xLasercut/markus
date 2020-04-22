@@ -31,7 +31,7 @@ class AbstractHandler {
     }
   }
 
-  protected _runWorkflow(message: Message): Promise<any> {
+  protected async _runWorkflow(message: Message): Promise<any> {
     throw new Error('Not implemented')
   }
 }
@@ -48,7 +48,7 @@ class AbstractMarketHandler extends AbstractHandler {
     this._formatter = formatter
   }
 
-  protected _runWorkflow(message: Message): Promise<any> {
+  protected async _runWorkflow(message: Message): Promise<any> {
     logger.writeLog(LOG_BASE.SEARCH001, {
       type: this._name,
       user: message.author.username,
@@ -56,7 +56,7 @@ class AbstractMarketHandler extends AbstractHandler {
       channel: message.channel.type
     })
     if (this._cache.isLoading()) {
-      return message.channel.send('Updating list. Please try again later.')
+      await message.channel.send('Updating list. Please try again later.')
     }
     let results = this._cache.search(this._getSearchQuery(message))
     let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
@@ -69,40 +69,39 @@ class AbstractMarketHandler extends AbstractHandler {
     }
 
     if (results.length > 0) {
-      return message.channel.send(this._formatter.loadingScreen())
-        .then((m) => {
-          return m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-        })
-        .then(async (m) => {
-          for (let emoji of this._reactionList) {
-            await m.react(emoji)
-          }
+      let loadingMsg = await message.channel.send(this._formatter.loadingScreen())
+      let m = await loadingMsg.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
 
-          const collector = m.createReactionCollector((reaction, user) => {
-            return user.id === message.author.id
-          }, {dispose: true, time: config.dict.reactionExpireTime})
+      for (let emoji of this._reactionList) {
+        await m.react(emoji)
+      }
 
-          const postEditor = (reaction) => {
-            if (currentPage > 1 && reaction.emoji.name === '⬅️') {
-              currentPage -= 1
-              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-            }
-            else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
-              currentPage += 1
-              m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-            }
-          }
+      const collector = m.createReactionCollector((reaction, user) => {
+        return user.id === message.author.id
+      }, {dispose: true, time: config.dict.reactionExpireTime})
 
-          collector.on('collect', (reaction) => {
-            postEditor(reaction)
-          })
+      const postEditor = async (reaction) => {
+        if (currentPage > 1 && reaction.emoji.name === '⬅️') {
+          currentPage -= 1
+          await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+        }
+        else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
+          currentPage += 1
+          await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+        }
+      }
 
-          collector.on('remove', (reaction) => {
-            postEditor(reaction)
-          })
-        })
+      collector.on('collect', (reaction) => {
+        postEditor(reaction)
+      })
+
+      collector.on('remove', (reaction) => {
+        postEditor(reaction)
+      })
     }
-    return message.channel.send('No results found')
+    else {
+      await message.channel.send('No results found')
+    }
   }
 
   protected _getSearchQuery(message: Message): string {
@@ -142,10 +141,17 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
   protected _postSchedule: cron.ScheduledTask
   protected _refreshSchedule: cron.ScheduledTask
   protected _autoPostList: IAutoPosterList
-  protected _addedUsers: Set<number>
+  protected _addedUsers: Set<string>
   protected _offset: number
+  protected _type: 'buy' | 'sell'
+  protected _channel: string
 
-  constructor(cache: AbstractMarketCache, name: string, formatter: AbstractFormatter, offset: number) {
+  constructor(cache: AbstractMarketCache,
+              name: string,
+              formatter: AbstractFormatter,
+              offset: number,
+              type: 'buy' | 'sell',
+              channel: string) {
     super(
       cache,
       name,
@@ -153,29 +159,26 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
       formatter
     )
     this._offset = offset
+    this._type = type
+    this._channel = channel
   }
 
-  protected _runWorkflow(message: Message): Promise<any> {
+  protected async _runWorkflow(message: Message): Promise<any> {
     let command = this._regex.exec(message.content)[1]
     if (command === 'enable') {
-      return this._startAutoPost(message)
+      await this._startAutoPost(message)
     }
     else if (command === 'disable') {
-      return this._stopAutoPost(message)
+      await this._stopAutoPost(message)
     }
     else if (command === 'test') {
-      this._generateBuckets()
-      this._refreshList()
-      for (let userId of this._autoPostList[`0:${this._offset}`]) {
-        let posts = this._cache.getUserPosts(userId)
-        if (posts && posts.length > 0) {
-          //@ts-ignore
-          return client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
-            .then((m) => {
-              return m.edit(this._formatter.generateOutput(posts, 0, 0))
-            })
-        }
+      let posts = this._cache.getUserPosts('', this._type)
+      if (posts && posts.length > 0) {
+        //@ts-ignore
+        let loadingMsg = await client.channels.cache.get(this._channel).send(this._formatter.loadingScreen())
+        await loadingMsg.edit(this._formatter.generateOutput(posts, 0, 0))
       }
+
     }
   }
 
@@ -184,7 +187,7 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
       this._generateBuckets()
       this._refreshList()
       this._postSchedule = cron.schedule(config.dict.autoPostRate, async () => {
-        await this._postItemList()
+          await this._postItemList()
       })
       this._refreshSchedule = cron.schedule(config.dict.autoPostRefreshRate, () => {
         this._refreshList()
@@ -195,13 +198,14 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
         status: 'enable',
         rate: config.dict.autoPostRefreshRate
       })
-      return message.reply(`${this._name} enabled`)
+      await message.reply(`${this._name} enabled`)
     }
-
-    return message.reply(`${this._name} already enabled`)
+    else {
+      await message.reply(`${this._name} already enabled`)
+    }
   }
 
-  protected _stopAutoPost(message: Message): Promise<any> {
+  protected async _stopAutoPost(message: Message): Promise<any> {
     this._refreshSchedule.destroy()
     this._postSchedule.destroy()
     logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} post`, status: 'disable', rate: config.dict.autoPostRate})
@@ -212,7 +216,7 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     })
     this._refreshSchedule = null
     this._postSchedule = null
-    return message.reply(`${this._name} disabled`)
+    await message.reply(`${this._name} disabled`)
   }
 
   protected _generateBuckets(): void {
@@ -231,7 +235,6 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
         this._addedUsers.add(userId)
         let minKey = this._findMinKey()
         this._autoPostList[minKey].push(userId)
-        logger.writeLog(LOG_BASE.AUTO002, {type: this._name, id: userId})
       }
     }
   }
@@ -254,13 +257,11 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
     let bucket = this._getBucketToPost()
     if (bucket in this._autoPostList) {
       for (let userId of this._autoPostList[bucket]) {
-        let posts = this._cache.getUserPosts(userId)
+        let posts = this._cache.getUserPosts(userId, this._type)
         if (posts && posts.length > 0) {
           //@ts-ignore
-          await client.channels.cache.get(config.dict.autoPostChannelId).send(this._formatter.loadingScreen())
-            .then((m) => {
-              m.edit(this._formatter.generateOutput(posts, 0, 0))
-            })
+          let loadingMsg = await client.channels.cache.get(this._channel).send(this._formatter.loadingScreen())
+          await loadingMsg.edit(this._formatter.generateOutput(posts, 0, 0))
         }
       }
     }
@@ -278,21 +279,39 @@ class AbstractAutoPostHandler extends AbstractMarketHandler {
   }
 }
 
-class AutoPostItemHandler extends AbstractAutoPostHandler {
+class AutoPostBuyItemHandler extends AbstractAutoPostHandler {
   protected _cache: ItemCache
   protected _formatter: AutoPostItemFormatter
 
   constructor() {
-    super(itemCache, 'item autopost', new AutoPostItemFormatter(), 0)
+    super(itemCache, 'item buy autopost', new AutoPostItemFormatter(), 0, 'buy', config.dict.autoPostBuyChannelId)
   }
 }
 
-class AutoPostTearHandler extends AbstractAutoPostHandler {
+class AutoPostSellItemHandler extends AbstractAutoPostHandler {
+  protected _cache: ItemCache
+  protected _formatter: AutoPostItemFormatter
+
+  constructor() {
+    super(itemCache, 'item sell autopost', new AutoPostItemFormatter(), 0, 'sell', config.dict.autoPostSellChannelId)
+  }
+}
+
+class AutoPostBuyTearHandler extends AbstractAutoPostHandler {
   protected _cache: TearCache
   protected _formatter: AutoPostTearFormatter
 
   constructor() {
-    super(tearCache, 'tear autopost', new AutoPostTearFormatter(), 5)
+    super(tearCache, 'tear buy autopost', new AutoPostTearFormatter(), 5, 'buy', config.dict.autoPostBuyChannelId)
+  }
+}
+
+class AutoPostSellTearHandler extends AbstractAutoPostHandler {
+  protected _cache: TearCache
+  protected _formatter: AutoPostTearFormatter
+
+  constructor() {
+    super(tearCache, 'tear sell autopost', new AutoPostTearFormatter(), 5, 'sell', config.dict.autoPostSellChannelId)
   }
 }
 
@@ -301,7 +320,7 @@ class AdminHandler extends AbstractHandler {
     super('admin', new RegExp('^reloadall$', 'i'))
   }
 
-  protected _runWorkflow(message: Message): Promise<any> {
+  protected async _runWorkflow(message: Message): Promise<any> {
     logger.writeLog(LOG_BASE.SERVER004, {
       command: message.content,
       user: message.author.username,
@@ -310,7 +329,7 @@ class AdminHandler extends AbstractHandler {
     config.load()
     itemCache.startCache()
     tearCache.startCache()
-    return message.reply('Config reloaded')
+    await message.reply('Config reloaded')
   }
 }
 
@@ -320,16 +339,18 @@ class TestHandler extends AbstractHandler {
     super('test', new RegExp('^test$', 'i'))
   }
 
-  protected _runWorkflow(message: Message): Promise<any> {
-    return message.channel.send('test')
+  protected async _runWorkflow(message: Message): Promise<any> {
+    await message.channel.send('test')
   }
 }
 
 export {
   ItemSearchHandler,
   TearSearchHandler,
-  AutoPostItemHandler,
-  AutoPostTearHandler,
+  AutoPostBuyItemHandler,
+  AutoPostSellItemHandler,
+  AutoPostBuyTearHandler,
+  AutoPostSellTearHandler,
   AdminHandler,
   TestHandler
 }

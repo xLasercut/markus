@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as cron from 'node-cron'
-import {IItem, IItems, ITear, ITears, IUserPosts} from './interfaces'
+import {IItem, IItems, IRawUserPosts, ITear, ITears, IUserPosts} from './interfaces'
 import {LOG_BASE, Logger} from './logging'
 import * as lunr from 'lunr'
 import {Config} from './config'
@@ -37,17 +37,17 @@ class AbstractMarketCache {
     return output
   }
 
-  public getUserPosts(userId: number): Array<any> {
+  public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<any> {
     let posts = []
     if (userId in this._userPosts) {
-      for (let post of this._userPosts[userId].slice(0, 11)) {
-        posts.push(this._posts[post.id])
+      for (let postId of this._userPosts[userId][type]) {
+        posts.push(this._posts[postId])
       }
     }
     return posts
   }
 
-  public getUserList(): Array<number> {
+  public getUserList(): Array<string> {
     let userList = []
     for (let userId in this._userPosts) {
       userList.push(userId)
@@ -65,46 +65,72 @@ class AbstractMarketCache {
     })
   }
 
-  protected _reloadCache(): void {
-    this._logger.writeLog(LOG_BASE.CACHE001, {
-      type: this._name,
-      stage: 'start',
-      rate: this._config.dict.cacheRefreshRate
-    })
-    this._loading = true
-    const body = JSON.stringify({
-      password: this._config.dict.apiPassword
-    })
-    axios.post(this._config.dict[`${this._name}ApiUrl`], body)
-      .then((response) => {
-        let apiData = response.data.posts
-        this._posts = {}
+  protected async _reloadCache(): Promise<any> {
+    try {
+      this._logger.writeLog(LOG_BASE.CACHE001, {
+        type: this._name,
+        stage: 'start',
+        rate: this._config.dict.cacheRefreshRate
+      })
+      this._loading = true
+      const body = JSON.stringify({
+        password: this._config.dict.apiPassword
+      })
 
-        for (let post of apiData) {
-          this._encodeHtml(post)
-          this._posts[post.id] = post
+      await this._reloadPosts(body)
+      await this._reloadUserPosts(body)
+
+      this._logger.writeLog(LOG_BASE.CACHE001, {
+        type: this._name,
+        stage: 'finish',
+        rate: this._config.dict.cacheRefreshRate
+      })
+
+      this._loading = false
+    }
+    catch (e) {
+      this._logger.writeLog(LOG_BASE.CACHE002, {
+        error: e.response.statusText,
+        status: e.response.status
+      })
+      this._loading = false
+    }
+  }
+
+  protected async _reloadPosts(body): Promise<any> {
+    let response = await axios.post(this._config.dict[`${this._name}ApiUrl`], body)
+    let apiData = response.data.posts
+    this._posts = {}
+
+    for (let post of apiData) {
+      this._encodeHtml(post)
+      this._posts[post.id] = post
+    }
+
+    this._searchIndex = this._generateSearchIndex(apiData)
+  }
+
+  protected async _reloadUserPosts(body): Promise<any> {
+    let response = await axios.post(this._config.dict[`${this._name}UserApiUrl`], body)
+    let userPosts: IRawUserPosts = response.data.users
+    this._userPosts = {}
+
+    for (let userId in userPosts) {
+      if (!(userId in this._userPosts)) {
+        this._userPosts[userId] = {
+          buy: [],
+          sell: []
         }
-
-        this._searchIndex = this._generateSearchIndex(apiData)
-        this._logger.writeLog(LOG_BASE.CACHE001, {
-          type: this._name,
-          stage: 'finish',
-          rate: this._config.dict.cacheRefreshRate
-        })
-
-        return axios.post(this._config.dict[`${this._name}UserApiUrl`], body)
-      })
-      .then((response) => {
-        this._userPosts = response.data.users
-        this._loading = false
-      })
-      .catch((response) => {
-        this._logger.writeLog(LOG_BASE.CACHE002, {
-          error: response.response.statusText,
-          status: response.response.status
-        })
-        this._loading = false
-      })
+      }
+      for (let post of userPosts[userId]) {
+        if (post.type === 'B>') {
+          this._userPosts[userId].buy.push(post.id)
+        }
+        else if (post.type === 'S>') {
+          this._userPosts[userId].sell.push(post.id)
+        }
+      }
+    }
   }
 
   protected _generateSearchIndex(apiData: Array<IItem | ITear>): lunr.Index {
@@ -146,8 +172,8 @@ class ItemCache extends AbstractMarketCache {
     return super.search(query)
   }
 
-  public getUserPosts(userId: number): Array<IItem> {
-    return super.getUserPosts(userId)
+  public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<IItem> {
+    return super.getUserPosts(userId, type)
   }
 
   protected _generateSearchIndex(apiData: Array<IItem>): lunr.Index {
@@ -188,8 +214,8 @@ class TearCache extends AbstractMarketCache {
     return super.search(query)
   }
 
-  public getUserPosts(userId: number): Array<ITear> {
-    return super.getUserPosts(userId)
+  public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<ITear> {
+    return super.getUserPosts(userId, type)
   }
 
   protected _generateSearchIndex(apiData: Array<ITear>): lunr.Index {

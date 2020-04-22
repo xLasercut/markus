@@ -133,6 +133,14 @@ class AbstractAutoPostFormatter extends AbstractFormatter {
       }
     }
   }
+
+  protected _getItemName(post: IItem | ITear): string {
+    let itemName = []
+    for (let field of this._itemFields) {
+      itemName.push(post[field])
+    }
+    return itemName.join(' ')
+  }
 }
 
 class AutoPostItemFormatter extends AbstractAutoPostFormatter {

@@ -18,7 +18,8 @@ class Config {
     this._config = {
       discordToken: rawConfig.discordToken,
       apiPassword: rawConfig.apiPassword,
-      autoPostChannelId: rawConfig.autoPostChannelId,
+      autoPostBuyChannelId: rawConfig.autoPostBuyChannelId,
+      autoPostSellChannelId: rawConfig.autoPostSellChannelId,
       searchChannelId: rawConfig.searchChannelId,
       ownerUserId: rawConfig.ownerUserId,
       itemApiUrl: rawConfig.itemApiUrl || 'https://www.ashal.eu/market/api/items.php',
@@ -40,10 +41,11 @@ class Config {
   }
 
   protected _validateConfig(rawConfig: IConfig) {
-    let mandatoryFields = ['discordToken', 'apiPassword', 'autoPostChannelId', 'searchChannelId', 'ownerUserId']
+    let mandatoryFields = ['discordToken', 'apiPassword', 'autoPostSellChannelId', 'autoPostBuyChannelId', 'searchChannelId', 'ownerUserId']
     for (let field of mandatoryFields) {
       if (!rawConfig[field] || !rawConfig[field].trim()) {
         this._logger.writeLog(LOG_BASE.SERVER002, {type: 'config', reason: `missing mandatory field: ${field}`})
+        throw new Error()
       }
     }
   }
