@@ -1,26 +1,15 @@
-import {client, config, logger} from './init'
+import {client, config, logger} from './app/init'
 import {Message} from 'discord.js'
+import {LOG_BASE} from './app/logging'
 import {
-  AdminHandler,
-  AutoPostBuyItemHandler,
-  AutoPostBuyTearHandler,
-  AutoPostSellItemHandler,
-  AutoPostSellTearHandler,
-  ItemSearchHandler,
-  TearSearchHandler,
-  TestHandler
-} from './message-handler'
-import {LOG_BASE} from './logging'
-
-
-const itemSearchHandler = new ItemSearchHandler()
-const tearSearchHandler = new TearSearchHandler()
-const autoPostBuyItemHandler = new AutoPostBuyItemHandler()
-const autoPostSellItemHandler = new AutoPostSellItemHandler()
-const autoPostBuyTearHandler = new AutoPostBuyTearHandler()
-const autoPostSellTearHandler = new AutoPostSellTearHandler()
-const adminHandler = new AdminHandler()
-const testHandler = new TestHandler()
+  adminHandler,
+  autoPostBuyItemHandler,
+  autoPostBuyTearHandler,
+  autoPostSellItemHandler,
+  autoPostSellTearHandler,
+  itemSearchHandler,
+  tearSearchHandler
+} from './handlers/init'
 
 
 client.on('ready', () => {
@@ -47,7 +36,6 @@ client.on('message', (message: Message) => {
       autoPostBuyItemHandler.processMessage(message)
       autoPostBuyTearHandler.processMessage(message)
       adminHandler.processMessage(message)
-      testHandler.processMessage(message)
     }
   }
 })

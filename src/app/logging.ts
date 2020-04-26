@@ -2,7 +2,7 @@ import * as winston from 'winston'
 import * as DailyRotateFile from 'winston-daily-rotate-file'
 import * as mustache from 'mustache'
 import {LOG_DIR} from './paths'
-import {ILog} from './interfaces'
+import {ILog} from '../interfaces'
 
 let {combine, timestamp, printf} = winston.format
 

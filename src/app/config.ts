@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import {IConfig} from './interfaces'
+import {IConfig} from '../interfaces'
 import {CONFIG_PATH} from './paths'
 import {LOG_BASE, Logger} from './logging'
 
