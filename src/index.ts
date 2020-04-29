@@ -7,6 +7,7 @@ import {
   autoPostBuyTearHandler,
   autoPostSellItemHandler,
   autoPostSellTearHandler,
+  expiryNotificationHandler,
   itemSearchHandler,
   tearSearchHandler
 } from './handlers/init'
@@ -36,6 +37,7 @@ client.on('message', (message: Message) => {
       autoPostBuyItemHandler.processMessage(message)
       autoPostBuyTearHandler.processMessage(message)
       adminHandler.processMessage(message)
+      expiryNotificationHandler.processMessage(message)
     }
   }
 })

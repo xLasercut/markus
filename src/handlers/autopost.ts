@@ -42,7 +42,7 @@ class AbstractAutoPostHandler extends AbstractMessageHandler {
       await this._stopAutoPost(message)
     }
     else if (command === 'test') {
-      let posts = this._cache.getUserPosts('54', this._type)
+      let posts = this._cache.getUserPosts('', this._type)
       if (posts && posts.length > 0) {
         //@ts-ignore
         let loadingMsg = await client.channels.cache.get(this._channel).send(this._formatter.loadingScreen())

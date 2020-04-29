@@ -32,7 +32,10 @@ class Config {
       itemUserApiUrl: rawConfig.itemUserApiUrl || 'https://www.ashal.eu/market/api/items_by_user.php',
       tearUserApiUrl: rawConfig.tearUserApiUrl || 'https://www.ashal.eu/market/api/tears_by_user.php',
       serverId: rawConfig.serverId,
-      updateIdApiUrl: rawConfig.updateIdApiUrl || 'https://www.ashal.eu/market/api/update_discord_id.php'
+      updateIdApiUrl: rawConfig.updateIdApiUrl || 'https://www.ashal.eu/market/api/update_discord_id.php',
+      userListApiUrl: rawConfig.userListApiUrl || 'https://www.ashal.eu/market/api/users.php',
+      expiryApiUrl: rawConfig.expiryApiUrl || 'https://www.ashal.eu/market/api/notify_expire.php',
+      expiryNotificationRate: rawConfig.expiryNotificationRate || '0 23 * * *'
     }
   }
 

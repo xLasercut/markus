@@ -28,49 +28,51 @@ class AbstractSearchHandler extends AbstractMessageHandler {
     if (this._cache.isLoading()) {
       await message.channel.send('Updating list. Please try again later.')
     }
-    let results = this._cache.search(this._getSearchQuery(message))
-    let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
-    let currentPage = 1
-
-    const slicedResults = (): Array<IItem | ITear> => {
-      let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage
-      let endIndex = startIndex + config.dict.searchResultsPerPage
-      return results.slice(startIndex, endIndex)
-    }
-
-    if (results.length > 0) {
-      let loadingMsg = await message.channel.send(this._formatter.loadingScreen())
-      let m = await loadingMsg.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-
-      for (let emoji of this._reactionList) {
-        await m.react(emoji)
-      }
-
-      const collector = m.createReactionCollector((reaction, user) => {
-        return user.id === message.author.id
-      }, {dispose: true, time: config.dict.reactionExpireTime})
-
-      const postEditor = async (reaction) => {
-        if (currentPage > 1 && reaction.emoji.name === '⬅️') {
-          currentPage -= 1
-          await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-        }
-        else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
-          currentPage += 1
-          await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-        }
-      }
-
-      collector.on('collect', (reaction) => {
-        postEditor(reaction)
-      })
-
-      collector.on('remove', (reaction) => {
-        postEditor(reaction)
-      })
-    }
     else {
-      await message.channel.send('No results found')
+      let results = this._cache.search(this._getSearchQuery(message))
+      let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
+      let currentPage = 1
+
+      const slicedResults = (): Array<IItem | ITear> => {
+        let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage
+        let endIndex = startIndex + config.dict.searchResultsPerPage
+        return results.slice(startIndex, endIndex)
+      }
+
+      if (results.length > 0) {
+        let loadingMsg = await message.channel.send(this._formatter.loadingScreen())
+        let m = await loadingMsg.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+
+        for (let emoji of this._reactionList) {
+          await m.react(emoji)
+        }
+
+        const collector = m.createReactionCollector((reaction, user) => {
+          return user.id === message.author.id
+        }, {dispose: true, time: config.dict.reactionExpireTime})
+
+        const postEditor = async (reaction) => {
+          if (currentPage > 1 && reaction.emoji.name === '⬅️') {
+            currentPage -= 1
+            await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+          }
+          else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
+            currentPage += 1
+            await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+          }
+        }
+
+        collector.on('collect', (reaction) => {
+          postEditor(reaction)
+        })
+
+        collector.on('remove', (reaction) => {
+          postEditor(reaction)
+        })
+      }
+      else {
+        await message.channel.send('No results found')
+      }
     }
   }
 

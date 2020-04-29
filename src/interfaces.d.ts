@@ -94,6 +94,9 @@ interface IConfig {
   tearUserApiUrl: string
   serverId: string
   updateIdApiUrl: string
+  userListApiUrl: string
+  expiryApiUrl: string
+  expiryNotificationRate: string
 }
 
 interface IEmbed {
@@ -113,4 +116,15 @@ interface IEmbedFooter {
   text: string
 }
 
-export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed, IRawUserPosts}
+interface IUserData {
+  id: number
+  username: string
+  usercode: string
+  displayname: string
+  contact: string
+  contact_discord: string
+  contact_discord_id: string
+  role: string
+}
+
+export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed, IRawUserPosts, IUserData}

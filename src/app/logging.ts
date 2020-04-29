@@ -89,6 +89,11 @@ const LOG_BASE = {
     code: 'SEARCH001',
     level: LOG_LEVEL.INFO,
     template: 'search - type="{{type}}" user="{{user}}" message="{{message}}" channel="{{channel}}"'
+  },
+  EXPIRE001: {
+    code: 'EXPIRE001',
+    level: LOG_LEVEL.INFO,
+    template: 'expiry notification - users="{{users}}" rate="{{rate}}"'
   }
 }
 
