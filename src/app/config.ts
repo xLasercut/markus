@@ -35,7 +35,8 @@ class Config {
       updateIdApiUrl: rawConfig.updateIdApiUrl || 'https://www.ashal.eu/market/api/update_discord_id.php',
       userListApiUrl: rawConfig.userListApiUrl || 'https://www.ashal.eu/market/api/users.php',
       expiryApiUrl: rawConfig.expiryApiUrl || 'https://www.ashal.eu/market/api/notify_expire.php',
-      expiryNotificationRate: rawConfig.expiryNotificationRate || '0 23 * * *'
+      expiryNotificationRate: rawConfig.expiryNotificationRate || '5 23 * * *',
+      reactivateItemApiUrl: rawConfig.reactivateItemApiUrl || 'https://www.ashal.eu/market/api/reactivate_posts.php'
     }
   }
 

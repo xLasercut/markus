@@ -97,6 +97,7 @@ interface IConfig {
   userListApiUrl: string
   expiryApiUrl: string
   expiryNotificationRate: string
+  reactivateItemApiUrl: string
 }
 
 interface IEmbed {

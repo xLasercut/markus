@@ -8,6 +8,7 @@ import {
   autoPostSellItemHandler,
   autoPostSellTearHandler,
   expiryNotificationHandler,
+  expiryReactivationHandler,
   itemSearchHandler,
   tearSearchHandler
 } from './handlers/init'
@@ -30,6 +31,9 @@ client.on('message', (message: Message) => {
     if (message.channel.id === config.dict.autoPostSellChannelId) {
       autoPostSellItemHandler.processMessage(message)
       autoPostSellTearHandler.processMessage(message)
+    }
+    if (message.channel.type === 'dm') {
+      expiryReactivationHandler.processMessage(message)
     }
     if (message.channel.type === 'dm' && message.author.id === config.dict.ownerUserId) {
       autoPostSellItemHandler.processMessage(message)

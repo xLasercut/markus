@@ -2,7 +2,7 @@ import {Message} from "discord.js"
 import {config, logger} from '../app/init'
 import {LOG_BASE} from '../app/logging'
 import {AbstractMessageHandler} from './abtract'
-import {itemCache, tearCache} from '../cache/init'
+import {expiryCache, itemCache, tearCache, userCache} from '../cache/init'
 
 class AdminHandler extends AbstractMessageHandler {
   constructor() {
@@ -18,6 +18,8 @@ class AdminHandler extends AbstractMessageHandler {
     config.load()
     itemCache.startCache()
     tearCache.startCache()
+    userCache.startCache()
+    expiryCache.startCache()
     await message.reply('Config reloaded')
   }
 }

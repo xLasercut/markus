@@ -94,6 +94,11 @@ const LOG_BASE = {
     code: 'EXPIRE001',
     level: LOG_LEVEL.INFO,
     template: 'expiry notification - users="{{users}}" rate="{{rate}}"'
+  },
+  EXPIRE002: {
+    code: 'EXPIRE002',
+    level: LOG_LEVEL.INFO,
+    template: 'clearing reactivation list - rate="{{rate}}"'
   }
 }
 

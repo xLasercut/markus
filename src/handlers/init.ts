@@ -6,7 +6,7 @@ import {
   AutoPostSellTearHandler
 } from './autopost'
 import {AdminHandler} from './admin'
-import {ExpiryNotificationHandler} from './expiry'
+import {ExpiryNotificationHandler, ExpiryReactivationHandler} from './expiry'
 
 const itemSearchHandler = new ItemSearchHandler()
 const tearSearchHandler = new TearSearchHandler()
@@ -16,6 +16,7 @@ const autoPostBuyTearHandler = new AutoPostBuyTearHandler()
 const autoPostSellTearHandler = new AutoPostSellTearHandler()
 const adminHandler = new AdminHandler()
 const expiryNotificationHandler = new ExpiryNotificationHandler()
+const expiryReactivationHandler = new ExpiryReactivationHandler()
 
 export {
   itemSearchHandler,
@@ -25,5 +26,6 @@ export {
   autoPostBuyTearHandler,
   autoPostBuyItemHandler,
   adminHandler,
-  expiryNotificationHandler
+  expiryNotificationHandler,
+  expiryReactivationHandler
 }

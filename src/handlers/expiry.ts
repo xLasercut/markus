@@ -5,6 +5,7 @@ import axios from 'axios'
 import {client, config, logger} from '../app/init'
 import {IUserData} from '../interfaces'
 import {LOG_BASE} from '../app/logging'
+import {expiryCache, userCache} from '../cache/init'
 
 class ExpiryNotificationHandler extends AbstractMessageHandler {
   protected _refreshSchedule: cron.ScheduledTask
@@ -22,7 +23,11 @@ class ExpiryNotificationHandler extends AbstractMessageHandler {
       await this._stopNotifier(message)
     }
     else if (command === 'test') {
-      await client.users.cache.get('218007670626451456').send('One or more of you items on ashal.eu is about to expire. Please use the command `reactivateitems` to reactivate your items.')
+      const body = {
+        password: config.dict.apiPassword
+      }
+      let response = await axios.post(config.dict.expiryApiUrl, body)
+      await message.reply(JSON.stringify(response.data.users))
     }
   }
 
@@ -45,36 +50,53 @@ class ExpiryNotificationHandler extends AbstractMessageHandler {
   }
 
   protected async _notifyExpiredPosts(): Promise<any> {
-    const body = {
+    const body = JSON.stringify({
       password: config.dict.apiPassword
-    }
-    let expiryResponse = await axios.post(config.dict.expiryApiUrl, body)
-    let expiryUsers: Array<number> = expiryResponse.data.users
+    })
+    let response = await axios.post(config.dict.expiryApiUrl, body)
+    let expiryUsers: Array<number> = response.data.users
 
     logger.writeLog(LOG_BASE.EXPIRE001, {users: expiryUsers, rate: config.dict.expiryNotificationRate})
 
     if (expiryUsers.length > 0) {
-      let userListResponse = await axios.post(config.dict.userListApiUrl, body)
-      let userList: Array<IUserData> = userListResponse.data.users
-
       for (let userId of expiryUsers) {
-        let discordId = this._get_discord_id(userId, userList)
+        let discordId = userCache.getDiscordId(userId)
         if (discordId) {
           await client.users.cache.get(discordId).send('One or more of you items on ashal.eu is about to expire. Please use the command `reactivateitems` to reactivate your items.')
         }
       }
     }
   }
-
-  protected _get_discord_id(userId: number, userList: Array<IUserData>): string {
-    for (let user of userList) {
-      if (user.id === userId) {
-        return user.contact_discord_id
-      }
-    }
-    return ''
-  }
 }
 
 
-export {ExpiryNotificationHandler}
+class ExpiryReactivationHandler extends AbstractMessageHandler {
+  constructor() {
+    super('expiry reactivation', new RegExp('^reactivateitems$', 'i'))
+  }
+
+  protected async _runWorkflow(message: Message): Promise<any> {
+    let discordId = message.author.id
+    if (expiryCache.isAlreadyReactivated(discordId)) {
+      await message.reply('You have already reactivated your items')
+    }
+    else {
+      let userId = userCache.getUserId(discordId)
+      if (userId != null && discordId) {
+        const body = JSON.stringify({
+          password: config.dict.apiPassword,
+          user_id: userId,
+          discord_id: discordId
+        })
+        await axios.post(config.dict.reactivateItemApiUrl, body)
+        expiryCache.addUser(discordId)
+        await message.reply('Reactivation successful')
+      }
+      else {
+        await message.reply('You have not linked your discord with your market account, please contact an admin')
+      }
+    }
+  }
+}
+
+export {ExpiryNotificationHandler, ExpiryReactivationHandler}
