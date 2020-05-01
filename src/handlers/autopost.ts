@@ -127,7 +127,7 @@ class AbstractAutoPostHandler extends AbstractMessageHandler {
     let bucket = this._getBucketToPost()
     if (bucket in this._autoPostList) {
       for (let userId of this._autoPostList[bucket]) {
-        let posts = this._cache.getUserPosts(userId, this._type)
+        let posts = this._cache.getUserPosts(userId, this._type).slice(0, 11)
         if (posts && posts.length > 0) {
           //@ts-ignore
           let loadingMsg = await client.channels.cache.get(this._channel).send(this._formatter.loadingScreen())
