@@ -62,7 +62,10 @@ class ExpiryNotificationHandler extends AbstractMessageHandler {
       for (let userId of expiryUsers) {
         let discordId = userCache.getDiscordId(userId)
         if (discordId) {
-          await client.users.cache.get(discordId).send('One or more of you items on ashal.eu is about to expire. Please use the command `reactivateitems` to reactivate your items.')
+          let user = client.users.cache.get(discordId)
+          if (user) {
+            await user.send('One or more of you items on ashal.eu is about to expire. Please use the command `reactivateitems` to reactivate your items.')
+          }
         }
       }
     }
