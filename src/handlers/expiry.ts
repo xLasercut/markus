@@ -3,7 +3,6 @@ import {Message} from 'discord.js'
 import * as cron from 'node-cron'
 import axios from 'axios'
 import {client, config, logger} from '../app/init'
-import {IUserData} from '../interfaces'
 import {LOG_BASE} from '../app/logging'
 import {expiryCache, userCache} from '../cache/init'
 
@@ -12,6 +11,7 @@ class ExpiryNotificationHandler extends AbstractMessageHandler {
 
   constructor() {
     super('expiry notifier', new RegExp('^(enable|disable|test)expirynotification$', 'i'))
+    this._startNotifier()
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -27,26 +27,26 @@ class ExpiryNotificationHandler extends AbstractMessageHandler {
         password: config.dict.apiPassword
       }
       let response = await axios.post(config.dict.expiryApiUrl, body)
-      await message.reply(JSON.stringify(response.data.users))
+      await this._reply(message, JSON.stringify(response.data.users))
     }
   }
 
-  protected async _startNotifier(message: Message): Promise<any> {
+  protected async _startNotifier(message: Message = null): Promise<any> {
     if (this._refreshSchedule) {
-      await message.reply('expiry notification already enabled')
+      await this._reply(message, 'expiry notification already enabled')
     }
     else {
       this._refreshSchedule = cron.schedule(config.dict.expiryNotificationRate, () => {
         this._notifyExpiredPosts()
       })
-      await message.reply('expiry notification enabled')
+      await this._reply(message, 'expiry notification enabled')
     }
   }
 
   protected async _stopNotifier(message: Message): Promise<any> {
     this._refreshSchedule.destroy()
     this._refreshSchedule = null
-    await message.reply('expiry notification disabled')
+    await this._reply(message, 'expiry notification disabled')
   }
 
   protected async _notifyExpiredPosts(): Promise<any> {
@@ -68,6 +68,12 @@ class ExpiryNotificationHandler extends AbstractMessageHandler {
           }
         }
       }
+    }
+  }
+
+  protected async _reply(message: Message = null, text: string = ''): Promise<any> {
+    if (message) {
+      await message.reply(text)
     }
   }
 }

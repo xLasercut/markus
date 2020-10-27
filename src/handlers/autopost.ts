@@ -31,6 +31,7 @@ class AbstractAutoPostHandler extends AbstractMessageHandler {
     this._offset = offset
     this._type = type
     this._channel = channel
+    this._startAutoPost()
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -52,7 +53,7 @@ class AbstractAutoPostHandler extends AbstractMessageHandler {
     }
   }
 
-  protected async _startAutoPost(message: Message): Promise<any> {
+  protected async _startAutoPost(message: Message = null): Promise<any> {
     if (!this._postSchedule) {
       this._generateBuckets()
       this._refreshList()
@@ -68,14 +69,14 @@ class AbstractAutoPostHandler extends AbstractMessageHandler {
         status: 'enable',
         rate: config.dict.autoPostRefreshRate
       })
-      await message.reply(`${this._name} enabled`)
+      await this._reply(message, `${this._name} enabled`)
     }
     else {
-      await message.reply(`${this._name} already enabled`)
+      await this._reply(message, `${this._name} already enabled`)
     }
   }
 
-  protected async _stopAutoPost(message: Message): Promise<any> {
+  protected async _stopAutoPost(message: Message = null): Promise<any> {
     this._refreshSchedule.destroy()
     this._postSchedule.destroy()
     logger.writeLog(LOG_BASE.AUTO001, {type: `${this._name} post`, status: 'disable', rate: config.dict.autoPostRate})
@@ -86,7 +87,7 @@ class AbstractAutoPostHandler extends AbstractMessageHandler {
     })
     this._refreshSchedule = null
     this._postSchedule = null
-    await message.reply(`${this._name} disabled`)
+    await this._reply(message, `${this._name} disabled`)
   }
 
   protected _generateBuckets(): void {
@@ -134,6 +135,12 @@ class AbstractAutoPostHandler extends AbstractMessageHandler {
           await loadingMsg.edit(this._formatter.generateOutput(posts))
         }
       }
+    }
+  }
+
+  protected async _reply(message: Message = null, text: string = ''): Promise<any> {
+    if (message) {
+      await message.reply(text)
     }
   }
 
