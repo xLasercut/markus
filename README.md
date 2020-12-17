@@ -55,7 +55,6 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
 **For all search combinations, please see [lunr docs](https://lunrjs.com/guides/searching.html)**
 
 ## Running locally
-### Docker
 #### Prerequisites
 - [Docker](https://docs.docker.com/install/)
 - [Docker compose](https://docs.docker.com/compose/)
@@ -63,48 +62,21 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
 - Ashal's market API password - Please contact Ashal for password
 
 #### Steps
-1. Create an environment file named `config.json` in the data directory
-```json
-{
-  "discordToken": "<your discord bot token - MANDATORY>",
-  "apiPassword": "<api password to ashal's market - MANDATORY>",
-  "searchChannelId": "<channel id of search channel - MANDATORY>",
-  "autoPostChannelId": "<channel id of autopost channel - MANDATORY>",
-  "ownerUserId": "<user id of the bot owner - MANDATORY>",
-  "serverId": "<id of server - MANDATORY>",
-  "itemApiUrl": "<api endpoint for item posts - OPTIONAL>",
-  "tearApiUrl": "<api endpoint for el tear posts - OPTIONAL>",
-  "cacheRefreshRate": "<refresh rate of cache - crontab - OPTIONAL>",
-  "autoPostRate": "<autopost check rate - crontab - OPTIONAL>",
-  "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>",
-  "itemUserApiUrl": "<api endpoint for user item posts - OPTIONAL>",
-  "tearUserApiUrl": "<api endpoint for user tear posts - OPTIONAL>"
-}
+1. Create an environment file named `config.env` in the root directory
+```dotenv
+DISCORD_TOKEN=<your discord bot token - MANDATORY>
+API_PASSWORD=<api password to ashal's market - MANDATORY>
+SEARCH_CHANNEL_ID=<channel id of search channel - MANDATORY>
+AUTO_POST_CHANNEL_ID=<channel id of autopost channel - MANDATORY>
+OWNER_USER_ID=<user id of the bot owner - MANDATORY>
+SERVER_ID=<id of server - MANDATORY>
+ITEM_API_URL=<api endpoint for item posts - OPTIONAL>
+TEAR_API_URL=<api endpoint for el tear posts - OPTIONAL>
+CACHE_REFRESH_RATE=<refresh rate of cache - crontab - OPTIONAL>
+AUTO_POST_RATE=<autopost check rate - crontab - OPTIONAL>
+AUTO_POST_REFRESH_RATE=<autopost refresh rate - crontab - OPTIONAL>
+ITEM_USER_API_URL=<api endpoint for user item posts - OPTIONAL>
+TEAR_USER_API_URL=<api endpoint for user tear posts - OPTIONAL>
 ```
 2. run `docker-compose build`
 3. run `docker-compose up`
-
-### No Docker
-#### Prerequisites
-- [Node.JS](https://nodejs.org/en/)
-
-#### Steps
-1. Create an environment file named `config.json` in the data directory
-```json
-{
-  "discordToken": "<your discord bot token - MANDATORY>",
-  "apiPassword": "<api password to ashal's market - MANDATORY>",
-  "searchChannelId": "<channel id of search channel - MANDATORY>",
-  "autoPostChannelId": "<channel id of autopost channel - MANDATORY>",
-  "ownerUserId": "<user id of the bot owner - MANDATORY>",
-  "serverId": "<id of server - MANDATORY>",
-  "itemApiUrl": "<api endpoint for item posts - OPTIONAL>",
-  "tearApiUrl": "<api endpoint for el tear posts - OPTIONAL>",
-  "cacheRefreshRate": "<refresh rate of cache - crontab - OPTIONAL>",
-  "autoPostRate": "<autopost check rate - crontab - OPTIONAL>",
-  "autoPostRefreshRate": "<autopost refresh rate - crontab - OPTIONAL>",
-  "itemUserApiUrl": "<api endpoint for user item posts - OPTIONAL>",
-  "tearUserApiUrl": "<api endpoint for user tear posts - OPTIONAL>"
-}
-```
-2. run `npm run serve`

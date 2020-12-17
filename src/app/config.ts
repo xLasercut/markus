@@ -1,57 +1,40 @@
-import * as fs from 'fs'
 import {IConfig} from '../interfaces'
-import {CONFIG_PATH} from './paths'
-import {LOG_BASE, Logger} from './logging'
 
 class Config {
   protected _config: IConfig
-  protected _logger: Logger
 
-  constructor(logger: Logger) {
-    this._logger = logger
+  constructor() {
     this.load()
   }
 
   public load(): void {
-    let rawConfig: IConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, {encoding: 'utf-8'}))
-    this._validateConfig(rawConfig)
     this._config = {
-      discordToken: rawConfig.discordToken,
-      apiPassword: rawConfig.apiPassword,
-      autoPostBuyChannelId: rawConfig.autoPostBuyChannelId,
-      autoPostSellChannelId: rawConfig.autoPostSellChannelId,
-      searchChannelId: rawConfig.searchChannelId,
-      ownerUserId: rawConfig.ownerUserId,
-      itemApiUrl: rawConfig.itemApiUrl || 'https://www.ashal.eu/market/api/items.php',
-      tearApiUrl: rawConfig.tearApiUrl || 'https://www.ashal.eu/market/api/tears.php',
-      cacheRefreshRate: rawConfig.cacheRefreshRate || '*/10 * * * *',
-      autoPostRate: rawConfig.autoPostRate || '*/5 * * * *',
-      autoPostRefreshRate: rawConfig.autoPostRefreshRate || '7-59/10 * * * *',
+      discordToken: process.env.DISCORD_TOKEN,
+      apiPassword: process.env.API_PASSWORD,
+      autoPostBuyChannelId: process.env.AUTO_POST_BUY_CHANNEL_ID,
+      autoPostSellChannelId: process.env.AUTO_POST_SELL_CHANNEL_ID,
+      searchChannelId: process.env.SEARCH_CHANNEL_ID,
+      ownerUserId: process.env.OWNER_USER_ID,
+      itemApiUrl: process.env.ITEM_API_URL || 'https://www.ashal.eu/market/api/items.php',
+      tearApiUrl: process.env.TEAR_API_URL || 'https://www.ashal.eu/market/api/tears.php',
+      cacheRefreshRate: process.env.CACHE_REFRESH_RATE || '*/10 * * * *',
+      autoPostRate: process.env.AUTO_POST_RATE || '*/5 * * * *',
+      autoPostRefreshRate: process.env.AUTO_POST_REFRESH_RATE || '7-59/10 * * * *',
       searchResultsPerPage: 10,
       reactionExpireTime: 120000,
-      itemUserApiUrl: rawConfig.itemUserApiUrl || 'https://www.ashal.eu/market/api/items_by_user.php',
-      tearUserApiUrl: rawConfig.tearUserApiUrl || 'https://www.ashal.eu/market/api/tears_by_user.php',
-      serverId: rawConfig.serverId,
-      updateIdApiUrl: rawConfig.updateIdApiUrl || 'https://www.ashal.eu/market/api/update_discord_id.php',
-      userListApiUrl: rawConfig.userListApiUrl || 'https://www.ashal.eu/market/api/users.php',
-      expiryApiUrl: rawConfig.expiryApiUrl || 'https://www.ashal.eu/market/api/notify_expire.php',
-      expiryNotificationRate: rawConfig.expiryNotificationRate || '5 23 * * *',
-      reactivateItemApiUrl: rawConfig.reactivateItemApiUrl || 'https://www.ashal.eu/market/api/reactivate_posts.php'
+      itemUserApiUrl: process.env.ITEM_USER_API_URL || 'https://www.ashal.eu/market/api/items_by_user.php',
+      tearUserApiUrl: process.env.TEAR_USER_API_URL || 'https://www.ashal.eu/market/api/tears_by_user.php',
+      serverId: process.env.SERVER_ID,
+      updateIdApiUrl: process.env.UPDATE_ID_API_URL || 'https://www.ashal.eu/market/api/update_discord_id.php',
+      userListApiUrl: process.env.USER_LIST_API_URL || 'https://www.ashal.eu/market/api/users.php',
+      expiryApiUrl: process.env.EXPIRY_API_URL || 'https://www.ashal.eu/market/api/notify_expire.php',
+      expiryNotificationRate: process.env.EXPIRY_NOTIFICATION_RATE || '5 23 * * *',
+      reactivateItemApiUrl: process.env.REACTIVATE_ITEM_API_URL || 'https://www.ashal.eu/market/api/reactivate_posts.php'
     }
   }
 
   public get dict(): IConfig {
     return this._config
-  }
-
-  protected _validateConfig(rawConfig: IConfig) {
-    let mandatoryFields = ['discordToken', 'apiPassword', 'autoPostSellChannelId', 'autoPostBuyChannelId', 'searchChannelId', 'ownerUserId']
-    for (let field of mandatoryFields) {
-      if (!rawConfig[field] || !rawConfig[field].trim()) {
-        this._logger.writeLog(LOG_BASE.SERVER002, {type: 'config', reason: `missing mandatory field: ${field}`})
-        throw new Error()
-      }
-    }
   }
 }
 

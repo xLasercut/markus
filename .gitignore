@@ -6,8 +6,8 @@ log/*
 .vscode
 .idea
 
-# bot config
-data/*
+# bot config data
+config.env
 
 
 !.gitkeep

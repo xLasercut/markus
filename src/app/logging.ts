@@ -15,7 +15,7 @@ let botLog = new DailyRotateFile({
   filename: 'bot-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   dirname: LOG_DIR,
-  maxFiles: '5',
+  maxFiles: '3',
   level: 'debug'
 })
 

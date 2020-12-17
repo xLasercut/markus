@@ -4,7 +4,7 @@ import * as Discord from 'discord.js'
 
 const client = new Discord.Client()
 const logger = new Logger()
-const config = new Config(logger)
+const config = new Config()
 
 
 export {client, logger, config}
