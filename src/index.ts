@@ -6,7 +6,7 @@ import {
   autoPostBuyItemHandler,
   autoPostBuyTearHandler,
   autoPostSellItemHandler,
-  autoPostSellTearHandler,
+  autoPostSellTearHandler, elswordCalcHandler,
   expiryNotificationHandler,
   expiryReactivationHandler,
   itemSearchHandler,
@@ -43,6 +43,7 @@ client.on('message', (message: Message) => {
       adminHandler.processMessage(message)
       expiryNotificationHandler.processMessage(message)
     }
+    elswordCalcHandler.processMessage(message)
   }
 })
 

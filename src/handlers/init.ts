@@ -7,6 +7,7 @@ import {
 } from './autopost'
 import {AdminHandler} from './admin'
 import {ExpiryNotificationHandler, ExpiryReactivationHandler} from './expiry'
+import {ElswordCalcHandler} from './elsword-calc'
 
 const itemSearchHandler = new ItemSearchHandler()
 const tearSearchHandler = new TearSearchHandler()
@@ -17,6 +18,7 @@ const autoPostSellTearHandler = new AutoPostSellTearHandler()
 const adminHandler = new AdminHandler()
 const expiryNotificationHandler = new ExpiryNotificationHandler()
 const expiryReactivationHandler = new ExpiryReactivationHandler()
+const elswordCalcHandler = new ElswordCalcHandler()
 
 export {
   itemSearchHandler,
@@ -27,5 +29,6 @@ export {
   autoPostBuyItemHandler,
   adminHandler,
   expiryNotificationHandler,
-  expiryReactivationHandler
+  expiryReactivationHandler,
+  elswordCalcHandler
 }
