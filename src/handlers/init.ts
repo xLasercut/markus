@@ -8,6 +8,8 @@ import {
 import {AdminHandler} from './admin'
 import {ExpiryNotificationHandler, ExpiryReactivationHandler} from './expiry'
 import {ElswordCalcHandler} from './elsword-calc'
+import {GenshinCalcHandler} from './genshin-calc'
+import {ElswordEnhancementEventHandler} from './elsword-enhancement-event'
 
 const itemSearchHandler = new ItemSearchHandler()
 const tearSearchHandler = new TearSearchHandler()
@@ -19,6 +21,8 @@ const adminHandler = new AdminHandler()
 const expiryNotificationHandler = new ExpiryNotificationHandler()
 const expiryReactivationHandler = new ExpiryReactivationHandler()
 const elswordCalcHandler = new ElswordCalcHandler()
+const genshinCalcHandler = new GenshinCalcHandler()
+const elswordEnhancementEventHandler = new ElswordEnhancementEventHandler()
 
 export {
   itemSearchHandler,
@@ -30,5 +34,7 @@ export {
   adminHandler,
   expiryNotificationHandler,
   expiryReactivationHandler,
-  elswordCalcHandler
+  elswordCalcHandler,
+  genshinCalcHandler,
+  elswordEnhancementEventHandler
 }

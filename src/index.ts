@@ -6,9 +6,9 @@ import {
   autoPostBuyItemHandler,
   autoPostBuyTearHandler,
   autoPostSellItemHandler,
-  autoPostSellTearHandler, elswordCalcHandler,
+  autoPostSellTearHandler, elswordCalcHandler, elswordEnhancementEventHandler,
   expiryNotificationHandler,
-  expiryReactivationHandler,
+  expiryReactivationHandler, genshinCalcHandler,
   itemSearchHandler,
   tearSearchHandler
 } from './handlers/init'
@@ -44,6 +44,8 @@ client.on('message', (message: Message) => {
       expiryNotificationHandler.processMessage(message)
     }
     elswordCalcHandler.processMessage(message)
+    genshinCalcHandler.processMessage(message)
+    elswordEnhancementEventHandler.processMessage(message)
   }
 })
 
