@@ -39,7 +39,8 @@ class AbstractAutoPostFormatter {
         fields: fields,
         footer: {
           text: ''
-        }
+        },
+        color: '0x00FFFF'
       }
     }
   }

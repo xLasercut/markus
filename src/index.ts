@@ -10,7 +10,8 @@ import {
   expiryNotificationHandler,
   expiryReactivationHandler, genshinCalcHandler,
   itemSearchHandler,
-  tearSearchHandler
+  tearSearchHandler,
+  helpHandler
 } from './handlers/init'
 
 
@@ -46,6 +47,7 @@ client.on('message', (message: Message) => {
     elswordCalcHandler.processMessage(message)
     genshinCalcHandler.processMessage(message)
     elswordEnhancementEventHandler.processMessage(message)
+    helpHandler.processMessage(message)
   }
 })
 

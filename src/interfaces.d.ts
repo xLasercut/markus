@@ -104,7 +104,8 @@ interface IEmbed {
   embed: {
     description: string
     fields: Array<IEmbedField>
-    footer: IEmbedFooter
+    footer: IEmbedFooter,
+    color: string
   }
 }
 

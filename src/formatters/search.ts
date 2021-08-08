@@ -25,7 +25,8 @@ class AbstractSearchFormatter {
         fields: fields,
         footer: {
           text: `Page ${currentPage} of ${maxPage}`
-        }
+        },
+        color: '0x00FFFF'
       }
     }
   }
