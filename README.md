@@ -69,6 +69,7 @@ API_PASSWORD=<api password to ashal's market - MANDATORY>
 SEARCH_CHANNEL_ID=<channel id of search channel - MANDATORY>
 AUTO_POST_BUY_CHANNEL_ID=<channel id of autopost buy channel - MANDATORY>
 AUTO_POST_SELL_CHANNEL_ID=<channel id of autopost sell channel - MANDATORY>
+BOTS_CHANNEL_ID=<channel id of bots channel - MANDATORY>
 OWNER_USER_ID=<user id of the bot owner - MANDATORY>
 SERVER_ID=<id of server - MANDATORY>
 ITEM_API_URL=<api endpoint for item posts - OPTIONAL>

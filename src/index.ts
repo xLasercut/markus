@@ -11,7 +11,8 @@ import {
   expiryReactivationHandler, genshinCalcHandler,
   itemSearchHandler,
   tearSearchHandler,
-  helpHandler
+  helpHandler,
+  dontGetAttachedHandler
 } from './handlers/init'
 
 
@@ -32,6 +33,9 @@ client.on('message', (message: Message) => {
     if (message.channel.id === config.dict.autoPostSellChannelId) {
       autoPostSellItemHandler.processMessage(message)
       autoPostSellTearHandler.processMessage(message)
+    }
+    if (message.channel.id === config.dict.botsChannelId || message.channel.type === 'dm') {
+      dontGetAttachedHandler.processMessage(message)
     }
     if (message.channel.type === 'dm') {
       expiryReactivationHandler.processMessage(message)

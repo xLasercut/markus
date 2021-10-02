@@ -98,6 +98,7 @@ interface IConfig {
   expiryApiUrl: string
   expiryNotificationRate: string
   reactivateItemApiUrl: string
+  botsChannelId: string
 }
 
 interface IEmbed {
@@ -118,6 +119,15 @@ interface IEmbedFooter {
   text: string
 }
 
+interface IImageEmbed {
+  embed: {
+    title: string
+    image: {
+      url: string
+    }
+  }
+}
+
 interface IUserData {
   id: number
   username: string
@@ -129,4 +139,4 @@ interface IUserData {
   role: string
 }
 
-export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed, IRawUserPosts, IUserData}
+export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed, IRawUserPosts, IUserData, IImageEmbed}

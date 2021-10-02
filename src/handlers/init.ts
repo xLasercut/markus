@@ -11,6 +11,7 @@ import {ElswordCalcHandler} from './elsword-calc'
 import {GenshinCalcHandler} from './genshin-calc'
 import {ElswordEnhancementEventHandler} from './elsword-enhancement-event'
 import {HelpHandler} from './help'
+import {DontGetAttachedHandler} from './anime'
 
 const itemSearchHandler = new ItemSearchHandler()
 const tearSearchHandler = new TearSearchHandler()
@@ -25,6 +26,7 @@ const elswordCalcHandler = new ElswordCalcHandler()
 const genshinCalcHandler = new GenshinCalcHandler()
 const elswordEnhancementEventHandler = new ElswordEnhancementEventHandler()
 const helpHandler = new HelpHandler()
+const dontGetAttachedHandler = new DontGetAttachedHandler()
 
 export {
   itemSearchHandler,
@@ -39,5 +41,6 @@ export {
   elswordCalcHandler,
   genshinCalcHandler,
   elswordEnhancementEventHandler,
-  helpHandler
+  helpHandler,
+  dontGetAttachedHandler
 }

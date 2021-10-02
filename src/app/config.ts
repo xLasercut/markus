@@ -29,7 +29,8 @@ class Config {
       userListApiUrl: process.env.USER_LIST_API_URL || 'https://www.ashal.eu/market/api/users.php',
       expiryApiUrl: process.env.EXPIRY_API_URL || 'https://www.ashal.eu/market/api/notify_expire.php',
       expiryNotificationRate: process.env.EXPIRY_NOTIFICATION_RATE || '5 23 * * *',
-      reactivateItemApiUrl: process.env.REACTIVATE_ITEM_API_URL || 'https://www.ashal.eu/market/api/reactivate_posts.php'
+      reactivateItemApiUrl: process.env.REACTIVATE_ITEM_API_URL || 'https://www.ashal.eu/market/api/reactivate_posts.php',
+      botsChannelId: process.env.BOTS_CHANNEL_ID
     }
   }
 
