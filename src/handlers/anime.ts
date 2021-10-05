@@ -1,12 +1,10 @@
-import {Message} from "discord.js"
-import {client, config, logger} from '../app/init'
-import {LOG_BASE} from '../app/logging'
+import {Message} from 'discord.js'
 import {AbstractMessageHandler} from './abtract'
-import {expiryCache, itemCache, tearCache, userCache} from '../cache/init'
 import {IImageEmbed} from '../interfaces'
 
 class DontGetAttachedHandler extends AbstractMessageHandler {
   protected _imgList: Array<string>
+  protected _indiciesNotSent: Array<number>
 
   constructor() {
     super('dont get attached', new RegExp('^!dontgetattached$', 'i'))
@@ -26,8 +24,14 @@ class DontGetAttachedHandler extends AbstractMessageHandler {
       'https://i.imgur.com/3jlkqtf.jpg',
       'https://i.imgur.com/WLmJgVe.png',
       'https://i.imgur.com/vSabqZF.jpg',
-      'https://i.imgur.com/P9UiOrS.jpg'
+      'https://i.imgur.com/P9UiOrS.jpg',
+      'https://i.imgur.com/JmKq9U7.jpg'
     ]
+    this._resetIndicies()
+  }
+
+  protected _resetIndicies() {
+    this._indiciesNotSent = [...Array(this._imgList.length).keys()]
   }
 
   protected async _runWorkflow(message: Message): Promise<any> {
@@ -35,8 +39,13 @@ class DontGetAttachedHandler extends AbstractMessageHandler {
   }
 
   protected _getRandomImageUrl(): string {
-    let randomIndex = Math.floor(Math.random() * this._imgList.length)
-    return this._imgList[randomIndex]
+    if (this._indiciesNotSent.length === 0) {
+      this._resetIndicies()
+    }
+    let randomIndex = Math.floor(Math.random() * this._indiciesNotSent.length)
+    let imgIndex = this._indiciesNotSent[randomIndex]
+    this._indiciesNotSent.splice(randomIndex, 1)
+    return this._imgList[imgIndex]
   }
 
   protected _generateMessage(): IImageEmbed {
