@@ -25,7 +25,16 @@ class DontGetAttachedHandler extends AbstractMessageHandler {
       'https://i.imgur.com/WLmJgVe.png',
       'https://i.imgur.com/vSabqZF.jpg',
       'https://i.imgur.com/P9UiOrS.jpg',
-      'https://i.imgur.com/JmKq9U7.jpg'
+      'https://i.imgur.com/JmKq9U7.jpg',
+      'https://i.imgur.com/BGp3Ouj.jpg',
+      'https://i.imgur.com/QnkVRE1.jpg',
+      'https://i.imgur.com/HQNapc5.png',
+      'https://i.imgur.com/e0MoeR7.jpg',
+      'https://i.imgur.com/5sraNzp.png',
+      'https://i.imgur.com/HF226oH.png',
+      'https://i.imgur.com/LXxF9eN.png',
+      'https://i.imgur.com/OY9Uu5R.jpg',
+      'https://i.imgur.com/do3Bm9P.jpg'
     ]
     this._resetIndicies()
   }
