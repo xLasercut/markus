@@ -13,12 +13,12 @@ RUN apk update \
 WORKDIR ${WORK_DIR}
 
 COPY ./package.json ${WORK_DIR}/package.json
-COPY ./package-lock.json ${WORK_DIR}/package-lock.json
+COPY ./yarn.lock ${WORK_DIR}/yarn.lock
 
-RUN npm ci
+RUN yarn install --frozen-lockfile
 
 COPY . ${WORK_DIR}/.
 
-RUN npm run compile
+RUN yarn compile
 
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]

@@ -1,13 +1,16 @@
-import {AbstractMessageHandler} from './abtract'
-import {Message} from 'discord.js'
+import {AbstractCommandHandler} from './abtract'
+import {SlashCommandBuilder} from '@discordjs/builders'
 
-class ElswordEnhancementEventHandler extends AbstractMessageHandler {
+class ElswordEnhancementEventHandler extends AbstractCommandHandler {
   constructor() {
-    super('elsword enhancement event', new RegExp('^!enhancement event', 'i'))
+    const command = new SlashCommandBuilder()
+      .setName('enhancement_event')
+      .setDescription('Thanks KoG!')
+    super(command)
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
-    await message.channel.send('', {files: ['https://media.discordapp.net/attachments/143807793261051905/426223556859527190/image.png']})
+  protected async _runWorkflow(interaction): Promise<any> {
+    return interaction.reply('https://media.discordapp.net/attachments/143807793261051905/426223556859527190/image.png')
   }
 }
 

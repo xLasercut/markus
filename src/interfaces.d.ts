@@ -99,6 +99,7 @@ interface IConfig {
   expiryNotificationRate: string
   reactivateItemApiUrl: string
   botsChannelId: string
+  applicationId: string
 }
 
 interface IEmbed {

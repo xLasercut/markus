@@ -43,62 +43,67 @@ const LOG_BASE = {
   SERVER001: {
     code: 'SERVER001',
     level: LOG_LEVEL.INFO,
-    template: 'Logged in as {{user}}'
+    template: 'Logged in as {{{user}}}'
   },
   CACHE001: {
     code: 'CACHE001',
     level: LOG_LEVEL.INFO,
-    template: 'market cache reload - type="{{type}}" stage="{{stage}}" rate="{{rate}}"'
+    template: 'market cache reload - type="{{{type}}}" stage="{{{stage}}}" rate="{{{rate}}}"'
   },
   CACHE002: {
     code: 'CACHE0002',
     level: LOG_LEVEL.ERROR,
-    template: 'market cache reload failed - status="{{status}}" error="{{error}}"'
+    template: 'market cache reload failed - status="{{{status}}}" error="{{{error}}}"'
   },
   CACHE003: {
     code: 'CACHE003',
     level: LOG_LEVEL.INFO,
-    template: 'user cache reload - stage="{{stage}}" rate="{{rate}}"'
+    template: 'user cache reload - stage="{{{stage}}}" rate="{{{rate}}}"'
   },
   SERVER002: {
     code: 'SERVER002',
     level: LOG_LEVEL.ERROR,
-    template: 'server error - type="{{type}}" reason="{{reason}}" message="{{message}}"'
+    template: 'server error - reason="{{{reason}}}"'
   },
   SERVER003: {
     code: 'SERVER003',
     level: LOG_LEVEL.ERROR,
-    template: 'could not connect to discord - reason="{{reason}}"'
+    template: 'could not connect to discord - reason="{{{reason}}}"'
   },
   SERVER004: {
     code: 'SERVER004',
     level: LOG_LEVEL.INFO,
-    template: 'admin command - command="{{command}}" user="{{user}}" id="{{id}}"'
+    template: 'admin command - command="{{{command}}}" user="{{{user}}}" id="{{{id}}}"'
+  },
+  SERVER005: {
+    code: 'SERVER005',
+    level: LOG_LEVEL.INFO,
+    template: 'Successfully registered application commands'
   },
   AUTO001: {
     code: 'AUTO001',
     level: LOG_LEVEL.INFO,
-    template: 'autopost operation - type="{{type}}" status="{{status}}" rate="{{rate}}"'
+    template: 'autopost operation - type="{{{type}}}" status="{{{status}}}" rate="{{{rate}}}"'
   },
   AUTO002: {
     code: 'AUTO002',
     level: LOG_LEVEL.INFO,
-    template: 'added user to autopost - type="{{type}}" id="{{id}}"'
+    template: 'added user to autopost - type="{{{type}}}" id="{{{id}}}"'
   },
   SEARCH001: {
     code: 'SEARCH001',
     level: LOG_LEVEL.INFO,
-    template: 'search - type="{{type}}" user="{{user}}" message="{{message}}" channel="{{channel}}"'
+    template: 'search - type="{{{type}}}" userId="{{{userId}}}" user="{{{user}}}" query="{{{query}}}" channel="{{{channel}}}"'
   },
   EXPIRE001: {
     code: 'EXPIRE001',
     level: LOG_LEVEL.INFO,
-    template: 'expiry notification - users="{{users}}" rate="{{rate}}"'
+    template: 'expiry notification - users="{{{users}}}" rate="{{{rate}}}"'
   },
   EXPIRE002: {
     code: 'EXPIRE002',
     level: LOG_LEVEL.INFO,
-    template: 'clearing reactivation list - rate="{{rate}}"'
+    template: 'clearing reactivation list - rate="{{{rate}}}"'
   }
 }
 

@@ -1,13 +1,16 @@
-import {AbstractMessageHandler} from './abtract'
-import {Message} from 'discord.js'
+import {AbstractCommandHandler} from './abtract'
+import {SlashCommandBuilder} from '@discordjs/builders'
 
-class GenshinCalcHandler extends AbstractMessageHandler {
+class GenshinCalcHandler extends AbstractCommandHandler {
   constructor() {
-    super('genshin calc', new RegExp('^!genshincalc', 'i'))
+    const command = new SlashCommandBuilder()
+      .setName('genshin_calc')
+      .setDescription('Genshin calculator')
+    super(command)
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
-    await message.channel.send('https://genshin.ashal.eu/equip')
+  protected async _runWorkflow(interaction): Promise<any> {
+    return interaction.reply('https://genshin.ashal.eu/equip')
   }
 }
 

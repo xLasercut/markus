@@ -1,12 +1,6 @@
 import {IItem, ITear} from '../interfaces'
-
-function loadingScreen(): object {
-  return {
-    embed: {
-      description: 'Processing...'
-    }
-  }
-}
+import {InteractionReplyOptions, MessageEditOptions} from 'discord.js'
+import {COLORS} from '../app/constants'
 
 function formatItemDescriptions(post: IItem | ITear, descriptionFields: { [key: string]: string }): string {
   let info = []
@@ -45,11 +39,14 @@ function formatUserInfo(post: IItem | ITear): string {
   return `- __${post.displayname}__`
 }
 
-function getLoadingScreen(): object{
+function getLoadingScreen(): InteractionReplyOptions {
   return {
-    embed: {
-      description: 'Processing...'
-    }
+    embeds: [
+      {
+        color: COLORS.WARNING,
+        description: 'Processing...'
+      }
+    ]
   }
 }
 

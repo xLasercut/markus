@@ -1,17 +1,19 @@
 import {AbstractCommandHandler} from './abtract'
 import {SlashCommandBuilder} from '@discordjs/builders'
 
-class ElswordCalcHandler extends AbstractCommandHandler {
+class PingHandler extends AbstractCommandHandler {
   constructor() {
     const command = new SlashCommandBuilder()
-      .setName('elsword_calc')
-      .setDescription('Elsword calculator')
+      .setName('ping')
+      .setDescription('Pong!')
     super(command)
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
-    return interaction.reply('https://ashal.eu/calcs/equip')
+    return interaction.reply({
+      content: 'Pong!'
+    })
   }
 }
 
-export {ElswordCalcHandler}
+export {PingHandler}

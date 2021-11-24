@@ -1,13 +1,23 @@
-import {Message} from 'discord.js'
-import {AbstractMessageHandler} from './abtract'
-import {IImageEmbed} from '../interfaces'
+import {MessageEmbed, MessageEmbedOptions, MessageOptions, User} from 'discord.js'
+import {AbstractCommandHandler} from './abtract'
+import {SlashCommandBuilder} from '@discordjs/builders'
+import {config} from '../app/init'
+import {COLORS} from '../app/constants'
 
-class DontGetAttachedHandler extends AbstractMessageHandler {
+class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _imgList: Array<string>
   protected _indiciesNotSent: Array<number>
 
   constructor() {
-    super('dont get attached', new RegExp('^!dontgetattached$', 'i'))
+    const command = new SlashCommandBuilder()
+      .setName('dont_get_attached')
+      .setDescription('Don\'t get attached!')
+      .addUserOption((option) => {
+        return option
+          .setName('user')
+          .setDescription('Select a user')
+      })
+    super(command, [config.dict.botsChannelId])
     this._imgList = [
       'https://i.imgur.com/6M4NoER.jpg',
       'https://i.imgur.com/GvnjMHq.jpg',
@@ -43,8 +53,22 @@ class DontGetAttachedHandler extends AbstractMessageHandler {
     this._indiciesNotSent = [...Array(this._imgList.length).keys()]
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
-    await message.channel.send(this._generateMessage())
+  protected async _runWorkflow(interaction): Promise<any> {
+    const user: User = interaction.options.getUser('user')
+    if (user) {
+      return interaction.reply({
+        content: `Hey <@${user.id}>`,
+        embeds: [
+          this._generateEmbed()
+        ]
+      })
+    }
+
+    return interaction.reply({
+      embeds: [
+        this._generateEmbed()
+      ]
+    })
   }
 
   protected _getRandomImageUrl(): string {
@@ -57,14 +81,13 @@ class DontGetAttachedHandler extends AbstractMessageHandler {
     return this._imgList[imgIndex]
   }
 
-  protected _generateMessage(): IImageEmbed {
+  protected _generateEmbed(): MessageEmbedOptions {
     return {
-      embed: {
-        title: 'DON\'T GET ATTACHED',
-        image: {
-          url: this._getRandomImageUrl()
-        }
-      }
+      title: 'DON\'T GET ATTACHED',
+      image: {
+        url: this._getRandomImageUrl()
+      },
+      color: COLORS.ERROR
     }
   }
 }

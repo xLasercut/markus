@@ -1,5 +1,7 @@
 import {IEmbed, IItem, ITear} from '../interfaces'
 import {formatItemDescriptions, formatItemNames, formatUserInfo, getLoadingScreen} from './helper'
+import {InteractionReplyOptions, MessageEditOptions, MessageEmbed, MessageEmbedOptions} from 'discord.js'
+import {COLORS} from '../app/constants'
 
 class AbstractSearchFormatter {
   protected _nameFields: Array<string>
@@ -10,7 +12,7 @@ class AbstractSearchFormatter {
     this._descriptionFields = descriptionFields
   }
 
-  public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): IEmbed {
+  public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): InteractionReplyOptions {
     let fields = []
     for (let post of inputs) {
       fields.push({
@@ -18,21 +20,45 @@ class AbstractSearchFormatter {
         value: formatItemDescriptions(post, this._descriptionFields) + formatUserInfo(post)
       })
     }
+    const embedOptions: MessageEmbedOptions = {
+      description: '',
+      fields: fields,
+      footer: {
+        text: `Page ${currentPage} of ${maxPage}`
+      },
+      color: COLORS.SUCCESS
+    }
 
     return {
-      embed: {
-        description: '',
-        fields: fields,
-        footer: {
-          text: `Page ${currentPage} of ${maxPage}`
-        },
-        color: '0x00FFFF'
-      }
+      embeds: [new MessageEmbed(embedOptions)]
     }
   }
 
-  public loadingScreen(): object {
+  public loadingScreen(): InteractionReplyOptions {
     return getLoadingScreen()
+  }
+
+  public noResultsScreen(): InteractionReplyOptions {
+    return {
+      embeds: [
+        {
+          color: COLORS.ERROR,
+          description: 'No results found.'
+        }
+      ]
+    }
+  }
+
+  public updateCacheScreen(): InteractionReplyOptions {
+    return {
+      embeds: [
+        {
+          color: COLORS.WARNING,
+          description: 'No results found.'
+        }
+      ],
+      ephemeral: true
+    }
   }
 }
 

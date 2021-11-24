@@ -44,7 +44,7 @@ class ExpiryNotificationHandler extends AbstractMessageHandler {
   }
 
   protected async _stopNotifier(message: Message): Promise<any> {
-    this._refreshSchedule.destroy()
+    this._refreshSchedule.stop()
     this._refreshSchedule = null
     await this._reply(message, 'expiry notification disabled')
   }

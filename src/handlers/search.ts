@@ -1,107 +1,114 @@
-import {Message} from 'discord.js'
 import {config, logger} from '../app/init'
 import {LOG_BASE} from '../app/logging'
 import {IItem, ITear} from '../interfaces'
-import {AbstractMessageHandler} from './abtract'
+import {AbstractCommandHandler} from './abtract'
 import {AbstractMarketCache} from '../cache/abstract'
 import {itemCache, tearCache} from '../cache/init'
 import {AbstractSearchFormatter, ItemSearchFormatter, TearSearchFormatter} from '../formatters/search'
+import {SlashCommandBuilder} from '@discordjs/builders'
+import {DiscordCommand} from '../types'
+import {REACTIONS} from '../app/constants'
 
-class AbstractSearchHandler extends AbstractMessageHandler {
+class AbstractSearchHandler extends AbstractCommandHandler {
   protected _cache: AbstractMarketCache
   protected _formatter: AbstractSearchFormatter
-  protected _reactionList = ['⬅️', '➡️']
+  protected _reactionList = [REACTIONS.BACK, REACTIONS.FORWARD]
 
-  constructor(cache: AbstractMarketCache, name: string, regex: RegExp, formatter: AbstractSearchFormatter) {
-    super(name, regex)
+  constructor(command: DiscordCommand, cache: AbstractMarketCache, formatter: AbstractSearchFormatter) {
+    super(command, [])
     this._cache = cache
     this._formatter = formatter
   }
 
-  protected async _runWorkflow(message: Message): Promise<any> {
+  protected async _runWorkflow(interaction): Promise<any> {
+    if (this._cache.isLoading()) {
+      return interaction.reply(this._formatter.updateCacheScreen())
+    }
+    const searchQuery = interaction.options.getString('query')
     logger.writeLog(LOG_BASE.SEARCH001, {
       type: this._name,
-      user: message.author.username,
-      message: message.content,
-      channel: message.channel.type
+      userId: interaction.user.id,
+      user: interaction.user.username,
+      query: searchQuery,
+      channel: interaction.channelId
     })
-    if (this._cache.isLoading()) {
-      await message.channel.send('Updating list. Please try again later.')
+
+    let results = this._cache.search(searchQuery)
+    let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
+    let currentPage = 1
+
+    const slicedResults = (): Array<IItem | ITear> => {
+      let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage
+      let endIndex = startIndex + config.dict.searchResultsPerPage
+      return results.slice(startIndex, endIndex)
     }
-    else {
-      let results = this._cache.search(this._getSearchQuery(message))
-      let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage)
-      let currentPage = 1
 
-      const slicedResults = (): Array<IItem | ITear> => {
-        let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage
-        let endIndex = startIndex + config.dict.searchResultsPerPage
-        return results.slice(startIndex, endIndex)
+    if (results.length < 1) {
+      return interaction.reply(this._formatter.noResultsScreen())
+    }
+
+    await interaction.reply(this._formatter.loadingScreen())
+    const message = await interaction.editReply(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+
+    for (let emoji of this._reactionList) {
+      await message.react(emoji)
+    }
+
+    const filter = (reaction, user) => {
+      return user.id === message.interaction.user.id
+    }
+
+    const collector = message.createReactionCollector({filter, dispose: true, time: config.dict.reactionExpireTime})
+
+    const postEditor = async (reaction) => {
+      if (currentPage > 1 && reaction.emoji.name === REACTIONS.BACK) {
+        currentPage -= 1
+        await interaction.editReply(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
       }
-
-      if (results.length > 0) {
-        let loadingMsg = await message.channel.send(this._formatter.loadingScreen())
-        let m = await loadingMsg.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-
-        for (let emoji of this._reactionList) {
-          await m.react(emoji)
-        }
-
-        const collector = m.createReactionCollector((reaction, user) => {
-          return user.id === message.author.id
-        }, {dispose: true, time: config.dict.reactionExpireTime})
-
-        const postEditor = async (reaction) => {
-          if (currentPage > 1 && reaction.emoji.name === '⬅️') {
-            currentPage -= 1
-            await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-          }
-          else if (currentPage < maxPage && reaction.emoji.name === '➡️') {
-            currentPage += 1
-            await m.edit(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-          }
-        }
-
-        collector.on('collect', (reaction) => {
-          postEditor(reaction)
-        })
-
-        collector.on('remove', (reaction) => {
-          postEditor(reaction)
-        })
-      }
-      else {
-        await message.channel.send('No results found')
+      else if (currentPage < maxPage && reaction.emoji.name === REACTIONS.FORWARD) {
+        currentPage += 1
+        await interaction.editReply(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
       }
     }
-  }
 
-  protected _getSearchQuery(message: Message): string {
-    let searchQuery = this._regex.exec(message.content)[1]
-    return searchQuery.replace(new RegExp('[+]{2,}', 'g'), '+')
+    collector.on('collect', async (reaction) => {
+      await postEditor(reaction)
+    })
+
+    collector.on('remove', async (reaction) => {
+      await postEditor(reaction)
+    })
   }
 }
 
 class ItemSearchHandler extends AbstractSearchHandler {
   constructor() {
-    super(
-      itemCache,
-      'item search',
-      new RegExp('^searchitem ([0-9a-z *+:#.\'\^]+)', 'i'),
-      new ItemSearchFormatter()
-    )
+    const command = new SlashCommandBuilder()
+      .setName('search_item')
+      .setDescription('Search items on Elsword market')
+      .addStringOption((option) => {
+        return option
+          .setName('query')
+          .setDescription('Enter a string')
+          .setRequired(true)
+      })
+    super(command, itemCache, new ItemSearchFormatter())
 
   }
 }
 
 class TearSearchHandler extends AbstractSearchHandler {
   constructor() {
-    super(
-      tearCache,
-      'tear search',
-      new RegExp('^searchtear ([0-9a-z *+:#.\'\^]+)', 'i'),
-      new TearSearchFormatter()
-    )
+    const command = new SlashCommandBuilder()
+      .setName('search_tear')
+      .setDescription('Search el tears on Elsword market')
+      .addStringOption((option) => {
+        return option
+          .setName('query')
+          .setDescription('Enter a string')
+          .setRequired(true)
+      })
+    super(command, tearCache, new TearSearchFormatter())
   }
 }
 

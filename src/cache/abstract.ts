@@ -53,7 +53,7 @@ class AbstractMarketCache {
 
   public startCache(): void {
     if (this._reloadSchedule) {
-      this._reloadSchedule.destroy()
+      this._reloadSchedule.stop()
     }
     this._reloadCache()
     this._reloadSchedule = cron.schedule(config.dict.cacheRefreshRate, () => {
