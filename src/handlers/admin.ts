@@ -3,13 +3,15 @@ import {LOG_BASE} from '../app/logging'
 import {AbstractCommandHandler} from './abtract'
 import {expiryCache, itemCache, tearCache, userCache} from '../cache/init'
 import {SlashCommandBuilder} from '@discordjs/builders'
+import {COLORS} from '../app/constants'
+import {MessageEmbed} from 'discord.js'
 
 class AdminHandler extends AbstractCommandHandler {
   constructor() {
     const command = new SlashCommandBuilder()
       .setName('update_market_cache')
       .setDescription('Reload cache')
-    super(command, [], ['1'])
+    super(command, [], [config.dict.ownerUserId])
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -23,7 +25,13 @@ class AdminHandler extends AbstractCommandHandler {
     tearCache.startCache()
     userCache.startCache()
     expiryCache.startCache()
-    return interaction.reply('Config reloaded')
+    return interaction.reply({
+      embeds: [
+        new MessageEmbed()
+          .setColor(COLORS.SUCCESS)
+          .setDescription('Config reloaded')
+      ]
+    })
   }
 }
 

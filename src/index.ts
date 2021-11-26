@@ -1,25 +1,8 @@
 import {client, config, logger, rest} from './app/init'
-import {CacheType, Interaction, Message, MessageComponentInteraction} from 'discord.js'
+import {Message, MessageComponentInteraction} from 'discord.js'
 import {LOG_BASE} from './app/logging'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import { REST } from '@discordjs/rest'
-import { Routes } from 'discord-api-types/v9'
-import {RouteLike} from '@discordjs/rest/dist/lib/RequestManager'
+import {Routes} from 'discord-api-types/v9'
 import {commands, handlers} from './handlers/init'
-
-// import {
-//   adminHandler,
-//   autoPostBuyItemHandler,
-//   autoPostBuyTearHandler,
-//   autoPostSellItemHandler,
-//   autoPostSellTearHandler, elswordCalcHandler, elswordEnhancementEventHandler,
-//   expiryNotificationHandler,
-//   expiryReactivationHandler, genshinCalcHandler,
-//   itemSearchHandler,
-//   tearSearchHandler,
-//   helpHandler,
-//   dontGetAttachedHandler
-// } from './handlers/init'
 
 client.on('ready', () => {
   logger.writeLog(LOG_BASE.SERVER001, {user: client.user.tag})
@@ -81,7 +64,7 @@ client.on('message', (message: Message) => {
 
 client.login(config.dict.discordToken)
   .then(() => {
-    return rest.put(Routes.applicationGuildCommands(config.dict.applicationId, config.dict.serverId), { body: commands })
+    return rest.put(Routes.applicationCommands(config.dict.applicationId), { body: commands })
   })
   .then(() => {
     logger.writeLog(LOG_BASE.SERVER005)
@@ -89,16 +72,3 @@ client.login(config.dict.discordToken)
   .catch((reason) => {
     logger.writeLog(LOG_BASE.SERVER003, {reason: reason})
   })
-
-// const rest = new REST({ version: '9' }).setToken(config.dict.discordToken)
-// rest.get(Routes.applicationGuildCommands('698194145948336209', config.dict.serverId))
-//   .then((data: Array<any>) => {
-//     console.log(data)
-//     const promises = [];
-//     for (const command of data) {
-//       const deleteUrl: RouteLike = `${Routes.applicationGuildCommands('698194145948336209', config.dict.serverId)}/${command.id}`;
-//       promises.push(rest.delete(deleteUrl));
-//     }
-//     return Promise.all(promises);
-//   });
-

@@ -15,7 +15,7 @@ class AbstractSearchHandler extends AbstractCommandHandler {
   protected _reactionList = [REACTIONS.BACK, REACTIONS.FORWARD]
 
   constructor(command: DiscordCommand, cache: AbstractMarketCache, formatter: AbstractSearchFormatter) {
-    super(command, [])
+    super(command, [config.dict.searchChannelId])
     this._cache = cache
     this._formatter = formatter
   }

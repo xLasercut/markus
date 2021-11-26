@@ -102,33 +102,6 @@ interface IConfig {
   applicationId: string
 }
 
-interface IEmbed {
-  embed: {
-    description: string
-    fields: Array<IEmbedField>
-    footer: IEmbedFooter,
-    color: string
-  }
-}
-
-interface IEmbedField {
-  name: string
-  value: string
-}
-
-interface IEmbedFooter {
-  text: string
-}
-
-interface IImageEmbed {
-  embed: {
-    title: string
-    image: {
-      url: string
-    }
-  }
-}
-
 interface IUserData {
   id: number
   username: string
@@ -140,4 +113,4 @@ interface IUserData {
   role: string
 }
 
-export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IEmbed, IRawUserPosts, IUserData, IImageEmbed}
+export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IRawUserPosts, IUserData}

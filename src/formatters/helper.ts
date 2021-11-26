@@ -1,5 +1,5 @@
 import {IItem, ITear} from '../interfaces'
-import {InteractionReplyOptions, MessageEditOptions} from 'discord.js'
+import {InteractionReplyOptions, MessageEditOptions, MessageEmbed} from 'discord.js'
 import {COLORS} from '../app/constants'
 
 function formatItemDescriptions(post: IItem | ITear, descriptionFields: { [key: string]: string }): string {
@@ -42,10 +42,9 @@ function formatUserInfo(post: IItem | ITear): string {
 function getLoadingScreen(): InteractionReplyOptions {
   return {
     embeds: [
-      {
-        color: COLORS.WARNING,
-        description: 'Processing...'
-      }
+      new MessageEmbed()
+        .setDescription('Processing...')
+        .setColor(COLORS.WARNING)
     ]
   }
 }

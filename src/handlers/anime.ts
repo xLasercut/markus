@@ -1,4 +1,4 @@
-import {MessageEmbed, MessageEmbedOptions, MessageOptions, User} from 'discord.js'
+import {InteractionReplyOptions, MessageEmbed, User} from 'discord.js'
 import {AbstractCommandHandler} from './abtract'
 import {SlashCommandBuilder} from '@discordjs/builders'
 import {config} from '../app/init'
@@ -55,20 +55,19 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction): Promise<any> {
     const user: User = interaction.options.getUser('user')
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new MessageEmbed()
+          .setColor(COLORS.ERROR)
+          .setTitle('DON\'T GET ATTACHED')
+          .setImage(this._getRandomImageUrl())
+      ]
+    }
     if (user) {
-      return interaction.reply({
-        content: `Hey <@${user.id}>`,
-        embeds: [
-          this._generateEmbed()
-        ]
-      })
+      response.content = `Hey <@${user.id}>`
     }
 
-    return interaction.reply({
-      embeds: [
-        this._generateEmbed()
-      ]
-    })
+    return interaction.reply(response)
   }
 
   protected _getRandomImageUrl(): string {
@@ -79,16 +78,6 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
     let imgIndex = this._indiciesNotSent[randomIndex]
     this._indiciesNotSent.splice(randomIndex, 1)
     return this._imgList[imgIndex]
-  }
-
-  protected _generateEmbed(): MessageEmbedOptions {
-    return {
-      title: 'DON\'T GET ATTACHED',
-      image: {
-        url: this._getRandomImageUrl()
-      },
-      color: COLORS.ERROR
-    }
   }
 }
 

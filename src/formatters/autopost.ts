@@ -1,5 +1,7 @@
-import {IEmbed, IItem, ITear} from '../interfaces'
+import {IItem, ITear} from '../interfaces'
 import {formatItemDescriptions, formatItemNames, getLoadingScreen} from './helper'
+import {InteractionReplyOptions, MessageEmbed} from 'discord.js'
+import {COLORS} from '../app/constants'
 
 class AbstractAutoPostFormatter {
   protected _nameFields: Array<string>
@@ -10,7 +12,7 @@ class AbstractAutoPostFormatter {
     this._descriptionFields = descriptionFields
   }
 
-  generateOutput(inputs: Array<IItem | ITear>): IEmbed {
+  generateOutput(inputs: Array<IItem | ITear>): InteractionReplyOptions {
     let firstPost = inputs[0]
     let title = [`User: __${firstPost.displayname}__`]
     if (firstPost.contact_discord || firstPost.discord_id) {
@@ -34,18 +36,17 @@ class AbstractAutoPostFormatter {
     }
 
     return {
-      embed: {
-        description: title.join(' '),
-        fields: fields,
-        footer: {
-          text: ''
-        },
-        color: '0x00FFFF'
-      }
+      embeds: [
+        new MessageEmbed()
+          .setDescription(title.join(' '))
+          .setFooter('')
+          .setColor(COLORS.PRIMARY)
+          .setFields(fields)
+      ]
     }
   }
 
-  public loadingScreen(): object {
+  public loadingScreen(): InteractionReplyOptions {
     return getLoadingScreen()
   }
 }

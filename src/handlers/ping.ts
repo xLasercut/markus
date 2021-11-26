@@ -1,5 +1,7 @@
 import {AbstractCommandHandler} from './abtract'
 import {SlashCommandBuilder} from '@discordjs/builders'
+import {COLORS} from '../app/constants'
+import {MessageEmbed} from 'discord.js'
 
 class PingHandler extends AbstractCommandHandler {
   constructor() {
@@ -11,7 +13,11 @@ class PingHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction): Promise<any> {
     return interaction.reply({
-      content: 'Pong!'
+      embeds: [
+        new MessageEmbed()
+          .setDescription('Pong!')
+          .setColor(COLORS.SUCCESS)
+      ]
     })
   }
 }

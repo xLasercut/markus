@@ -1,5 +1,7 @@
 import {AbstractCommandHandler} from './abtract'
 import {SlashCommandBuilder} from '@discordjs/builders'
+import {COLORS} from '../app/constants'
+import {MessageEmbed} from 'discord.js'
 
 class ElswordEnhancementEventHandler extends AbstractCommandHandler {
   constructor() {
@@ -10,7 +12,14 @@ class ElswordEnhancementEventHandler extends AbstractCommandHandler {
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
-    return interaction.reply('https://media.discordapp.net/attachments/143807793261051905/426223556859527190/image.png')
+    return interaction.reply({
+      embeds: [
+        new MessageEmbed()
+          .setColor(COLORS.ERROR)
+          .setTitle('Thanks KoG!')
+          .setImage('https://media.discordapp.net/attachments/143807793261051905/426223556859527190/image.png')
+      ]
+    })
   }
 }
 
