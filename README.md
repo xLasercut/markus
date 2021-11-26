@@ -64,6 +64,7 @@ For el tears, the available categories are: `name` (tear name), `character`, `sl
 #### Steps
 1. Create an environment file named `config.env` in the root directory
 ```dotenv
+APPLICATION_ID=<bot application id - MANDATORY>
 DISCORD_TOKEN=<your discord bot token - MANDATORY>
 API_PASSWORD=<api password to ashal's market - MANDATORY>
 SEARCH_CHANNEL_ID=<channel id of search channel - MANDATORY>
