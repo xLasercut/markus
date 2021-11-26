@@ -11,20 +11,19 @@ class UserCache {
   protected _users: Array<IUserData>
 
   constructor() {
-    this.startCache()
   }
 
   public isLoading(): boolean {
     return this._loading
   }
 
-  public startCache(): void {
+  public async startCache(): Promise<any> {
     if (this._reloadSchedule) {
       this._reloadSchedule.stop()
     }
-    this._reloadCache()
-    this._reloadSchedule = cron.schedule(config.dict.cacheRefreshRate, () => {
-      this._reloadCache()
+    await this._reloadCache()
+    this._reloadSchedule = cron.schedule(config.dict.cacheRefreshRate, async () => {
+      await this._reloadCache()
     })
   }
 

@@ -100,6 +100,8 @@ interface IConfig {
   reactivateItemApiUrl: string
   botsChannelId: string
   applicationId: string
+  imgurClientId: string
+  imgurAlbumHash: string
 }
 
 interface IUserData {

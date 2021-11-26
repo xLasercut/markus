@@ -1,7 +1,7 @@
 import {config, logger} from '../app/init'
 import {LOG_BASE} from '../app/logging'
 import {AbstractCommandHandler} from './abtract'
-import {expiryCache, itemCache, tearCache, userCache} from '../cache/init'
+import {reloadCache} from '../cache/init'
 import {SlashCommandBuilder} from '@discordjs/builders'
 import {COLORS} from '../app/constants'
 import {MessageEmbed} from 'discord.js'
@@ -9,7 +9,7 @@ import {MessageEmbed} from 'discord.js'
 class AdminHandler extends AbstractCommandHandler {
   constructor() {
     const command = new SlashCommandBuilder()
-      .setName('update_market_cache')
+      .setName('update_cache')
       .setDescription('Reload cache')
     super(command, [], [config.dict.ownerUserId])
   }
@@ -20,12 +20,16 @@ class AdminHandler extends AbstractCommandHandler {
       user: interaction.user.username,
       id: interaction.user.id
     })
+    await interaction.reply({
+      embeds: [
+        new MessageEmbed()
+          .setColor(COLORS.WARNING)
+          .setDescription('Reloading config...')
+      ]
+    })
     config.load()
-    itemCache.startCache()
-    tearCache.startCache()
-    userCache.startCache()
-    expiryCache.startCache()
-    return interaction.reply({
+    await reloadCache()
+    return interaction.editReply({
       embeds: [
         new MessageEmbed()
           .setColor(COLORS.SUCCESS)

@@ -17,7 +17,6 @@ class AbstractMarketCache {
   constructor(name: string, fieldsToEncode: Array<string>) {
     this._name = name
     this._fieldsToEncode = fieldsToEncode
-    this.startCache()
   }
 
   public isLoading(): boolean {
@@ -51,13 +50,13 @@ class AbstractMarketCache {
     return userList
   }
 
-  public startCache(): void {
+  public async startCache(): Promise<any> {
     if (this._reloadSchedule) {
       this._reloadSchedule.stop()
     }
-    this._reloadCache()
-    this._reloadSchedule = cron.schedule(config.dict.cacheRefreshRate, () => {
-      this._reloadCache()
+    await this._reloadCache()
+    this._reloadSchedule = cron.schedule(config.dict.cacheRefreshRate, async () => {
+      await this._reloadCache()
     })
   }
 

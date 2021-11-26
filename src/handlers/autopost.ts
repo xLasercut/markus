@@ -77,7 +77,6 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
     }
 
     return this._reply(interaction, `${this._name} already enabled`)
-
   }
 
   protected async _stopAutoPost(message: Message = null): Promise<any> {

@@ -31,7 +31,9 @@ class Config {
       expiryNotificationRate: process.env.EXPIRY_NOTIFICATION_RATE || '5 23 * * *',
       reactivateItemApiUrl: process.env.REACTIVATE_ITEM_API_URL || 'https://www.ashal.eu/market/api/reactivate_posts.php',
       botsChannelId: process.env.BOTS_CHANNEL_ID,
-      applicationId: process.env.APPLICATION_ID
+      applicationId: process.env.APPLICATION_ID,
+      imgurAlbumHash: process.env.IMGUR_ALBUM_HASH || '',
+      imgurClientId: process.env.IMGUR_CLIENT_ID || ''
     }
   }
 
