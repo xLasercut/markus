@@ -1,5 +1,6 @@
 import axios from 'axios'
-import {config} from '../app/init'
+import {config, logger} from '../app/init'
+import {LOG_BASE} from '../app/logging'
 
 class AnimeCache {
   protected _images: Array<string>
@@ -11,7 +12,15 @@ class AnimeCache {
   }
 
   public async startCache(): Promise<any> {
+    logger.writeLog(LOG_BASE.CACHE004, {
+      stage: 'start',
+      count: 0
+    })
     this._images = await this._getImgurAlbumImages()
+    logger.writeLog(LOG_BASE.CACHE004, {
+      stage: 'finish',
+      count: this._images.length
+    })
     this._imagesSent = new Set()
   }
 

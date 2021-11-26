@@ -60,6 +60,11 @@ const LOG_BASE = {
     level: LOG_LEVEL.INFO,
     template: 'user cache reload - stage="{{{stage}}}" rate="{{{rate}}}"'
   },
+  CACHE004: {
+    code: 'CACHE004',
+    level: LOG_LEVEL.INFO,
+    template: 'anime cache reload - stage="{{{stage}}}" count="{{{count}}}"'
+  },
   SERVER002: {
     code: 'SERVER002',
     level: LOG_LEVEL.ERROR,
