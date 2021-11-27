@@ -2,11 +2,26 @@ import {client, config, logger, rest} from './app/init'
 import {MessageComponentInteraction} from 'discord.js'
 import {LOG_BASE} from './app/logging'
 import {Routes} from 'discord-api-types/v9'
-import {commands, handlers} from './handlers/init'
+import {
+  autoPostBuyItemHandler,
+  autoPostBuyTearHandler,
+  autoPostSellItemHandler,
+  autoPostSellTearHandler,
+  commands,
+  handlers
+} from './handlers/init'
 import {reloadCache} from './cache/init'
 
-client.on('ready', () => {
+client.on('ready', async () => {
   logger.writeLog(LOG_BASE.SERVER001, {user: client.user.tag})
+  await reloadCache()
+  await rest.put(Routes.applicationCommands(config.dict.applicationId), { body: [] })
+  await rest.put(Routes.applicationGuildCommands(config.dict.applicationId, config.dict.serverId), { body: commands })
+  await autoPostBuyItemHandler.startAutoPost()
+  await autoPostSellItemHandler.startAutoPost()
+  await autoPostBuyTearHandler.startAutoPost()
+  await autoPostSellTearHandler.startAutoPost()
+  logger.writeLog(LOG_BASE.SERVER005)
 })
 
 client.on('interactionCreate', async (interaction: MessageComponentInteraction) => {
@@ -28,16 +43,6 @@ client.on('interactionCreate', async (interaction: MessageComponentInteraction) 
 })
 
 client.login(config.dict.discordToken)
-  .then(() => {
-    return rest.put(Routes.applicationCommands(config.dict.applicationId), { body: [] })
-  })
-  .then(() => {
-    return rest.put(Routes.applicationGuildCommands(config.dict.applicationId, config.dict.serverId), { body: commands })
-  })
-  .then(() => {
-    logger.writeLog(LOG_BASE.SERVER005)
-    return reloadCache()
-  })
   .catch((reason) => {
     logger.writeLog(LOG_BASE.SERVER003, {reason: reason})
   })

@@ -92,7 +92,7 @@ class AbstractMarketCache {
   }
 
   protected async _reloadPosts(body): Promise<any> {
-    let response = await axios.post(config.dict[`${this._name}ApiUrl`], body)
+    let response = await axios.post(config.dict[`${this._name}PostsApiUrl`], body)
     let apiData = response.data.posts
     this._posts = {}
 
@@ -105,7 +105,7 @@ class AbstractMarketCache {
   }
 
   protected async _reloadUserPosts(body): Promise<any> {
-    let response = await axios.post(config.dict[`${this._name}UserApiUrl`], body)
+    let response = await axios.post(config.dict[`${this._name}PostsUserApiUrl`], body)
     let userPosts: IRawUserPosts = response.data.users
     this._userPosts = {}
 

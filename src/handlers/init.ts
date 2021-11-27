@@ -49,7 +49,11 @@ const commands = Object.values(handlers).map((handler) => {
 
 export {
   handlers,
-  commands
+  commands,
+  autoPostBuyItemHandler,
+  autoPostSellItemHandler,
+  autoPostBuyTearHandler,
+  autoPostSellTearHandler
 }
 
 // const expiryNotificationHandler = new ExpiryNotificationHandler()

@@ -73,13 +73,13 @@ AUTO_POST_SELL_CHANNEL_ID=<channel id of autopost sell channel - MANDATORY>
 BOTS_CHANNEL_ID=<channel id of bots channel - MANDATORY>
 OWNER_USER_ID=<user id of the bot owner - MANDATORY>
 SERVER_ID=<id of server - MANDATORY>
-ITEM_API_URL=<api endpoint for item posts - OPTIONAL>
-TEAR_API_URL=<api endpoint for el tear posts - OPTIONAL>
+ITEM_POSTS_API_URL=<api endpoint for item posts - OPTIONAL>
+TEAR_POSTS_API_URL=<api endpoint for el tear posts - OPTIONAL>
 CACHE_REFRESH_RATE=<refresh rate of cache - crontab - OPTIONAL>
 AUTO_POST_RATE=<autopost check rate - crontab - OPTIONAL>
 AUTO_POST_REFRESH_RATE=<autopost refresh rate - crontab - OPTIONAL>
-ITEM_USER_API_URL=<api endpoint for user item posts - OPTIONAL>
-TEAR_USER_API_URL=<api endpoint for user tear posts - OPTIONAL>
+ITEM_POSTS_USER_API_URL=<api endpoint for user item posts - OPTIONAL>
+TEAR_POSTS_USER_API_URL=<api endpoint for user tear posts - OPTIONAL>
 ```
 2. run `docker-compose build`
 3. run `docker-compose up`

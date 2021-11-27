@@ -33,13 +33,12 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
     this._offset = offset
     this._type = type
     this._channel = channel
-    this._startAutoPost()
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
     const action = interaction.options.getString('action')
     if (action === 'enable') {
-      return this._startAutoPost(interaction)
+      return this.startAutoPost(interaction)
     }
 
     if (action === 'disable') {
@@ -57,7 +56,7 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
     }
   }
 
-  protected async _startAutoPost(interaction = null): Promise<any> {
+  public async startAutoPost(interaction = null): Promise<any> {
     if (!this._postSchedule) {
       this._generateBuckets()
       this._refreshList()

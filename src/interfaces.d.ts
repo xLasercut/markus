@@ -83,15 +83,15 @@ interface IConfig {
   autoPostBuyChannelId: string
   autoPostSellChannelId: string
   ownerUserId: string
-  itemApiUrl: string
-  tearApiUrl: string
+  itemPostsApiUrl: string
+  tearPostsApiUrl: string
   cacheRefreshRate: string
   autoPostRate: string
   autoPostRefreshRate: string
   searchResultsPerPage: number
   reactionExpireTime: number
-  itemUserApiUrl: string
-  tearUserApiUrl: string
+  itemPostsUserApiUrl: string
+  tearPostsUserApiUrl: string
   serverId: string
   updateIdApiUrl: string
   userListApiUrl: string
