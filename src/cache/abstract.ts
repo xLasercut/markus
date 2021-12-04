@@ -84,7 +84,7 @@ class AbstractMarketCache {
       this._loading = false
     } catch (e) {
       logger.writeLog(LOG_BASE.CACHE002, {
-        error: e.stack
+        error: e
       })
       this._loading = false
     }
@@ -92,7 +92,12 @@ class AbstractMarketCache {
 
   protected async _reloadPosts(body): Promise<any> {
     let response = await axios.post(config.dict[`${this._name}PostsApiUrl`], body)
-    let apiData = response.data.posts
+    let apiData = []
+
+    if (Array.isArray(response.data.posts)) {
+      apiData = response.data.posts
+    }
+
     this._posts = {}
 
     for (let post of apiData) {

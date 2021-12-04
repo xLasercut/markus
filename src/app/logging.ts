@@ -53,7 +53,7 @@ const LOG_BASE = {
   CACHE002: {
     code: 'CACHE0002',
     level: LOG_LEVEL.ERROR,
-    template: 'market cache reload failed - status="{{{status}}}" error="{{{error}}}"'
+    template: 'market cache reload failed - error="{{{error}}}"'
   },
   CACHE003: {
     code: 'CACHE003',
