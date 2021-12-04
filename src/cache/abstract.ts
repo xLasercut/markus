@@ -84,8 +84,7 @@ class AbstractMarketCache {
       this._loading = false
     } catch (e) {
       logger.writeLog(LOG_BASE.CACHE002, {
-        error: e.response.statusText,
-        status: e.response.status
+        error: e.stack
       })
       this._loading = false
     }
