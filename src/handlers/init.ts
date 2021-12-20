@@ -12,6 +12,7 @@ import {ElswordEnhancementEventHandler} from './elsword-enhancement-event'
 import {MarketHelpHandler} from './help'
 import {DontGetAttachedHandler} from './anime'
 import {PingHandler} from './ping'
+import {PtrHandler} from './ptr'
 
 const pingHandler = new PingHandler()
 const dontGetAttachedHandler = new DontGetAttachedHandler()
@@ -26,6 +27,7 @@ const autoPostBuyItemHandler = new AutoPostBuyItemHandler()
 const autoPostSellItemHandler = new AutoPostSellItemHandler()
 const autoPostBuyTearHandler = new AutoPostBuyTearHandler()
 const autoPostSellTearHandler = new AutoPostSellTearHandler()
+const ptrHandler = new PtrHandler()
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -40,7 +42,8 @@ const handlers = {
   [autoPostBuyItemHandler.name]: autoPostBuyItemHandler,
   [autoPostSellItemHandler.name]: autoPostSellItemHandler,
   [autoPostBuyTearHandler.name]: autoPostBuyTearHandler,
-  [autoPostSellTearHandler.name]: autoPostSellTearHandler
+  [autoPostSellTearHandler.name]: autoPostSellTearHandler,
+  [ptrHandler.name]: ptrHandler
 }
 
 const commands = Object.values(handlers).map((handler) => {
