@@ -40,7 +40,7 @@ class AnimeCache {
 
   public getRandomImage(): string {
     const images = this._images
-    if (images.length >= this._imagesSent.size) {
+    if (images.length <= this._imagesSent.size) {
       this._imagesSent = new Set()
     }
     while (images.length > 0) {
