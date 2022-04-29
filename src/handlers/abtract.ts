@@ -1,6 +1,4 @@
-import {Message, MessageComponentInteraction} from 'discord.js'
-import {logger} from '../app/init'
-import {LOG_BASE} from '../app/logging'
+import {MessageComponentInteraction} from 'discord.js'
 import {DiscordCommand} from '../types'
 
 class AbstractCommandHandler {

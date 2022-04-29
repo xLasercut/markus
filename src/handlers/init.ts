@@ -10,9 +10,9 @@ import {ElswordCalcHandler} from './elsword-calc'
 import {GenshinCalcHandler} from './genshin-calc'
 import {ElswordEnhancementEventHandler} from './elsword-enhancement-event'
 import {MarketHelpHandler} from './help'
-import {DontGetAttachedHandler} from './anime'
+import {DontGetAttachedHandler, AnimeStreamAlertHandler} from './anime'
 import {PingHandler} from './ping'
-import {PtrHandler} from './ptr'
+import {PtrHandler, BonkHandler} from './memes'
 
 const pingHandler = new PingHandler()
 const dontGetAttachedHandler = new DontGetAttachedHandler()
@@ -28,6 +28,8 @@ const autoPostSellItemHandler = new AutoPostSellItemHandler()
 const autoPostBuyTearHandler = new AutoPostBuyTearHandler()
 const autoPostSellTearHandler = new AutoPostSellTearHandler()
 const ptrHandler = new PtrHandler()
+const animeStreamAlertHandler = new AnimeStreamAlertHandler()
+const bonkHandler = new BonkHandler()
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -43,7 +45,9 @@ const handlers = {
   [autoPostSellItemHandler.name]: autoPostSellItemHandler,
   [autoPostBuyTearHandler.name]: autoPostBuyTearHandler,
   [autoPostSellTearHandler.name]: autoPostSellTearHandler,
-  [ptrHandler.name]: ptrHandler
+  [ptrHandler.name]: ptrHandler,
+  [animeStreamAlertHandler.name]: animeStreamAlertHandler,
+  [bonkHandler.name]: bonkHandler
 }
 
 const commands = Object.values(handlers).map((handler) => {

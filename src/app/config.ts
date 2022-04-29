@@ -34,7 +34,8 @@ class Config {
       applicationId: process.env.APPLICATION_ID,
       imgurAlbumHash: process.env.IMGUR_ALBUM_HASH || '',
       imgurClientId: process.env.IMGUR_CLIENT_ID || '',
-      testChannelId: process.env.TEST_CHANNEL_ID || ''
+      testChannelId: process.env.TEST_CHANNEL_ID || '',
+      animeRoleId: process.env.ANIME_ROLE_ID || ''
     }
   }
 

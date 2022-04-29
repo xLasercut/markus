@@ -103,6 +103,7 @@ interface IConfig {
   imgurClientId: string
   imgurAlbumHash: string
   testChannelId: string
+  animeRoleId: string
 }
 
 interface IUserData {
