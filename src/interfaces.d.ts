@@ -102,6 +102,7 @@ interface IConfig {
   applicationId: string
   imgurClientId: string
   imgurAlbumHash: string
+  testChannelId: string
 }
 
 interface IUserData {

@@ -65,6 +65,11 @@ const LOG_BASE = {
     level: LOG_LEVEL.INFO,
     template: 'anime cache reload - stage="{{{stage}}}" count="{{{count}}}"'
   },
+  CACHE005: {
+    code: 'CACHE005',
+    level: LOG_LEVEL.INFO,
+    template: 'fetched anime image - url="{{{imageUrl}}}"'
+  },
   SERVER002: {
     code: 'SERVER002',
     level: LOG_LEVEL.ERROR,

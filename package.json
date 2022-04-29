@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "node clean.js && tsc -b",
     "start": "node dist/index.js",
-    "serve": "npm run compile && npm run start"
+    "serve": "yarn compile && yarn start"
   },
   "author": "xLasercut",
   "license": "MIT",

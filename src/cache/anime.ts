@@ -4,11 +4,11 @@ import {LOG_BASE} from '../app/logging'
 
 class AnimeCache {
   protected _images: Array<string>
-  protected _imagesSent: Set<string>
+  protected _imagesToSend: Array<string>
 
   constructor() {
     this._images = []
-    this._imagesSent = new Set()
+    this._imagesToSend = []
   }
 
   public async startCache(): Promise<any> {
@@ -21,7 +21,7 @@ class AnimeCache {
       stage: 'finish',
       count: this._images.length
     })
-    this._imagesSent = new Set()
+    this._imagesToSend = []
   }
 
   protected async _getImgurAlbumImages(): Promise<Array<string>> {
@@ -39,20 +39,17 @@ class AnimeCache {
   }
 
   public getRandomImage(): string {
-    const images = this._images
-    if (images.length <= this._imagesSent.size) {
-      this._imagesSent = new Set()
+    if (this._imagesToSend.length <= 0) {
+      this._imagesToSend = this._images
     }
-    while (images.length > 0) {
-      const randomIndex = Math.floor(Math.random() * images.length)
-      const imageUrl = images[randomIndex]
-      if (!this._imagesSent.has(imageUrl)) {
-        this._imagesSent.add(imageUrl)
-        return imageUrl
-      }
-      images.splice(randomIndex, 1)
-    }
-    return ''
+
+    const randomIndex = Math.floor(Math.random() * this._imagesToSend.length)
+    const imageUrl = this._imagesToSend[randomIndex] || ''
+    logger.writeLog(LOG_BASE.CACHE005, {
+      imageUrl: imageUrl
+    })
+    this._imagesToSend.splice(randomIndex, 1)
+    return imageUrl
   }
 }
 

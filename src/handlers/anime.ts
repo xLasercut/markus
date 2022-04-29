@@ -18,7 +18,7 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
           .setName('user')
           .setDescription('Select a user')
       })
-    super(command, [config.dict.botsChannelId])
+    super(command, [config.dict.botsChannelId, config.dict.testChannelId])
     this._cache = animeCache
   }
 
