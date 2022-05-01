@@ -1,6 +1,7 @@
 version: '3'
 services:
   ashal_market_bot:
+    container_name: ashal_market_bot
     build:
       context: '.'
     restart: unless-stopped
@@ -11,3 +12,8 @@ services:
     logging:
       options:
         max-size: 50m
+    networks:
+      ashal_market_bot:
+
+networks:
+  ashal_market_bot:
