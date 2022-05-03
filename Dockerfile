@@ -2,7 +2,7 @@ FROM node:lts-alpine
 
 LABEL maintainer=xLasercut
 
-ARG WORK_DIR=/home/ashal_market_bot
+ARG WORK_DIR=/home/markus
 
 RUN apk update \
  && apk -q add curl \

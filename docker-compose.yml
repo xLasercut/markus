@@ -1,19 +1,19 @@
 version: '3'
 services:
-  ashal_market_bot:
-    container_name: ashal_market_bot
+  markus:
+    container_name: markus
     build:
       context: '.'
     restart: unless-stopped
     volumes:
-      - ./log/:/home/ashal_market_bot/log
+      - ./log/:/home/markus/log
     env_file:
       - config.env
     logging:
       options:
         max-size: 50m
     networks:
-      ashal_market_bot:
+      markus:
 
 networks:
-  ashal_market_bot:
+  markus:
