@@ -1,6 +1,6 @@
-# Ashal Market Bot
+# M.A.R.K.U.S
 
-A discord bot for [Ashal's Market](https://www.ashal.eu/market/search.php) built using [Discord.js](https://discord.js.org/#/) and [lunr](https://lunrjs.com/)
+A discord bot for [Ashal's Market](https://www.ashal.eu/market/search.php) and Memes built using [Discord.js](https://discord.js.org/#/) and [lunr](https://lunrjs.com/)
 
 ## Usage
 
