@@ -6,18 +6,18 @@ A discord bot for [Ashal's Market](https://www.ashal.eu/market/search.php) built
 
 The bot has two search commands:
 
-`searchitem` and `searchtear`
+`/search_item` and `/search_tear`
 
-use `searchitem` to search for normal items and use `searchtear` to search for el tears
+use `/search_item` to search for normal items and use `/search_tear` to search for el tears
 
 ### Basic Search
 
-For basic searching, simply type: `searchitem <search term one> <search term two> ...`
+For basic searching, simply type: `/search_item <search term one> <search term two> ...`
 
 This will search the market for posts that contain any of the search terms
 
 ##### Examples:
-- `searchitem elsword top` will return all posts that contain either elsword or top
+- `/search_item elsword top` will return all posts that contain either elsword or top
 
 ### Advanced Search
 
@@ -28,16 +28,16 @@ The search indexer uses the lunr engine. it supports a few advanced search featu
 To search for posts that include more than one terms, add a `+` in front of each term.
 
 ##### Examples:
-- to search for posts that has both elsword **AND** top `searchitem +elsword +top`
-- to search for posts that has both elsword **AND** buy `searchitem +elsword +buy`
+- to search for posts that has both elsword **AND** top `/search_item +elsword +top`
+- to search for posts that has both elsword **AND** buy `/search_item +elsword +buy`
 
 #### Wildcards
 
 You can search for partial words by appending or prepending the search terms with `*`
 
 ##### Examples:
- - to search for posts that includes words beginning with `nere`, use: `searchitem nere*`
- - to search for posts that include words beginning with `n` and end with `d`, use: `searchitem n*d`
+ - to search for posts that includes words beginning with `nere`, use: `/search_item nere*`
+ - to search for posts that include words beginning with `n` and end with `d`, use: `/search_item n*d`
 
 #### Category Searching
 
@@ -48,8 +48,8 @@ For items, the available categories are: `name` (item name), `character`, `slot`
 For el tears, the available categories are: `name` (tear name), `character`, `slot` (tear slot), `shape` (shape of tear), `color` (color of tear), `user` (name of seller/buyer), `type` (buy or sell), `discord` (discord name of seller/buyer), `rarity`
 
 ##### Examples:
-- to search for all top items for Elsword: `searchitem +character:elsword +slot:top`
-- to search for all purple shoe tears: `searchtear +color:purple +slot:shoes`
+- to search for all top items for Elsword: `/search_item +character:elsword +slot:top`
+- to search for all purple shoe tears: `/search_tear +color:purple +slot:shoes`
 
 
 **For all search combinations, please see [lunr docs](https://lunrjs.com/guides/searching.html)**
