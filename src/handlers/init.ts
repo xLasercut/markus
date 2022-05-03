@@ -12,7 +12,7 @@ import {ElswordEnhancementEventHandler} from './elsword-enhancement-event'
 import {MarketHelpHandler} from './help'
 import {DontGetAttachedHandler, AnimeStreamAlertHandler} from './anime'
 import {PingHandler} from './ping'
-import {PtrHandler, BonkHandler} from './memes'
+import {PtrHandler, BonkHandler, ChristianServerHandler} from './memes'
 
 const pingHandler = new PingHandler()
 const dontGetAttachedHandler = new DontGetAttachedHandler()
@@ -30,6 +30,7 @@ const autoPostSellTearHandler = new AutoPostSellTearHandler()
 const ptrHandler = new PtrHandler()
 const animeStreamAlertHandler = new AnimeStreamAlertHandler()
 const bonkHandler = new BonkHandler()
+const christianServerHandler = new ChristianServerHandler()
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -47,7 +48,8 @@ const handlers = {
   [autoPostSellTearHandler.name]: autoPostSellTearHandler,
   [ptrHandler.name]: ptrHandler,
   [animeStreamAlertHandler.name]: animeStreamAlertHandler,
-  [bonkHandler.name]: bonkHandler
+  [bonkHandler.name]: bonkHandler,
+  [christianServerHandler.name]: christianServerHandler
 }
 
 const commands = Object.values(handlers).map((handler) => {

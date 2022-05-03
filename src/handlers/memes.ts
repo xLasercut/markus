@@ -52,7 +52,28 @@ class BonkHandler extends AbstractCommandHandler {
   }
 }
 
+class ChristianServerHandler extends AbstractCommandHandler {
+  constructor() {
+    const command = new SlashCommandBuilder()
+      .setName('christian_server')
+      .setDescription('AMEN!')
+    super(command)
+  }
+
+  protected async _runWorkflow(interaction): Promise<any> {
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new MessageEmbed()
+          .setImage('https://i.imgur.com/xDw8nXF.png')
+          .setColor(COLORS.INFO)
+      ]
+    }
+    return interaction.reply(response)
+  }
+}
+
 export {
   PtrHandler,
-  BonkHandler
+  BonkHandler,
+  ChristianServerHandler
 }
