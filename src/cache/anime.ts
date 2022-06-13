@@ -5,10 +5,12 @@ import {LOG_BASE} from '../app/logging'
 class AnimeCache {
   protected _images: Array<string>
   protected _imagesToSend: Array<string>
+  protected _currentImageCount: number
 
   constructor() {
     this._images = []
     this._imagesToSend = []
+    this._currentImageCount = 0
   }
 
   public async startCache(): Promise<any> {
@@ -21,7 +23,8 @@ class AnimeCache {
       stage: 'finish',
       count: this._images.length
     })
-    this._imagesToSend = []
+    this._imagesToSend = this._shuffleArray(this._images)
+    this._currentImageCount = 0
   }
 
   protected async _getImgurAlbumImages(): Promise<Array<string>> {
@@ -39,17 +42,29 @@ class AnimeCache {
   }
 
   public getRandomImage(): string {
-    if (this._imagesToSend.length <= 0) {
-      this._imagesToSend = this._images
+    if (this._currentImageCount >= this._imagesToSend.length) {
+      this._imagesToSend = this._shuffleArray(this._images)
+      this._currentImageCount = 0
     }
 
-    const randomIndex = Math.floor(Math.random() * this._imagesToSend.length)
-    const imageUrl = this._imagesToSend[randomIndex] || ''
+    const imageUrl = this._imagesToSend[this._currentImageCount]
     logger.writeLog(LOG_BASE.CACHE005, {
       imageUrl: imageUrl
     })
-    this._imagesToSend.splice(randomIndex, 1)
+    this._currentImageCount += 1
     return imageUrl
+  }
+
+  protected _shuffleArray(array: string[]): string[] {
+    const shuffledList = [ ...array ]
+    let currentIndex = shuffledList.length, randomIndex
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex)
+      currentIndex--;
+      [ shuffledList[currentIndex], shuffledList[randomIndex] ] = [
+        shuffledList[randomIndex], shuffledList[currentIndex] ]
+    }
+    return shuffledList
   }
 }
 
