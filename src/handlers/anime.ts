@@ -1,10 +1,10 @@
-import {InteractionReplyOptions, MessageEmbed, User} from 'discord.js'
-import {AbstractCommandHandler} from './abtract'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {config} from '../app/init'
-import {COLORS} from '../app/constants'
-import {AnimeCache} from '../cache/anime'
-import {animeCache} from '../cache/init'
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
+import { AbstractCommandHandler } from './abtract'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { config } from '../app/init'
+import { COLORS } from '../app/constants'
+import { AnimeCache } from '../cache/anime'
+import { animeCache } from '../cache/init'
 
 class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _cache: AnimeCache
@@ -12,11 +12,9 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
   constructor() {
     const command = new SlashCommandBuilder()
       .setName('dont_get_attached')
-      .setDescription('Don\'t get attached!')
+      .setDescription("Don't get attached!")
       .addUserOption((option) => {
-        return option
-          .setName('user')
-          .setDescription('Select a user')
+        return option.setName('user').setDescription('Select a user')
       })
     super(command, [config.dict.botsChannelId, config.dict.testChannelId])
     this._cache = animeCache
@@ -28,7 +26,7 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
       embeds: [
         new MessageEmbed()
           .setColor(COLORS.ERROR)
-          .setTitle('DON\'T GET ATTACHED')
+          .setTitle("DON'T GET ATTACHED")
           .setImage(this._cache.getRandomImage())
       ]
     }
@@ -82,7 +80,7 @@ class AnimeStreamAlertHandler extends AbstractCommandHandler {
         embeds: [
           new MessageEmbed()
             .setColor(COLORS.INFO)
-            .setTitle('It\'s Anime Time. DON\'T BE LATE!')
+            .setTitle("It's Anime Time. DON'T BE LATE!")
             .setImage('https://i.imgur.com/R0v1uDe.jpg')
         ]
       }
@@ -91,7 +89,4 @@ class AnimeStreamAlertHandler extends AbstractCommandHandler {
   }
 }
 
-export {
-  DontGetAttachedHandler,
-  AnimeStreamAlertHandler
-}
+export { DontGetAttachedHandler, AnimeStreamAlertHandler }

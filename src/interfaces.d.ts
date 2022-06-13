@@ -117,4 +117,15 @@ interface IUserData {
   role: string
 }
 
-export {IItem, ITear, IUserPosts, ILog, IItems, ITears, IAutoPosterList, IConfig, IRawUserPosts, IUserData}
+export {
+  IItem,
+  ITear,
+  IUserPosts,
+  ILog,
+  IItems,
+  ITears,
+  IAutoPosterList,
+  IConfig,
+  IRawUserPosts,
+  IUserData
+}

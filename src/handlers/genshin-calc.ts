@@ -1,7 +1,7 @@
-import {AbstractCommandHandler} from './abtract'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {COLORS} from '../app/constants'
-import {InteractionReplyOptions, MessageEmbed, User} from 'discord.js'
+import { AbstractCommandHandler } from './abtract'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { COLORS } from '../app/constants'
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
 
 class GenshinCalcHandler extends AbstractCommandHandler {
   constructor() {
@@ -9,9 +9,7 @@ class GenshinCalcHandler extends AbstractCommandHandler {
       .setName('genshin_calc')
       .setDescription('Genshin calculator')
       .addUserOption((option) => {
-        return option
-          .setName('user')
-          .setDescription('Select a user')
+        return option.setName('user').setDescription('Select a user')
       })
     super(command)
   }
@@ -35,4 +33,4 @@ class GenshinCalcHandler extends AbstractCommandHandler {
   }
 }
 
-export {GenshinCalcHandler}
+export { GenshinCalcHandler }

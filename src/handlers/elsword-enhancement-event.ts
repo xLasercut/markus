@@ -1,7 +1,7 @@
-import {AbstractCommandHandler} from './abtract'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {COLORS} from '../app/constants'
-import {MessageEmbed} from 'discord.js'
+import { AbstractCommandHandler } from './abtract'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { COLORS } from '../app/constants'
+import { MessageEmbed } from 'discord.js'
 
 class ElswordEnhancementEventHandler extends AbstractCommandHandler {
   constructor() {
@@ -17,10 +17,12 @@ class ElswordEnhancementEventHandler extends AbstractCommandHandler {
         new MessageEmbed()
           .setColor(COLORS.ERROR)
           .setTitle('Thanks KoG!')
-          .setImage('https://media.discordapp.net/attachments/143807793261051905/426223556859527190/image.png')
+          .setImage(
+            'https://media.discordapp.net/attachments/143807793261051905/426223556859527190/image.png'
+          )
       ]
     })
   }
 }
 
-export {ElswordEnhancementEventHandler}
+export { ElswordEnhancementEventHandler }

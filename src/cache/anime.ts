@@ -1,6 +1,6 @@
 import axios from 'axios'
-import {config, logger} from '../app/init'
-import {LOG_BASE} from '../app/logging'
+import { config, logger } from '../app/init'
+import { LOG_BASE } from '../app/logging'
 
 class AnimeCache {
   protected _images: Array<string>
@@ -36,7 +36,7 @@ class AnimeCache {
         }
       })
 
-      return response.data.data.images.map(image => image.link)
+      return response.data.data.images.map((image) => image.link)
     }
     return []
   }
@@ -56,16 +56,19 @@ class AnimeCache {
   }
 
   protected _shuffleArray(array: string[]): string[] {
-    const shuffledList = [ ...array ]
-    let currentIndex = shuffledList.length, randomIndex
+    const shuffledList = [...array]
+    let currentIndex = shuffledList.length,
+      randomIndex
     while (currentIndex !== 0) {
       randomIndex = Math.floor(Math.random() * currentIndex)
-      currentIndex--;
-      [ shuffledList[currentIndex], shuffledList[randomIndex] ] = [
-        shuffledList[randomIndex], shuffledList[currentIndex] ]
+      currentIndex--
+      ;[shuffledList[currentIndex], shuffledList[randomIndex]] = [
+        shuffledList[randomIndex],
+        shuffledList[currentIndex]
+      ]
     }
     return shuffledList
   }
 }
 
-export {AnimeCache}
+export { AnimeCache }

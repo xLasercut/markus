@@ -1,6 +1,6 @@
-import {Logger} from './logging'
-import {Config} from './config'
-import {Client, Intents} from 'discord.js'
+import { Logger } from './logging'
+import { Config } from './config'
+import { Client, Intents } from 'discord.js'
 import { REST } from '@discordjs/rest'
 
 const client = new Client({
@@ -14,5 +14,4 @@ const logger = new Logger()
 const config = new Config()
 const rest = new REST({ version: '9' }).setToken(config.dict.discordToken)
 
-
-export {client, logger, config, rest}
+export { client, logger, config, rest }

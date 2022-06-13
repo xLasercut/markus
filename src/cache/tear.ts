@@ -1,6 +1,6 @@
-import {ITear, ITears} from '../interfaces'
+import { ITear, ITears } from '../interfaces'
 import * as lunr from 'lunr'
-import {AbstractMarketCache} from './abstract'
+import { AbstractMarketCache } from './abstract'
 
 class TearCache extends AbstractMarketCache {
   protected _posts: ITears
@@ -18,7 +18,19 @@ class TearCache extends AbstractMarketCache {
   }
 
   protected _generateSearchIndex(apiData: Array<ITear>): lunr.Index {
-    let searchFields = ['name', 'type', 'user', 'slot', 'shape', 'color', 'value', 'character', 'price', 'discord', 'rarity']
+    let searchFields = [
+      'name',
+      'type',
+      'user',
+      'slot',
+      'shape',
+      'color',
+      'value',
+      'character',
+      'price',
+      'discord',
+      'rarity'
+    ]
     return lunr(function () {
       this.ref('id')
       for (let field of searchFields) {
@@ -45,4 +57,4 @@ class TearCache extends AbstractMarketCache {
   }
 }
 
-export {TearCache}
+export { TearCache }

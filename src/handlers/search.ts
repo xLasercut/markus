@@ -1,20 +1,28 @@
-import {config, logger} from '../app/init'
-import {LOG_BASE} from '../app/logging'
-import {IItem, ITear} from '../interfaces'
-import {AbstractCommandHandler} from './abtract'
-import {AbstractMarketCache} from '../cache/abstract'
-import {itemCache, tearCache} from '../cache/init'
-import {AbstractSearchFormatter, ItemSearchFormatter, TearSearchFormatter} from '../formatters/search'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {DiscordCommand} from '../types'
-import {REACTIONS} from '../app/constants'
+import { config, logger } from '../app/init'
+import { LOG_BASE } from '../app/logging'
+import { IItem, ITear } from '../interfaces'
+import { AbstractCommandHandler } from './abtract'
+import { AbstractMarketCache } from '../cache/abstract'
+import { itemCache, tearCache } from '../cache/init'
+import {
+  AbstractSearchFormatter,
+  ItemSearchFormatter,
+  TearSearchFormatter
+} from '../formatters/search'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { DiscordCommand } from '../types'
+import { REACTIONS } from '../app/constants'
 
 class AbstractSearchHandler extends AbstractCommandHandler {
   protected _cache: AbstractMarketCache
   protected _formatter: AbstractSearchFormatter
   protected _reactionList = [REACTIONS.BACK, REACTIONS.FORWARD]
 
-  constructor(command: DiscordCommand, cache: AbstractMarketCache, formatter: AbstractSearchFormatter) {
+  constructor(
+    command: DiscordCommand,
+    cache: AbstractMarketCache,
+    formatter: AbstractSearchFormatter
+  ) {
     super(command, [config.dict.searchChannelId])
     this._cache = cache
     this._formatter = formatter
@@ -48,7 +56,9 @@ class AbstractSearchHandler extends AbstractCommandHandler {
     }
 
     await interaction.reply(this._formatter.loadingScreen())
-    const message = await interaction.editReply(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+    const message = await interaction.editReply(
+      this._formatter.generateOutput(slicedResults(), currentPage, maxPage)
+    )
 
     for (let emoji of this._reactionList) {
       await message.react(emoji)
@@ -58,16 +68,23 @@ class AbstractSearchHandler extends AbstractCommandHandler {
       return user.id === message.interaction.user.id
     }
 
-    const collector = message.createReactionCollector({filter, dispose: true, time: config.dict.reactionExpireTime})
+    const collector = message.createReactionCollector({
+      filter,
+      dispose: true,
+      time: config.dict.reactionExpireTime
+    })
 
     const postEditor = async (reaction) => {
       if (currentPage > 1 && reaction.emoji.name === REACTIONS.BACK) {
         currentPage -= 1
-        await interaction.editReply(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
-      }
-      else if (currentPage < maxPage && reaction.emoji.name === REACTIONS.FORWARD) {
+        await interaction.editReply(
+          this._formatter.generateOutput(slicedResults(), currentPage, maxPage)
+        )
+      } else if (currentPage < maxPage && reaction.emoji.name === REACTIONS.FORWARD) {
         currentPage += 1
-        await interaction.editReply(this._formatter.generateOutput(slicedResults(), currentPage, maxPage))
+        await interaction.editReply(
+          this._formatter.generateOutput(slicedResults(), currentPage, maxPage)
+        )
       }
     }
 
@@ -87,13 +104,9 @@ class ItemSearchHandler extends AbstractSearchHandler {
       .setName('search_item')
       .setDescription('Search items on Elsword market')
       .addStringOption((option) => {
-        return option
-          .setName('query')
-          .setDescription('Enter a string')
-          .setRequired(true)
+        return option.setName('query').setDescription('Enter a string').setRequired(true)
       })
     super(command, itemCache, new ItemSearchFormatter())
-
   }
 }
 
@@ -103,13 +116,10 @@ class TearSearchHandler extends AbstractSearchHandler {
       .setName('search_tear')
       .setDescription('Search el tears on Elsword market')
       .addStringOption((option) => {
-        return option
-          .setName('query')
-          .setDescription('Enter a string')
-          .setRequired(true)
+        return option.setName('query').setDescription('Enter a string').setRequired(true)
       })
     super(command, tearCache, new TearSearchFormatter())
   }
 }
 
-export {ItemSearchHandler, TearSearchHandler}
+export { ItemSearchHandler, TearSearchHandler }

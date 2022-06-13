@@ -1,8 +1,11 @@
-import {IItem, ITear} from '../interfaces'
-import {InteractionReplyOptions, MessageEditOptions, MessageEmbed} from 'discord.js'
-import {COLORS} from '../app/constants'
+import { IItem, ITear } from '../interfaces'
+import { InteractionReplyOptions, MessageEditOptions, MessageEmbed } from 'discord.js'
+import { COLORS } from '../app/constants'
 
-function formatItemDescriptions(post: IItem | ITear, descriptionFields: { [key: string]: string }): string {
+function formatItemDescriptions(
+  post: IItem | ITear,
+  descriptionFields: { [key: string]: string }
+): string {
   let info = []
 
   for (let field in descriptionFields) {
@@ -41,12 +44,8 @@ function formatUserInfo(post: IItem | ITear): string {
 
 function getLoadingScreen(): InteractionReplyOptions {
   return {
-    embeds: [
-      new MessageEmbed()
-        .setDescription('Processing...')
-        .setColor(COLORS.WARNING)
-    ]
+    embeds: [new MessageEmbed().setDescription('Processing...').setColor(COLORS.WARNING)]
   }
 }
 
-export {formatItemNames, formatItemDescriptions, formatUserInfo, getLoadingScreen}
+export { formatItemNames, formatItemDescriptions, formatUserInfo, getLoadingScreen }

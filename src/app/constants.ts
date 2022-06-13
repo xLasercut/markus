@@ -1,4 +1,4 @@
-import {ColorResolvable} from 'discord.js'
+import { ColorResolvable } from 'discord.js'
 
 const COLORS: { [key: string]: ColorResolvable } = {
   ERROR: '#f04740',
@@ -13,7 +13,4 @@ const REACTIONS = {
   FORWARD: '➡️'
 }
 
-export {
-  COLORS,
-  REACTIONS
-}
+export { COLORS, REACTIONS }

@@ -1,5 +1,5 @@
-import {MessageComponentInteraction} from 'discord.js'
-import {DiscordCommand} from '../types'
+import { MessageComponentInteraction } from 'discord.js'
+import { DiscordCommand } from '../types'
 
 class AbstractCommandHandler {
   protected _name: string
@@ -7,7 +7,11 @@ class AbstractCommandHandler {
   protected _allowedChannels: Array<string>
   protected _allowedUsers: Array<string>
 
-  constructor(command: DiscordCommand, allowedChannels: Array<string> = [], allowedUsers: Array<string> = []) {
+  constructor(
+    command: DiscordCommand,
+    allowedChannels: Array<string> = [],
+    allowedUsers: Array<string> = []
+  ) {
     this._name = command.name
     this._command = command
     this._allowedChannels = allowedChannels
@@ -56,4 +60,4 @@ class AbstractCommandHandler {
   }
 }
 
-export {AbstractCommandHandler}
+export { AbstractCommandHandler }

@@ -1,16 +1,14 @@
-import {config, logger} from '../app/init'
-import {LOG_BASE} from '../app/logging'
-import {AbstractCommandHandler} from './abtract'
-import {reloadCache} from '../cache/init'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {COLORS} from '../app/constants'
-import {MessageEmbed} from 'discord.js'
+import { config, logger } from '../app/init'
+import { LOG_BASE } from '../app/logging'
+import { AbstractCommandHandler } from './abtract'
+import { reloadCache } from '../cache/init'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { COLORS } from '../app/constants'
+import { MessageEmbed } from 'discord.js'
 
 class AdminHandler extends AbstractCommandHandler {
   constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('update_cache')
-      .setDescription('Reload cache')
+    const command = new SlashCommandBuilder().setName('update_cache').setDescription('Reload cache')
     super(command, [], [config.dict.ownerUserId])
   }
 
@@ -21,22 +19,14 @@ class AdminHandler extends AbstractCommandHandler {
       id: interaction.user.id
     })
     await interaction.reply({
-      embeds: [
-        new MessageEmbed()
-          .setColor(COLORS.WARNING)
-          .setDescription('Reloading config...')
-      ]
+      embeds: [new MessageEmbed().setColor(COLORS.WARNING).setDescription('Reloading config...')]
     })
     config.load()
     await reloadCache()
     return interaction.editReply({
-      embeds: [
-        new MessageEmbed()
-          .setColor(COLORS.SUCCESS)
-          .setDescription('Config reloaded')
-      ]
+      embeds: [new MessageEmbed().setColor(COLORS.SUCCESS).setDescription('Config reloaded')]
     })
   }
 }
 
-export {AdminHandler}
+export { AdminHandler }

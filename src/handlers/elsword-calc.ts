@@ -1,7 +1,7 @@
-import {AbstractCommandHandler} from './abtract'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {COLORS} from '../app/constants'
-import {InteractionReplyOptions, MessageEmbed, User} from 'discord.js'
+import { AbstractCommandHandler } from './abtract'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { COLORS } from '../app/constants'
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
 
 class ElswordCalcHandler extends AbstractCommandHandler {
   constructor() {
@@ -9,9 +9,7 @@ class ElswordCalcHandler extends AbstractCommandHandler {
       .setName('elsword_calc')
       .setDescription('Elsword calculator')
       .addUserOption((option) => {
-        return option
-          .setName('user')
-          .setDescription('Select a user')
+        return option.setName('user').setDescription('Select a user')
       })
     super(command)
   }
@@ -34,4 +32,4 @@ class ElswordCalcHandler extends AbstractCommandHandler {
   }
 }
 
-export {ElswordCalcHandler}
+export { ElswordCalcHandler }

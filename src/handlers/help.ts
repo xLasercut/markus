@@ -1,7 +1,7 @@
-import {AbstractCommandHandler} from './abtract'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {COLORS} from '../app/constants'
-import {InteractionReplyOptions, MessageEmbed, User} from 'discord.js'
+import { AbstractCommandHandler } from './abtract'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { COLORS } from '../app/constants'
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
 
 class MarketHelpHandler extends AbstractCommandHandler {
   constructor() {
@@ -9,9 +9,7 @@ class MarketHelpHandler extends AbstractCommandHandler {
       .setName('market_help')
       .setDescription('How to access the market')
       .addUserOption((option) => {
-        return option
-          .setName('user')
-          .setDescription('Select a user')
+        return option.setName('user').setDescription('Select a user')
       })
     super(command)
   }
@@ -25,10 +23,10 @@ class MarketHelpHandler extends AbstractCommandHandler {
           .setTitle('Market Help')
           .setDescription(
             'We use an external website for the market in this server.\n' +
-            '\n' +
-            'To access market:\n' +
-            '1. Go to https://ashal.eu/market/login to create your market account\n' +
-            `2. Read the market rules and verification method in #rules_and_important_stuff`
+              '\n' +
+              'To access market:\n' +
+              '1. Go to https://ashal.eu/market/login to create your market account\n' +
+              `2. Read the market rules and verification method in #rules_and_important_stuff`
           )
       ]
     }
@@ -41,4 +39,4 @@ class MarketHelpHandler extends AbstractCommandHandler {
   }
 }
 
-export {MarketHelpHandler}
+export { MarketHelpHandler }

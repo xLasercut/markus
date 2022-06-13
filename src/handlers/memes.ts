@@ -1,22 +1,18 @@
-import {AbstractCommandHandler} from './abtract'
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {COLORS} from '../app/constants'
-import {InteractionReplyOptions, MessageEmbed, User} from 'discord.js'
+import { AbstractCommandHandler } from './abtract'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { COLORS } from '../app/constants'
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
 
 class PtrHandler extends AbstractCommandHandler {
   constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('ptr')
-      .setDescription('Push the rules!')
+    const command = new SlashCommandBuilder().setName('ptr').setDescription('Push the rules!')
     super(command)
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
     return interaction.reply({
       embeds: [
-        new MessageEmbed()
-          .setImage('https://i.imgur.com/X7aB8pQ.png')
-          .setColor(COLORS.SUCCESS)
+        new MessageEmbed().setImage('https://i.imgur.com/X7aB8pQ.png').setColor(COLORS.SUCCESS)
       ]
     })
   }
@@ -28,9 +24,7 @@ class BonkHandler extends AbstractCommandHandler {
       .setName('bonk')
       .setDescription('BONK!')
       .addUserOption((option) => {
-        return option
-          .setName('user')
-          .setDescription('Select a user')
+        return option.setName('user').setDescription('Select a user')
       })
     super(command)
   }
@@ -40,7 +34,9 @@ class BonkHandler extends AbstractCommandHandler {
     const response: InteractionReplyOptions = {
       embeds: [
         new MessageEmbed()
-          .setImage('https://cdn.discordapp.com/attachments/200128243200688129/966950355000758342/bonk.png')
+          .setImage(
+            'https://cdn.discordapp.com/attachments/200128243200688129/966950355000758342/bonk.png'
+          )
           .setColor(COLORS.WARNING)
       ]
     }
@@ -54,26 +50,16 @@ class BonkHandler extends AbstractCommandHandler {
 
 class ChristianServerHandler extends AbstractCommandHandler {
   constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('christian_server')
-      .setDescription('AMEN!')
+    const command = new SlashCommandBuilder().setName('christian_server').setDescription('AMEN!')
     super(command)
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
     const response: InteractionReplyOptions = {
-      embeds: [
-        new MessageEmbed()
-          .setImage('https://i.imgur.com/xDw8nXF.png')
-          .setColor(COLORS.INFO)
-      ]
+      embeds: [new MessageEmbed().setImage('https://i.imgur.com/xDw8nXF.png').setColor(COLORS.INFO)]
     }
     return interaction.reply(response)
   }
 }
 
-export {
-  PtrHandler,
-  BonkHandler,
-  ChristianServerHandler
-}
+export { PtrHandler, BonkHandler, ChristianServerHandler }

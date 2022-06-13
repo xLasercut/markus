@@ -1,12 +1,12 @@
 import * as winston from 'winston'
 import * as DailyRotateFile from 'winston-daily-rotate-file'
 import * as mustache from 'mustache'
-import {LOG_DIR} from './paths'
-import {ILog} from '../interfaces'
+import { LOG_DIR } from './paths'
+import { ILog } from '../interfaces'
 
-let {combine, timestamp, printf} = winston.format
+let { combine, timestamp, printf } = winston.format
 
-let logFormat = printf(({level, message, timestamp}) => {
+let logFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} | ${level} | ${message}`
 })
 
@@ -21,16 +21,9 @@ let botLog = new DailyRotateFile({
 
 let logger = winston.createLogger({
   level: 'debug',
-  format: combine(
-    timestamp(),
-    logFormat
-  ),
-  transports: [
-    botLog,
-    new winston.transports.Console()
-  ]
+  format: combine(timestamp(), logFormat),
+  transports: [botLog, new winston.transports.Console()]
 })
-
 
 const LOG_LEVEL = {
   INFO: 'INFO',
@@ -103,7 +96,8 @@ const LOG_BASE = {
   SEARCH001: {
     code: 'SEARCH001',
     level: LOG_LEVEL.INFO,
-    template: 'search - type="{{{type}}}" userId="{{{userId}}}" user="{{{user}}}" query="{{{query}}}" channel="{{{channel}}}"'
+    template:
+      'search - type="{{{type}}}" userId="{{{userId}}}" user="{{{user}}}" query="{{{query}}}" channel="{{{channel}}}"'
   },
   EXPIRE001: {
     code: 'EXPIRE001',
@@ -118,7 +112,6 @@ const LOG_BASE = {
 }
 
 class Logger {
-
   public writeLog(logConfig: ILog, variables: object = {}): void {
     let logMsg = `${logConfig.code} | ${mustache.render(logConfig.template, variables)}`
     switch (logConfig.level) {
@@ -138,4 +131,4 @@ class Logger {
   }
 }
 
-export {Logger, LOG_BASE}
+export { Logger, LOG_BASE }

@@ -1,7 +1,6 @@
 import * as cron from 'node-cron'
-import {config, logger} from '../app/init'
-import {LOG_BASE} from '../app/logging'
-
+import { config, logger } from '../app/init'
+import { LOG_BASE } from '../app/logging'
 
 class ExpiryCache {
   protected _name: string = 'user'
@@ -31,9 +30,9 @@ class ExpiryCache {
   }
 
   protected _reloadCache(): void {
-    logger.writeLog(LOG_BASE.EXPIRE002, {rate: config.dict.expiryNotificationRate})
+    logger.writeLog(LOG_BASE.EXPIRE002, { rate: config.dict.expiryNotificationRate })
     this._users = new Set()
   }
 }
 
-export {ExpiryCache}
+export { ExpiryCache }

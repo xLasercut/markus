@@ -1,7 +1,7 @@
-import {IItem, ITear} from '../interfaces'
-import {formatItemDescriptions, formatItemNames, getLoadingScreen} from './helper'
-import {InteractionReplyOptions, MessageEmbed} from 'discord.js'
-import {COLORS} from '../app/constants'
+import { IItem, ITear } from '../interfaces'
+import { formatItemDescriptions, formatItemNames, getLoadingScreen } from './helper'
+import { InteractionReplyOptions, MessageEmbed } from 'discord.js'
+import { COLORS } from '../app/constants'
 
 class AbstractAutoPostFormatter {
   protected _nameFields: Array<string>
@@ -54,7 +54,7 @@ class AbstractAutoPostFormatter {
 class AutoPostItemFormatter extends AbstractAutoPostFormatter {
   constructor() {
     let itemFields = ['name']
-    let optionalFields = {detail: '', price: '**'}
+    let optionalFields = { detail: '', price: '**' }
     super(itemFields, optionalFields)
   }
 }
@@ -62,9 +62,9 @@ class AutoPostItemFormatter extends AbstractAutoPostFormatter {
 class AutoPostTearFormatter extends AbstractAutoPostFormatter {
   constructor() {
     let itemFields = ['name', 'value', 'color', 'slot']
-    let optionalFields = {price: '**'}
+    let optionalFields = { price: '**' }
     super(itemFields, optionalFields)
   }
 }
 
-export {AbstractAutoPostFormatter, AutoPostItemFormatter, AutoPostTearFormatter}
+export { AbstractAutoPostFormatter, AutoPostItemFormatter, AutoPostTearFormatter }

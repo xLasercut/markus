@@ -1,6 +1,6 @@
-import {IItem, IItems} from '../interfaces'
+import { IItem, IItems } from '../interfaces'
 import * as lunr from 'lunr'
-import {AbstractMarketCache} from './abstract'
+import { AbstractMarketCache } from './abstract'
 
 class ItemCache extends AbstractMarketCache {
   protected _posts: IItems
@@ -18,7 +18,18 @@ class ItemCache extends AbstractMarketCache {
   }
 
   protected _generateSearchIndex(apiData: Array<IItem>): lunr.Index {
-    let searchFields = ['name', 'type', 'user', 'slot', 'character', 'detail', 'price', 'discord', 'rarity', 'category']
+    let searchFields = [
+      'name',
+      'type',
+      'user',
+      'slot',
+      'character',
+      'detail',
+      'price',
+      'discord',
+      'rarity',
+      'category'
+    ]
     return lunr(function () {
       this.ref('id')
       for (let field of searchFields) {
@@ -44,4 +55,4 @@ class ItemCache extends AbstractMarketCache {
   }
 }
 
-export {ItemCache}
+export { ItemCache }

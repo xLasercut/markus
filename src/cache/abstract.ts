@@ -1,9 +1,9 @@
-import {LOG_BASE} from '../app/logging'
+import { LOG_BASE } from '../app/logging'
 import * as lunr from 'lunr'
 import * as cron from 'node-cron'
-import {IItem, IRawUserPosts, ITear, IUserPosts} from '../interfaces'
+import { IItem, IRawUserPosts, ITear, IUserPosts } from '../interfaces'
 import axios from 'axios'
-import {config, logger} from '../app/init'
+import { config, logger } from '../app/init'
 
 class AbstractMarketCache {
   protected _name: string
@@ -123,8 +123,7 @@ class AbstractMarketCache {
       for (let post of userPosts[userId]) {
         if (post.type === 'B>') {
           this._userPosts[userId].buy.push(post.id)
-        }
-        else if (post.type === 'S>') {
+        } else if (post.type === 'S>') {
           this._userPosts[userId].sell.push(post.id)
         }
       }
@@ -148,7 +147,7 @@ class AbstractMarketCache {
       '>': '&gt;',
       '"': '&quot;',
       '\\/': '&sol;',
-      '\'': '&apos;'
+      "'": '&apos;'
     }
 
     let outputString = inputString
@@ -159,4 +158,4 @@ class AbstractMarketCache {
   }
 }
 
-export {AbstractMarketCache}
+export { AbstractMarketCache }

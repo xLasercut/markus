@@ -1,7 +1,7 @@
 import * as cron from 'node-cron'
-import {IUserData} from '../interfaces'
-import {config, logger} from '../app/init'
-import {LOG_BASE} from '../app/logging'
+import { IUserData } from '../interfaces'
+import { config, logger } from '../app/init'
+import { LOG_BASE } from '../app/logging'
 import axios from 'axios'
 
 class UserCache {
@@ -10,8 +10,7 @@ class UserCache {
   protected _reloadSchedule: cron.ScheduledTask
   protected _users: Array<IUserData>
 
-  constructor() {
-  }
+  constructor() {}
 
   public isLoading(): boolean {
     return this._loading
@@ -77,4 +76,4 @@ class UserCache {
   }
 }
 
-export {UserCache}
+export { UserCache }

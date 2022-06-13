@@ -1,7 +1,7 @@
-import {IItem, ITear} from '../interfaces'
-import {formatItemDescriptions, formatItemNames, formatUserInfo, getLoadingScreen} from './helper'
-import {InteractionReplyOptions, MessageEmbed} from 'discord.js'
-import {COLORS} from '../app/constants'
+import { IItem, ITear } from '../interfaces'
+import { formatItemDescriptions, formatItemNames, formatUserInfo, getLoadingScreen } from './helper'
+import { InteractionReplyOptions, MessageEmbed } from 'discord.js'
+import { COLORS } from '../app/constants'
 
 class AbstractSearchFormatter {
   protected _nameFields: Array<string>
@@ -12,7 +12,11 @@ class AbstractSearchFormatter {
     this._descriptionFields = descriptionFields
   }
 
-  public generateOutput(inputs: Array<IItem | ITear>, currentPage: number, maxPage: number): InteractionReplyOptions {
+  public generateOutput(
+    inputs: Array<IItem | ITear>,
+    currentPage: number,
+    maxPage: number
+  ): InteractionReplyOptions {
     let fields = []
     for (let post of inputs) {
       fields.push({
@@ -38,11 +42,7 @@ class AbstractSearchFormatter {
 
   public noResultsScreen(): InteractionReplyOptions {
     return {
-      embeds: [
-        new MessageEmbed()
-          .setColor(COLORS.ERROR)
-          .setDescription('No results found.')
-      ]
+      embeds: [new MessageEmbed().setColor(COLORS.ERROR).setDescription('No results found.')]
     }
   }
 
@@ -61,7 +61,7 @@ class AbstractSearchFormatter {
 class ItemSearchFormatter extends AbstractSearchFormatter {
   constructor() {
     let itemFields = ['type', 'name']
-    let optionalFields = {detail: '', price: '**'}
+    let optionalFields = { detail: '', price: '**' }
     super(itemFields, optionalFields)
   }
 }
@@ -69,9 +69,9 @@ class ItemSearchFormatter extends AbstractSearchFormatter {
 class TearSearchFormatter extends AbstractSearchFormatter {
   constructor() {
     let itemFields = ['type', 'name', 'value', 'color', 'slot']
-    let optionalFields = {price: '**'}
+    let optionalFields = { price: '**' }
     super(itemFields, optionalFields)
   }
 }
 
-export {ItemSearchFormatter, TearSearchFormatter, AbstractSearchFormatter}
+export { ItemSearchFormatter, TearSearchFormatter, AbstractSearchFormatter }
