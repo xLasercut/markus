@@ -1,20 +1,20 @@
-import { ITear, ITears } from '../interfaces'
-import * as lunr from 'lunr'
-import { AbstractMarketCache } from './abstract'
+import { ITear, ITears } from '../interfaces';
+import * as lunr from 'lunr';
+import { AbstractMarketCache } from './abstract';
 
 class TearCache extends AbstractMarketCache {
-  protected _posts: ITears
+  protected _posts: ITears;
 
   constructor() {
-    super('tear', ['price'])
+    super('tear', ['price']);
   }
 
   public search(query: string): Array<ITear> {
-    return super.search(query)
+    return super.search(query);
   }
 
   public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<ITear> {
-    return super.getUserPosts(userId, type)
+    return super.getUserPosts(userId, type);
   }
 
   protected _generateSearchIndex(apiData: Array<ITear>): lunr.Index {
@@ -30,11 +30,11 @@ class TearCache extends AbstractMarketCache {
       'price',
       'discord',
       'rarity'
-    ]
+    ];
     return lunr(function () {
-      this.ref('id')
+      this.ref('id');
       for (let field of searchFields) {
-        this.field(field)
+        this.field(field);
       }
 
       for (let post of apiData) {
@@ -51,10 +51,10 @@ class TearCache extends AbstractMarketCache {
           shape: post.shape,
           value: post.value,
           rarity: post.rarity
-        })
+        });
       }
-    })
+    });
   }
 }
 
-export { TearCache }
+export { TearCache };

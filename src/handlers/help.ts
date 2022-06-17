@@ -1,7 +1,7 @@
-import { AbstractCommandHandler } from './abtract'
-import { SlashCommandBuilder } from '@discordjs/builders'
-import { COLORS } from '../app/constants'
-import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
+import { AbstractCommandHandler } from './abtract';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { COLORS } from '../app/constants';
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
 
 class MarketHelpHandler extends AbstractCommandHandler {
   constructor() {
@@ -9,13 +9,13 @@ class MarketHelpHandler extends AbstractCommandHandler {
       .setName('market_help')
       .setDescription('How to access the market')
       .addUserOption((option) => {
-        return option.setName('user').setDescription('Select a user')
-      })
-    super(command)
+        return option.setName('user').setDescription('Select a user');
+      });
+    super(command);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
-    const user: User = interaction.options.getUser('user')
+    const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
         new MessageEmbed()
@@ -29,14 +29,14 @@ class MarketHelpHandler extends AbstractCommandHandler {
               `2. Read the market rules and verification method in #rules_and_important_stuff`
           )
       ]
-    }
+    };
 
     if (user) {
-      response.content = `Hey <@${user.id}>`
+      response.content = `Hey <@${user.id}>`;
     }
 
-    return interaction.reply(response)
+    return interaction.reply(response);
   }
 }
 
-export { MarketHelpHandler }
+export { MarketHelpHandler };

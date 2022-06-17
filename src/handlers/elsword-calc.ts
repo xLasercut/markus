@@ -1,7 +1,7 @@
-import { AbstractCommandHandler } from './abtract'
-import { SlashCommandBuilder } from '@discordjs/builders'
-import { COLORS } from '../app/constants'
-import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
+import { AbstractCommandHandler } from './abtract';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { COLORS } from '../app/constants';
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
 
 class ElswordCalcHandler extends AbstractCommandHandler {
   constructor() {
@@ -9,13 +9,13 @@ class ElswordCalcHandler extends AbstractCommandHandler {
       .setName('elsword_calc')
       .setDescription('Elsword calculator')
       .addUserOption((option) => {
-        return option.setName('user').setDescription('Select a user')
-      })
-    super(command)
+        return option.setName('user').setDescription('Select a user');
+      });
+    super(command);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
-    const user: User = interaction.options.getUser('user')
+    const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
         new MessageEmbed()
@@ -23,13 +23,13 @@ class ElswordCalcHandler extends AbstractCommandHandler {
           .setColor(COLORS.PRIMARY)
           .setTitle('If only there was a calculator for that')
       ]
-    }
+    };
 
     if (user) {
-      response.content = `Hey <@${user.id}>`
+      response.content = `Hey <@${user.id}>`;
     }
-    return interaction.reply(response)
+    return interaction.reply(response);
   }
 }
 
-export { ElswordCalcHandler }
+export { ElswordCalcHandler };

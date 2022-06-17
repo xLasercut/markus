@@ -1,29 +1,29 @@
-import * as cron from 'node-cron'
-import { IAutoPosterList } from '../interfaces'
+import * as cron from 'node-cron';
+import { IAutoPosterList } from '../interfaces';
 import {
   AbstractAutoPostFormatter,
   AutoPostItemFormatter,
   AutoPostTearFormatter
-} from '../formatters/autopost'
-import { Message } from 'discord.js'
-import { client, config, logger } from '../app/init'
-import { LOG_BASE } from '../app/logging'
-import { AbstractCommandHandler } from './abtract'
-import { AbstractMarketCache } from '../cache/abstract'
-import { itemCache, tearCache } from '../cache/init'
-import { DiscordCommand } from '../types'
-import { SlashCommandBuilder } from '@discordjs/builders'
+} from '../formatters/autopost';
+import { Message } from 'discord.js';
+import { client, config, logger } from '../app/init';
+import { LOG_BASE } from '../app/logging';
+import { AbstractCommandHandler } from './abtract';
+import { AbstractMarketCache } from '../cache/abstract';
+import { itemCache, tearCache } from '../cache/init';
+import { DiscordCommand } from '../types';
+import { SlashCommandBuilder } from '@discordjs/builders';
 
 class AbstractAutoPostHandler extends AbstractCommandHandler {
-  protected _postSchedule: cron.ScheduledTask
-  protected _refreshSchedule: cron.ScheduledTask
-  protected _autoPostList: IAutoPosterList
-  protected _addedUsers: Set<string>
-  protected _offset: number
-  protected _type: 'buy' | 'sell'
-  protected _channel: string
-  protected _cache: AbstractMarketCache
-  protected _formatter: AbstractAutoPostFormatter
+  protected _postSchedule: cron.ScheduledTask;
+  protected _refreshSchedule: cron.ScheduledTask;
+  protected _autoPostList: IAutoPosterList;
+  protected _addedUsers: Set<string>;
+  protected _offset: number;
+  protected _type: 'buy' | 'sell';
+  protected _channel: string;
+  protected _cache: AbstractMarketCache;
+  protected _formatter: AbstractAutoPostFormatter;
 
   constructor(
     command: DiscordCommand,
@@ -33,87 +33,87 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
     type: 'buy' | 'sell',
     channel: string
   ) {
-    super(command, [], [config.dict.ownerUserId])
-    this._cache = cache
-    this._formatter = formatter
-    this._offset = offset
-    this._type = type
-    this._channel = channel
+    super(command, [], [config.dict.ownerUserId]);
+    this._cache = cache;
+    this._formatter = formatter;
+    this._offset = offset;
+    this._type = type;
+    this._channel = channel;
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
-    const action = interaction.options.getString('action')
+    const action = interaction.options.getString('action');
     if (action === 'enable') {
-      return this.startAutoPost(interaction)
+      return this.startAutoPost(interaction);
     }
 
     if (action === 'disable') {
-      return this._stopAutoPost(interaction)
+      return this._stopAutoPost(interaction);
     }
 
     if (action === 'test') {
-      let posts = this._cache.getUserPosts('', this._type)
+      let posts = this._cache.getUserPosts('', this._type);
       if (posts && posts.length > 0) {
         let loadingMsg = await client.channels.cache
           .get(this._channel)
           //@ts-ignore
-          .send(this._formatter.loadingScreen())
-        await loadingMsg.edit(this._formatter.generateOutput(posts))
+          .send(this._formatter.loadingScreen());
+        await loadingMsg.edit(this._formatter.generateOutput(posts));
       }
-      return interaction.reply('Test Sent')
+      return interaction.reply('Test Sent');
     }
   }
 
   public async startAutoPost(interaction = null): Promise<any> {
     if (!this._postSchedule) {
-      this._generateBuckets()
-      this._refreshList()
+      this._generateBuckets();
+      this._refreshList();
       this._postSchedule = cron.schedule(config.dict.autoPostRate, async () => {
-        await this._postItemList()
-      })
+        await this._postItemList();
+      });
       this._refreshSchedule = cron.schedule(config.dict.autoPostRefreshRate, () => {
-        this._refreshList()
-      })
+        this._refreshList();
+      });
       logger.writeLog(LOG_BASE.AUTO001, {
         type: `${this._name} post`,
         status: 'enable',
         rate: config.dict.autoPostRate
-      })
+      });
       logger.writeLog(LOG_BASE.AUTO001, {
         type: `${this._name} refresh`,
         status: 'enable',
         rate: config.dict.autoPostRefreshRate
-      })
-      return this._reply(interaction, `${this._name} enabled`)
+      });
+      return this._reply(interaction, `${this._name} enabled`);
     }
 
-    return this._reply(interaction, `${this._name} already enabled`)
+    return this._reply(interaction, `${this._name} already enabled`);
   }
 
   protected async _stopAutoPost(message: Message = null): Promise<any> {
-    this._refreshSchedule.stop()
-    this._postSchedule.stop()
+    this._refreshSchedule.stop();
+    this._postSchedule.stop();
     logger.writeLog(LOG_BASE.AUTO001, {
       type: `${this._name} post`,
       status: 'disable',
       rate: config.dict.autoPostRate
-    })
+    });
     logger.writeLog(LOG_BASE.AUTO001, {
       type: `${this._name} refresh`,
       status: 'disable',
       rate: config.dict.autoPostRefreshRate
-    })
-    this._refreshSchedule = null
-    this._postSchedule = null
-    await this._reply(message, `${this._name} disabled`)
+    });
+    this._refreshSchedule = null;
+    this._postSchedule = null;
+    await this._reply(message, `${this._name} disabled`);
   }
 
   protected _generateBuckets(): void {
-    this._addedUsers = new Set()
-    this._autoPostList = {}
+    this._addedUsers = new Set();
+    this._autoPostList = {};
     for (let hour = 0; hour < 12; hour++) {
       for (let minute = 0; minute < 60; minute += 10) {
-        this._autoPostList[`${hour}:${minute + this._offset}`] = []
+        this._autoPostList[`${hour}:${minute + this._offset}`] = [];
       }
     }
   }
@@ -121,37 +121,37 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
   protected _refreshList(): void {
     for (let userId of this._cache.getUserList()) {
       if (!this._addedUsers.has(userId)) {
-        this._addedUsers.add(userId)
-        let minKey = this._findMinKey()
-        this._autoPostList[minKey].push(userId)
+        this._addedUsers.add(userId);
+        let minKey = this._findMinKey();
+        this._autoPostList[minKey].push(userId);
       }
     }
   }
 
   protected _findMinKey(): string {
-    let maxLength = 0
+    let maxLength = 0;
     for (let key in this._autoPostList) {
-      let listLength = this._autoPostList[key].length
+      let listLength = this._autoPostList[key].length;
       if (listLength < maxLength) {
-        return key
+        return key;
       } else {
-        maxLength = listLength
+        maxLength = listLength;
       }
     }
-    return `0:${this._offset}`
+    return `0:${this._offset}`;
   }
 
   protected async _postItemList(): Promise<any> {
-    let bucket = this._getBucketToPost()
+    let bucket = this._getBucketToPost();
     if (bucket in this._autoPostList) {
       for (let userId of this._autoPostList[bucket]) {
-        let posts = this._cache.getUserPosts(userId, this._type).slice(0, 11)
+        let posts = this._cache.getUserPosts(userId, this._type).slice(0, 11);
         if (posts && posts.length > 0) {
           let loadingMsg = await client.channels.cache
             .get(this._channel)
             //@ts-ignore
-            .send(this._formatter.loadingScreen())
-          await loadingMsg.edit(this._formatter.generateOutput(posts))
+            .send(this._formatter.loadingScreen());
+          await loadingMsg.edit(this._formatter.generateOutput(posts));
         }
       }
     }
@@ -159,19 +159,19 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
 
   protected async _reply(interaction = null, text: string = ''): Promise<any> {
     if (interaction) {
-      return interaction.reply(text)
+      return interaction.reply(text);
     }
   }
 
   protected _getBucketToPost(): string {
-    let datetime = new Date()
+    let datetime = new Date();
 
-    let hours = datetime.getHours()
+    let hours = datetime.getHours();
     if (hours >= 12) {
-      hours -= 12
+      hours -= 12;
     }
 
-    return `${hours}:${datetime.getMinutes()}`
+    return `${hours}:${datetime.getMinutes()}`;
   }
 }
 
@@ -187,8 +187,8 @@ class AutoPostBuyItemHandler extends AbstractAutoPostHandler {
           .setRequired(true)
           .addChoice('Enable', 'enable')
           .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test')
-      })
+          .addChoice('Test', 'test');
+      });
     super(
       command,
       itemCache,
@@ -196,7 +196,7 @@ class AutoPostBuyItemHandler extends AbstractAutoPostHandler {
       0,
       'buy',
       config.dict.autoPostBuyChannelId
-    )
+    );
   }
 }
 
@@ -212,8 +212,8 @@ class AutoPostSellItemHandler extends AbstractAutoPostHandler {
           .setRequired(true)
           .addChoice('Enable', 'enable')
           .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test')
-      })
+          .addChoice('Test', 'test');
+      });
     super(
       command,
       itemCache,
@@ -221,7 +221,7 @@ class AutoPostSellItemHandler extends AbstractAutoPostHandler {
       0,
       'sell',
       config.dict.autoPostSellChannelId
-    )
+    );
   }
 }
 
@@ -237,8 +237,8 @@ class AutoPostBuyTearHandler extends AbstractAutoPostHandler {
           .setRequired(true)
           .addChoice('Enable', 'enable')
           .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test')
-      })
+          .addChoice('Test', 'test');
+      });
     super(
       command,
       tearCache,
@@ -246,7 +246,7 @@ class AutoPostBuyTearHandler extends AbstractAutoPostHandler {
       5,
       'buy',
       config.dict.autoPostBuyChannelId
-    )
+    );
   }
 }
 
@@ -262,8 +262,8 @@ class AutoPostSellTearHandler extends AbstractAutoPostHandler {
           .setRequired(true)
           .addChoice('Enable', 'enable')
           .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test')
-      })
+          .addChoice('Test', 'test');
+      });
     super(
       command,
       tearCache,
@@ -271,7 +271,7 @@ class AutoPostSellTearHandler extends AbstractAutoPostHandler {
       5,
       'sell',
       config.dict.autoPostSellChannelId
-    )
+    );
   }
 }
 
@@ -280,4 +280,4 @@ export {
   AutoPostBuyItemHandler,
   AutoPostSellItemHandler,
   AutoPostBuyTearHandler
-}
+};

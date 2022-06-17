@@ -1,20 +1,20 @@
-import { IItem, IItems } from '../interfaces'
-import * as lunr from 'lunr'
-import { AbstractMarketCache } from './abstract'
+import { IItem, IItems } from '../interfaces';
+import * as lunr from 'lunr';
+import { AbstractMarketCache } from './abstract';
 
 class ItemCache extends AbstractMarketCache {
-  protected _posts: IItems
+  protected _posts: IItems;
 
   constructor() {
-    super('item', ['detail', 'price'])
+    super('item', ['detail', 'price']);
   }
 
   public search(query: string): Array<IItem> {
-    return super.search(query)
+    return super.search(query);
   }
 
   public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<IItem> {
-    return super.getUserPosts(userId, type)
+    return super.getUserPosts(userId, type);
   }
 
   protected _generateSearchIndex(apiData: Array<IItem>): lunr.Index {
@@ -29,11 +29,11 @@ class ItemCache extends AbstractMarketCache {
       'discord',
       'rarity',
       'category'
-    ]
+    ];
     return lunr(function () {
-      this.ref('id')
+      this.ref('id');
       for (let field of searchFields) {
-        this.field(field)
+        this.field(field);
       }
 
       for (let post of apiData) {
@@ -49,10 +49,10 @@ class ItemCache extends AbstractMarketCache {
           discord: post.contact_discord,
           rarity: post.rarity,
           category: post.category
-        })
+        });
       }
-    })
+    });
   }
 }
 
-export { ItemCache }
+export { ItemCache };

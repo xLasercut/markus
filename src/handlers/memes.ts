@@ -1,12 +1,12 @@
-import { AbstractCommandHandler } from './abtract'
-import { SlashCommandBuilder } from '@discordjs/builders'
-import { COLORS } from '../app/constants'
-import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js'
+import { AbstractCommandHandler } from './abtract';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { COLORS } from '../app/constants';
+import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
 
 class PtrHandler extends AbstractCommandHandler {
   constructor() {
-    const command = new SlashCommandBuilder().setName('ptr').setDescription('Push the rules!')
-    super(command)
+    const command = new SlashCommandBuilder().setName('ptr').setDescription('Push the rules!');
+    super(command);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -14,7 +14,7 @@ class PtrHandler extends AbstractCommandHandler {
       embeds: [
         new MessageEmbed().setImage('https://i.imgur.com/X7aB8pQ.png').setColor(COLORS.SUCCESS)
       ]
-    })
+    });
   }
 }
 
@@ -24,13 +24,13 @@ class BonkHandler extends AbstractCommandHandler {
       .setName('bonk')
       .setDescription('BONK!')
       .addUserOption((option) => {
-        return option.setName('user').setDescription('Select a user')
-      })
-    super(command)
+        return option.setName('user').setDescription('Select a user');
+      });
+    super(command);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
-    const user: User = interaction.options.getUser('user')
+    const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
         new MessageEmbed()
@@ -39,27 +39,27 @@ class BonkHandler extends AbstractCommandHandler {
           )
           .setColor(COLORS.WARNING)
       ]
-    }
+    };
 
     if (user) {
-      response.content = `<@${user.id}>, BONK`
+      response.content = `<@${user.id}>, BONK`;
     }
-    return interaction.reply(response)
+    return interaction.reply(response);
   }
 }
 
 class ChristianServerHandler extends AbstractCommandHandler {
   constructor() {
-    const command = new SlashCommandBuilder().setName('christian_server').setDescription('AMEN!')
-    super(command)
+    const command = new SlashCommandBuilder().setName('christian_server').setDescription('AMEN!');
+    super(command);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
     const response: InteractionReplyOptions = {
       embeds: [new MessageEmbed().setImage('https://i.imgur.com/xDw8nXF.png').setColor(COLORS.INFO)]
-    }
-    return interaction.reply(response)
+    };
+    return interaction.reply(response);
   }
 }
 
-export { PtrHandler, BonkHandler, ChristianServerHandler }
+export { PtrHandler, BonkHandler, ChristianServerHandler };

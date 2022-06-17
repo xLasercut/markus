@@ -1,14 +1,14 @@
-import * as winston from 'winston'
-import * as DailyRotateFile from 'winston-daily-rotate-file'
-import * as mustache from 'mustache'
-import { LOG_DIR } from './paths'
-import { ILog } from '../interfaces'
+import * as winston from 'winston';
+import * as DailyRotateFile from 'winston-daily-rotate-file';
+import * as mustache from 'mustache';
+import { LOG_DIR } from './paths';
+import { ILog } from '../interfaces';
 
-let { combine, timestamp, printf } = winston.format
+let { combine, timestamp, printf } = winston.format;
 
 let logFormat = printf(({ level, message, timestamp }) => {
-  return `${timestamp} | ${level} | ${message}`
-})
+  return `${timestamp} | ${level} | ${message}`;
+});
 
 let botLog = new DailyRotateFile({
   frequency: '24h',
@@ -17,20 +17,20 @@ let botLog = new DailyRotateFile({
   dirname: LOG_DIR,
   maxFiles: '3',
   level: 'debug'
-})
+});
 
 let logger = winston.createLogger({
   level: 'debug',
   format: combine(timestamp(), logFormat),
   transports: [botLog, new winston.transports.Console()]
-})
+});
 
 const LOG_LEVEL = {
   INFO: 'INFO',
   WARN: 'WARN',
   ERROR: 'ERROR',
   DEBUG: 'DEBUG'
-}
+};
 
 const LOG_BASE = {
   SERVER001: {
@@ -109,26 +109,26 @@ const LOG_BASE = {
     level: LOG_LEVEL.INFO,
     template: 'clearing reactivation list - rate="{{{rate}}}"'
   }
-}
+};
 
 class Logger {
   public writeLog(logConfig: ILog, variables: object = {}): void {
-    let logMsg = `${logConfig.code} | ${mustache.render(logConfig.template, variables)}`
+    let logMsg = `${logConfig.code} | ${mustache.render(logConfig.template, variables)}`;
     switch (logConfig.level) {
       case LOG_LEVEL.INFO:
-        logger.info(logMsg)
-        break
+        logger.info(logMsg);
+        break;
       case LOG_LEVEL.WARN:
-        logger.warn(logMsg)
-        break
+        logger.warn(logMsg);
+        break;
       case LOG_LEVEL.DEBUG:
-        logger.debug(logMsg)
-        break
+        logger.debug(logMsg);
+        break;
       default:
-        logger.error(logMsg)
-        break
+        logger.error(logMsg);
+        break;
     }
   }
 }
 
-export { Logger, LOG_BASE }
+export { Logger, LOG_BASE };

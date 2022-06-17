@@ -1,10 +1,10 @@
-import { IConfig } from '../interfaces'
+import { IConfig } from '../interfaces';
 
 class Config {
-  protected _config: IConfig
+  protected _config: IConfig;
 
   constructor() {
-    this.load()
+    this.load();
   }
 
   public load(): void {
@@ -45,12 +45,12 @@ class Config {
       imgurClientId: process.env.IMGUR_CLIENT_ID || '',
       testChannelId: process.env.TEST_CHANNEL_ID || '',
       animeRoleId: process.env.ANIME_ROLE_ID || ''
-    }
+    };
   }
 
   public get dict(): IConfig {
-    return this._config
+    return this._config;
   }
 }
 
-export { Config }
+export { Config };

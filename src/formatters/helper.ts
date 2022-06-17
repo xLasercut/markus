@@ -1,51 +1,51 @@
-import { IItem, ITear } from '../interfaces'
-import { InteractionReplyOptions, MessageEditOptions, MessageEmbed } from 'discord.js'
-import { COLORS } from '../app/constants'
+import { IItem, ITear } from '../interfaces';
+import { InteractionReplyOptions, MessageEmbed } from 'discord.js';
+import { COLORS } from '../app/constants';
 
 function formatItemDescriptions(
   post: IItem | ITear,
   descriptionFields: { [key: string]: string }
 ): string {
-  let info = []
+  let info = [];
 
   for (let field in descriptionFields) {
-    let trimmedField = post[field].trim()
+    let trimmedField = post[field].trim();
     if (trimmedField) {
-      info.push(`${descriptionFields[field]}${trimmedField}${descriptionFields[field]}`)
+      info.push(`${descriptionFields[field]}${trimmedField}${descriptionFields[field]}`);
     }
   }
 
-  return info.join(' ') || '\u200B'
+  return info.join(' ') || '\u200B';
 }
 
 function formatItemNames(post: IItem | ITear, nameFields: Array<string>): string {
-  let itemName = []
+  let itemName = [];
   for (let field of nameFields) {
-    itemName.push(post[field])
+    itemName.push(post[field]);
   }
-  return itemName.join(' ') || '\u200B'
+  return itemName.join(' ') || '\u200B';
 }
 
 function formatUserInfo(post: IItem | ITear): string {
   if (post.contact_discord || post.discord_id) {
-    let row = ['-']
+    let row = ['-'];
     if (post.discord_id && post.discord_id != '0') {
-      row.push(`<@${post.discord_id}>`)
+      row.push(`<@${post.discord_id}>`);
     }
 
     if (post.contact_discord) {
-      row.push(`__${post.contact_discord}__`)
+      row.push(`__${post.contact_discord}__`);
     }
 
-    return row.join(' ')
+    return row.join(' ');
   }
-  return `- __${post.displayname}__`
+  return `- __${post.displayname}__`;
 }
 
 function getLoadingScreen(): InteractionReplyOptions {
   return {
     embeds: [new MessageEmbed().setDescription('Processing...').setColor(COLORS.WARNING)]
-  }
+  };
 }
 
-export { formatItemNames, formatItemDescriptions, formatUserInfo, getLoadingScreen }
+export { formatItemNames, formatItemDescriptions, formatUserInfo, getLoadingScreen };

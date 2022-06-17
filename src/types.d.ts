@@ -1,5 +1,5 @@
-import { SlashCommandBuilder } from '@discordjs/builders'
+import { SlashCommandBuilder } from '@discordjs/builders';
 
-type DiscordCommand = Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
+type DiscordCommand = Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
 
-export { DiscordCommand }
+export { DiscordCommand };
