@@ -1,25 +1,30 @@
 import axios from 'axios';
-import { config, logger } from '../app/init';
-import { LOG_BASE } from '../app/logging';
+import { LOG_BASE } from '../app/logging/log-base';
+import { Logger } from '../app/logging/logger';
+import { Config } from '../app/config';
 
 class AnimeCache {
   protected _images: Array<string>;
   protected _imagesToSend: Array<string>;
   protected _currentImageCount: number;
+  protected _logger: Logger
+  protected _config: Config
 
-  constructor() {
+  constructor(config: Config, logger: Logger) {
     this._images = [];
     this._imagesToSend = [];
     this._currentImageCount = 0;
+    this._logger = logger;
+    this._config = config
   }
 
   public async startCache(): Promise<any> {
-    logger.writeLog(LOG_BASE.CACHE004, {
+    this._logger.writeLog(LOG_BASE.ANIME_CACHE_RELOAD, {
       stage: 'start',
       count: 0
     });
     this._images = await this._getImgurAlbumImages();
-    logger.writeLog(LOG_BASE.CACHE004, {
+    this._logger.writeLog(LOG_BASE.ANIME_CACHE_RELOAD, {
       stage: 'finish',
       count: this._images.length
     });
@@ -28,11 +33,11 @@ class AnimeCache {
   }
 
   protected async _getImgurAlbumImages(): Promise<Array<string>> {
-    if (config.dict.imgurClientId && config.dict.imgurAlbumHash) {
-      const url = `https://api.imgur.com/3/album/${config.dict.imgurAlbumHash}`;
+    if (this._config.dict.imgurClientId && this._config.dict.imgurAlbumHash) {
+      const url = `https://api.imgur.com/3/album/${this._config.dict.imgurAlbumHash}`;
       const response = await axios.get(url, {
         headers: {
-          Authorization: `Client-ID ${config.dict.imgurClientId}`
+          Authorization: `Client-ID ${this._config.dict.imgurClientId}`
         }
       });
 
@@ -48,7 +53,7 @@ class AnimeCache {
     }
 
     const imageUrl = this._imagesToSend[this._currentImageCount];
-    logger.writeLog(LOG_BASE.CACHE005, {
+    this._logger.writeLog(LOG_BASE.FETCHED_ANIME_IMAGE, {
       imageUrl: imageUrl
     });
     this._currentImageCount += 1;

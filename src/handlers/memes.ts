@@ -2,11 +2,12 @@ import { AbstractCommandHandler } from './abtract';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
+import { Config } from '../app/config';
 
 class PtrHandler extends AbstractCommandHandler {
-  constructor() {
+  constructor(config: Config) {
     const command = new SlashCommandBuilder().setName('ptr').setDescription('Push the rules!');
-    super(command);
+    super(command, config);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -19,14 +20,14 @@ class PtrHandler extends AbstractCommandHandler {
 }
 
 class BonkHandler extends AbstractCommandHandler {
-  constructor() {
+  constructor(config: Config) {
     const command = new SlashCommandBuilder()
       .setName('bonk')
       .setDescription('BONK!')
       .addUserOption((option) => {
         return option.setName('user').setDescription('Select a user');
       });
-    super(command);
+    super(command, config);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -49,9 +50,9 @@ class BonkHandler extends AbstractCommandHandler {
 }
 
 class ChristianServerHandler extends AbstractCommandHandler {
-  constructor() {
+  constructor(config: Config) {
     const command = new SlashCommandBuilder().setName('christian_server').setDescription('AMEN!');
-    super(command);
+    super(command, config);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {

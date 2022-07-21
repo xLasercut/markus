@@ -2,16 +2,17 @@ import { AbstractCommandHandler } from './abtract';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
+import { Config } from '../app/config';
 
 class ElswordCalcHandler extends AbstractCommandHandler {
-  constructor() {
+  constructor(config: Config) {
     const command = new SlashCommandBuilder()
       .setName('elsword_calc')
       .setDescription('Elsword calculator')
       .addUserOption((option) => {
         return option.setName('user').setDescription('Select a user');
       });
-    super(command);
+    super(command, config);
   }
 
   protected async _runWorkflow(interaction): Promise<any> {

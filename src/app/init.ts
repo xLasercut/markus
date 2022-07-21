@@ -1,4 +1,4 @@
-import { Logger } from './logging';
+import { Logger } from './logging/logger';
 import { Config } from './config';
 import { Client, Intents } from 'discord.js';
 import { REST } from '@discordjs/rest';
@@ -10,8 +10,8 @@ const client = new Client({
     Intents.FLAGS.GUILD_MESSAGE_REACTIONS
   ]
 });
-const logger = new Logger();
 const config = new Config();
+const logger = new Logger(config.dict.logDir);
 const rest = new REST({ version: '9' }).setToken(config.dict.discordToken);
 
 export { client, logger, config, rest };

@@ -1,4 +1,7 @@
 import { IConfig } from '../interfaces';
+import * as path from 'path';
+
+const BASE_DIR = path.join(__dirname, '../../');
 
 class Config {
   protected _config: IConfig;
@@ -44,7 +47,8 @@ class Config {
       imgurAlbumHash: process.env.IMGUR_ALBUM_HASH || '',
       imgurClientId: process.env.IMGUR_CLIENT_ID || '',
       testChannelId: process.env.TEST_CHANNEL_ID || '',
-      animeRoleId: process.env.ANIME_ROLE_ID || ''
+      animeRoleId: process.env.ANIME_ROLE_ID || '',
+      logDir: path.join(BASE_DIR, 'log')
     };
   }
 

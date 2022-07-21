@@ -50,8 +50,8 @@ interface IRawUserPosts {
 }
 
 interface IUserPost {
-  buy: Array<number>;
-  sell: Array<number>;
+  buy: number[];
+  sell: number[];
 }
 
 interface IUserPosts {
@@ -59,9 +59,9 @@ interface IUserPosts {
 }
 
 interface ILog {
-  code: string;
+  reference: string;
   level: string;
-  template: string;
+  message: string;
 }
 
 interface IItems {
@@ -104,6 +104,7 @@ interface IConfig {
   imgurAlbumHash: string;
   testChannelId: string;
   animeRoleId: string;
+  logDir: string;
 }
 
 interface IUserData {

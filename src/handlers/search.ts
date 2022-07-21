@@ -1,5 +1,5 @@
 import { config, logger } from '../app/init';
-import { LOG_BASE } from '../app/logging';
+import { LOG_BASE } from '../app/logging/log-base';
 import { IItem, ITear } from '../interfaces';
 import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
