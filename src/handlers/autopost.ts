@@ -1,44 +1,38 @@
 import * as cron from 'node-cron';
-import { IAutoPosterList } from '../interfaces';
+import { IItem, ITear } from '../interfaces';
 import {
   AbstractAutoPostFormatter,
   AutoPostItemFormatter,
   AutoPostTearFormatter
 } from '../formatters/autopost';
 import { Message } from 'discord.js';
-import { client, config, logger } from '../app/init';
-import { LOG_BASE } from '../app/logging';
+import { client } from '../app/init';
+import { LOG_BASE } from '../app/logging/log-base';
 import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
 import { itemCache, tearCache } from '../cache/init';
-import { DiscordCommand } from '../types';
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { Config } from '../app/config';
+import { mandatoryToggleActionCommand } from './command';
+import { Logger } from '../app/logging/logger';
 
-class AbstractAutoPostHandler extends AbstractCommandHandler {
+abstract class AbstractAutoPostHandler<T extends ITear | IItem> extends AbstractCommandHandler {
+  protected _logger: Logger;
   protected _postSchedule: cron.ScheduledTask;
-  protected _refreshSchedule: cron.ScheduledTask;
-  protected _autoPostList: IAutoPosterList;
-  protected _addedUsers: Set<string>;
-  protected _offset: number;
   protected _type: 'buy' | 'sell';
   protected _channel: string;
-  protected _cache: AbstractMarketCache;
-  protected _formatter: AbstractAutoPostFormatter;
+  protected _cache: AbstractMarketCache<T>;
+  protected _formatter: AbstractAutoPostFormatter<T>;
 
-  constructor(
-    command: DiscordCommand,
-    cache: AbstractMarketCache,
-    formatter: AbstractAutoPostFormatter,
-    offset: number,
-    type: 'buy' | 'sell',
-    channel: string
+  protected constructor(
+    config: Config,
+    logger: Logger,
+    cache: AbstractMarketCache<T>,
+    formatter: AbstractAutoPostFormatter<T>
   ) {
-    super(command, [], [config.dict.ownerUserId]);
+    super(config, [], [config.dict.ownerUserId]);
     this._cache = cache;
     this._formatter = formatter;
-    this._offset = offset;
-    this._type = type;
-    this._channel = channel;
+    this._logger = logger;
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -50,110 +44,47 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
     if (action === 'disable') {
       return this._stopAutoPost(interaction);
     }
+  }
 
-    if (action === 'test') {
-      let posts = this._cache.getUserPosts('', this._type);
+  public async startAutoPost(interaction = null): Promise<any> {
+    if (!this._postSchedule) {
+      this._postSchedule = cron.schedule(this._config.dict.autoPostRate, async () => {
+        await this._postItemList();
+      });
+      this._logger.writeLog(LOG_BASE.AUTOPOST_OPERATION, {
+        type: `${this.name} post`,
+        status: 'enable',
+        rate: this._config.dict.autoPostRate
+      });
+      return this._reply(interaction, `${this.name} enabled`);
+    }
+
+    return this._reply(interaction, `${this.name} already enabled`);
+  }
+
+  protected async _stopAutoPost(message: Message = null): Promise<any> {
+    this._postSchedule.stop();
+    this._logger.writeLog(LOG_BASE.AUTOPOST_OPERATION, {
+      type: `${this.name} post`,
+      status: 'disable',
+      rate: this._config.dict.autoPostRate
+    });
+    this._postSchedule = null;
+    await this._reply(message, `${this.name} disabled`);
+  }
+
+  protected async _postItemList(): Promise<any> {
+    const userList = this._cache.getUserList();
+    for (const userId of userList) {
+      const posts = this._cache.getUserPosts(userId, this._type).slice(0, 11);
       if (posts && posts.length > 0) {
-        let loadingMsg = await client.channels.cache
+        const loadingMsg = await client.channels.cache
           .get(this._channel)
           //@ts-ignore
           .send(this._formatter.loadingScreen());
         await loadingMsg.edit(this._formatter.generateOutput(posts));
       }
-      return interaction.reply('Test Sent');
-    }
-  }
-
-  public async startAutoPost(interaction = null): Promise<any> {
-    if (!this._postSchedule) {
-      this._generateBuckets();
-      this._refreshList();
-      this._postSchedule = cron.schedule(config.dict.autoPostRate, async () => {
-        await this._postItemList();
-      });
-      this._refreshSchedule = cron.schedule(config.dict.autoPostRefreshRate, () => {
-        this._refreshList();
-      });
-      logger.writeLog(LOG_BASE.AUTO001, {
-        type: `${this._name} post`,
-        status: 'enable',
-        rate: config.dict.autoPostRate
-      });
-      logger.writeLog(LOG_BASE.AUTO001, {
-        type: `${this._name} refresh`,
-        status: 'enable',
-        rate: config.dict.autoPostRefreshRate
-      });
-      return this._reply(interaction, `${this._name} enabled`);
-    }
-
-    return this._reply(interaction, `${this._name} already enabled`);
-  }
-
-  protected async _stopAutoPost(message: Message = null): Promise<any> {
-    this._refreshSchedule.stop();
-    this._postSchedule.stop();
-    logger.writeLog(LOG_BASE.AUTO001, {
-      type: `${this._name} post`,
-      status: 'disable',
-      rate: config.dict.autoPostRate
-    });
-    logger.writeLog(LOG_BASE.AUTO001, {
-      type: `${this._name} refresh`,
-      status: 'disable',
-      rate: config.dict.autoPostRefreshRate
-    });
-    this._refreshSchedule = null;
-    this._postSchedule = null;
-    await this._reply(message, `${this._name} disabled`);
-  }
-
-  protected _generateBuckets(): void {
-    this._addedUsers = new Set();
-    this._autoPostList = {};
-    for (let hour = 0; hour < 12; hour++) {
-      for (let minute = 0; minute < 60; minute += 10) {
-        this._autoPostList[`${hour}:${minute + this._offset}`] = [];
-      }
-    }
-  }
-
-  protected _refreshList(): void {
-    for (let userId of this._cache.getUserList()) {
-      if (!this._addedUsers.has(userId)) {
-        this._addedUsers.add(userId);
-        let minKey = this._findMinKey();
-        this._autoPostList[minKey].push(userId);
-      }
-    }
-  }
-
-  protected _findMinKey(): string {
-    let maxLength = 0;
-    for (let key in this._autoPostList) {
-      let listLength = this._autoPostList[key].length;
-      if (listLength < maxLength) {
-        return key;
-      } else {
-        maxLength = listLength;
-      }
-    }
-    return `0:${this._offset}`;
-  }
-
-  protected async _postItemList(): Promise<any> {
-    let bucket = this._getBucketToPost();
-    if (bucket in this._autoPostList) {
-      for (let userId of this._autoPostList[bucket]) {
-        let posts = this._cache.getUserPosts(userId, this._type).slice(0, 11);
-        if (posts && posts.length > 0) {
-          let loadingMsg = await client.channels.cache
-            .get(this._channel)
-            //@ts-ignore
-            .send(this._formatter.loadingScreen());
-          await loadingMsg.edit(this._formatter.generateOutput(posts));
-        }
-      }
+      await this._delay(300);
     }
   }
 
@@ -163,115 +94,60 @@ class AbstractAutoPostHandler extends AbstractCommandHandler {
     }
   }
 
-  protected _getBucketToPost(): string {
-    let datetime = new Date();
-
-    let hours = datetime.getHours();
-    if (hours >= 12) {
-      hours -= 12;
-    }
-
-    return `${hours}:${datetime.getMinutes()}`;
+  protected async _delay(time: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, time);
+    });
   }
 }
 
-class AutoPostBuyItemHandler extends AbstractAutoPostHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('autopost_buy_item')
-      .setDescription('Auto posting buy items')
-      .addStringOption((option) => {
-        return option
-          .setName('action')
-          .setDescription('Select action')
-          .setRequired(true)
-          .addChoice('Enable', 'enable')
-          .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test');
-      });
-    super(
-      command,
-      itemCache,
-      new AutoPostItemFormatter(),
-      0,
-      'buy',
-      config.dict.autoPostBuyChannelId
+class AutoPostBuyItemHandler extends AbstractAutoPostHandler<IItem> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger, itemCache, new AutoPostItemFormatter());
+    this._command = mandatoryToggleActionCommand(
+      'autopost_buy_item',
+      'Toggle auto posting buy items'
     );
+    this._type = 'buy';
+    this._channel = config.dict.autoPostBuyChannelId;
   }
 }
 
-class AutoPostSellItemHandler extends AbstractAutoPostHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('autopost_sell_item')
-      .setDescription('Auto posting sell items')
-      .addStringOption((option) => {
-        return option
-          .setName('action')
-          .setDescription('Select action')
-          .setRequired(true)
-          .addChoice('Enable', 'enable')
-          .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test');
-      });
-    super(
-      command,
-      itemCache,
-      new AutoPostItemFormatter(),
-      0,
-      'sell',
-      config.dict.autoPostSellChannelId
+class AutoPostSellItemHandler extends AbstractAutoPostHandler<IItem> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger, itemCache, new AutoPostItemFormatter());
+    this._command = mandatoryToggleActionCommand(
+      'autopost_sell_item',
+      'Toggle auto posting sell items'
     );
+    this._type = 'sell';
+    this._channel = config.dict.autoPostSellChannelId;
   }
 }
 
-class AutoPostBuyTearHandler extends AbstractAutoPostHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('autopost_buy_tear')
-      .setDescription('Auto posting buy tears')
-      .addStringOption((option) => {
-        return option
-          .setName('action')
-          .setDescription('Select action')
-          .setRequired(true)
-          .addChoice('Enable', 'enable')
-          .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test');
-      });
-    super(
-      command,
-      tearCache,
-      new AutoPostTearFormatter(),
-      5,
-      'buy',
-      config.dict.autoPostBuyChannelId
+class AutoPostBuyTearHandler extends AbstractAutoPostHandler<ITear> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger, tearCache, new AutoPostTearFormatter());
+    this._command = mandatoryToggleActionCommand(
+      'autopost_buy_tear',
+      'Toggle auto posting buy tears'
     );
+    this._type = 'buy';
+    this._channel = config.dict.autoPostBuyChannelId;
   }
 }
 
-class AutoPostSellTearHandler extends AbstractAutoPostHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('autopost_sell_tear')
-      .setDescription('Auto posting sell tears')
-      .addStringOption((option) => {
-        return option
-          .setName('action')
-          .setDescription('Select action')
-          .setRequired(true)
-          .addChoice('Enable', 'enable')
-          .addChoice('Disable', 'disable')
-          .addChoice('Test', 'test');
-      });
-    super(
-      command,
-      tearCache,
-      new AutoPostTearFormatter(),
-      5,
-      'sell',
-      config.dict.autoPostSellChannelId
+class AutoPostSellTearHandler extends AbstractAutoPostHandler<ITear> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger, tearCache, new AutoPostTearFormatter());
+    this._command = mandatoryToggleActionCommand(
+      'autopost_sell_tear',
+      'Toggle auto posting sell tears'
     );
+    this._type = 'sell';
+    this._channel = config.dict.autoPostSellChannelId;
   }
 }
 

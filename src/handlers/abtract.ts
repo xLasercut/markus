@@ -1,25 +1,25 @@
 import { MessageComponentInteraction } from 'discord.js';
 import { DiscordCommand } from '../types';
+import { Config } from '../app/config';
 
-class AbstractCommandHandler {
-  protected _name: string;
+abstract class AbstractCommandHandler {
   protected _command: DiscordCommand;
-  protected _allowedChannels: Array<string>;
-  protected _allowedUsers: Array<string>;
+  protected _allowedChannels: string[];
+  protected _allowedUsers: string[];
+  protected _config: Config;
 
-  constructor(
-    command: DiscordCommand,
-    allowedChannels: Array<string> = [],
-    allowedUsers: Array<string> = []
+  protected constructor(
+    config: Config,
+    allowedChannels: string[] = [],
+    allowedUsers: string[] = []
   ) {
-    this._name = command.name;
-    this._command = command;
     this._allowedChannels = allowedChannels;
     this._allowedUsers = allowedUsers;
+    this._config = config;
   }
 
   get name(): string {
-    return this._name;
+    return this._command.name;
   }
 
   get command(): DiscordCommand {
@@ -31,7 +31,11 @@ class AbstractCommandHandler {
   }
 
   protected _isNotAllowedChannel(channelId: string): boolean {
-    return this._allowedChannels.length > 0 && !this._allowedChannels.includes(channelId);
+    return (
+      this._allowedChannels.length > 0 &&
+      !this._allowedChannels.includes(channelId) &&
+      channelId !== this._config.dict.testChannelId
+    );
   }
 
   public async executeCommand(interaction: MessageComponentInteraction): Promise<any> {

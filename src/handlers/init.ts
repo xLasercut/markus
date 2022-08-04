@@ -6,31 +6,32 @@ import {
   AutoPostSellTearHandler
 } from './autopost';
 import { AdminHandler } from './admin';
-import { ElswordCalcHandler } from './elsword-calc';
-import { GenshinCalcHandler } from './genshin-calc';
+import { ElswordCalcHandler, GenshinCalcHandler } from './calculators';
 import { ElswordEnhancementEventHandler } from './elsword-enhancement-event';
 import { MarketHelpHandler } from './help';
-import { DontGetAttachedHandler, AnimeStreamAlertHandler } from './anime';
+import { AnimeStreamAlertHandler, DontGetAttachedHandler } from './anime';
 import { PingHandler } from './ping';
-import { PtrHandler, BonkHandler, ChristianServerHandler } from './memes';
+import { BonkHandler, ChristianServerHandler, PtrHandler } from './memes';
+import { animeCache } from '../cache/init';
+import { config, logger } from '../app/init';
 
-const pingHandler = new PingHandler();
-const dontGetAttachedHandler = new DontGetAttachedHandler();
-const elswordEnhancementEventHandler = new ElswordEnhancementEventHandler();
-const elswordCalcHandler = new ElswordCalcHandler();
-const genshinCalcHandler = new GenshinCalcHandler();
-const marketHelpHandler = new MarketHelpHandler();
-const itemSearchHandler = new ItemSearchHandler();
-const tearSearchHandler = new TearSearchHandler();
-const adminHandler = new AdminHandler();
-const autoPostBuyItemHandler = new AutoPostBuyItemHandler();
-const autoPostSellItemHandler = new AutoPostSellItemHandler();
-const autoPostBuyTearHandler = new AutoPostBuyTearHandler();
-const autoPostSellTearHandler = new AutoPostSellTearHandler();
-const ptrHandler = new PtrHandler();
-const animeStreamAlertHandler = new AnimeStreamAlertHandler();
-const bonkHandler = new BonkHandler();
-const christianServerHandler = new ChristianServerHandler();
+const pingHandler = new PingHandler(config);
+const dontGetAttachedHandler = new DontGetAttachedHandler(animeCache, config);
+const elswordEnhancementEventHandler = new ElswordEnhancementEventHandler(config);
+const elswordCalcHandler = new ElswordCalcHandler(config);
+const genshinCalcHandler = new GenshinCalcHandler(config);
+const marketHelpHandler = new MarketHelpHandler(config);
+const itemSearchHandler = new ItemSearchHandler(config, logger);
+const tearSearchHandler = new TearSearchHandler(config, logger);
+const adminHandler = new AdminHandler(config, logger);
+const autoPostBuyItemHandler = new AutoPostBuyItemHandler(config, logger);
+const autoPostSellItemHandler = new AutoPostSellItemHandler(config, logger);
+const autoPostBuyTearHandler = new AutoPostBuyTearHandler(config, logger);
+const autoPostSellTearHandler = new AutoPostSellTearHandler(config, logger);
+const ptrHandler = new PtrHandler(config);
+const animeStreamAlertHandler = new AnimeStreamAlertHandler(config);
+const bonkHandler = new BonkHandler(config);
+const christianServerHandler = new ChristianServerHandler(config);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -64,6 +65,3 @@ export {
   autoPostBuyTearHandler,
   autoPostSellTearHandler
 };
-
-// const expiryNotificationHandler = new ExpiryNotificationHandler()
-// const expiryReactivationHandler = new ExpiryReactivationHandler()

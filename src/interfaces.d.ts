@@ -46,12 +46,12 @@ interface IRawUserPost {
 }
 
 interface IRawUserPosts {
-  [key: string]: Array<IRawUserPost>;
+  [key: string]: IRawUserPost[];
 }
 
 interface IUserPost {
-  buy: Array<number>;
-  sell: Array<number>;
+  buy: number[];
+  sell: number[];
 }
 
 interface IUserPosts {
@@ -59,17 +59,9 @@ interface IUserPosts {
 }
 
 interface ILog {
-  code: string;
+  reference: string;
   level: string;
-  template: string;
-}
-
-interface IItems {
-  [key: number]: IItem;
-}
-
-interface ITears {
-  [key: number]: ITear;
+  message: string;
 }
 
 interface IAutoPosterList {
@@ -87,23 +79,19 @@ interface IConfig {
   tearPostsApiUrl: string;
   cacheRefreshRate: string;
   autoPostRate: string;
-  autoPostRefreshRate: string;
   searchResultsPerPage: number;
   reactionExpireTime: number;
   itemPostsUserApiUrl: string;
   tearPostsUserApiUrl: string;
   serverId: string;
-  updateIdApiUrl: string;
   userListApiUrl: string;
-  expiryApiUrl: string;
-  expiryNotificationRate: string;
-  reactivateItemApiUrl: string;
   botsChannelId: string;
   applicationId: string;
   imgurClientId: string;
   imgurAlbumHash: string;
   testChannelId: string;
   animeRoleId: string;
+  logDir: string;
 }
 
 interface IUserData {
@@ -117,15 +105,4 @@ interface IUserData {
   role: string;
 }
 
-export {
-  IItem,
-  ITear,
-  IUserPosts,
-  ILog,
-  IItems,
-  ITears,
-  IAutoPosterList,
-  IConfig,
-  IRawUserPosts,
-  IUserData
-};
+export { IItem, ITear, IUserPosts, ILog, IAutoPosterList, IConfig, IRawUserPosts, IUserData };

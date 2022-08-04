@@ -1,31 +1,31 @@
-import { config, logger } from '../app/init';
-import { LOG_BASE } from '../app/logging';
+import { LOG_BASE } from '../app/logging/log-base';
 import { IItem, ITear } from '../interfaces';
 import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
 import { itemCache, tearCache } from '../cache/init';
-import {
-  AbstractSearchFormatter,
-  ItemSearchFormatter,
-  TearSearchFormatter
-} from '../formatters/search';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { DiscordCommand } from '../types';
+import { ItemSearchFormatter, TearSearchFormatter } from '../formatters/search';
 import { REACTIONS } from '../app/constants';
+import { Config } from '../app/config';
+import { AbstractFormatter } from '../formatters/abstract';
+import { Logger } from '../app/logging/logger';
+import { mandatoryQueryCommand } from './command';
 
-class AbstractSearchHandler extends AbstractCommandHandler {
-  protected _cache: AbstractMarketCache;
-  protected _formatter: AbstractSearchFormatter;
+abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCommandHandler {
+  protected _cache: AbstractMarketCache<T>;
+  protected _formatter: AbstractFormatter<T>;
   protected _reactionList = [REACTIONS.BACK, REACTIONS.FORWARD];
+  protected _logger: Logger;
 
-  constructor(
-    command: DiscordCommand,
-    cache: AbstractMarketCache,
-    formatter: AbstractSearchFormatter
+  protected constructor(
+    config: Config,
+    logger: Logger,
+    cache: AbstractMarketCache<T>,
+    formatter: AbstractFormatter<T>
   ) {
-    super(command, [config.dict.searchChannelId]);
+    super(config, [config.dict.searchChannelId]);
     this._cache = cache;
     this._formatter = formatter;
+    this._logger = logger;
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -33,27 +33,28 @@ class AbstractSearchHandler extends AbstractCommandHandler {
       return interaction.reply(this._formatter.updateCacheScreen());
     }
     const searchQuery = interaction.options.getString('query');
-    logger.writeLog(LOG_BASE.SEARCH001, {
-      type: this._name,
+    this._logger.writeLog(LOG_BASE.SEARCH_MARKET, {
+      type: this.name,
       userId: interaction.user.id,
       user: interaction.user.username,
       query: searchQuery,
       channel: interaction.channelId
     });
 
-    let results = this._cache.search(searchQuery);
-    let maxPage = Math.ceil(results.length / config.dict.searchResultsPerPage);
-    let currentPage = 1;
-
-    const slicedResults = (): Array<IItem | ITear> => {
-      let startIndex = (currentPage - 1) * config.dict.searchResultsPerPage;
-      let endIndex = startIndex + config.dict.searchResultsPerPage;
-      return results.slice(startIndex, endIndex);
-    };
+    const results = this._cache.search(searchQuery);
 
     if (results.length < 1) {
       return interaction.reply(this._formatter.noResultsScreen());
     }
+
+    const maxPage = Math.ceil(results.length / this._config.dict.searchResultsPerPage);
+    let currentPage = 1;
+
+    const slicedResults = (): T[] => {
+      const startIndex = (currentPage - 1) * this._config.dict.searchResultsPerPage;
+      const endIndex = startIndex + this._config.dict.searchResultsPerPage;
+      return results.slice(startIndex, endIndex);
+    };
 
     await interaction.reply(this._formatter.loadingScreen());
     const message = await interaction.editReply(
@@ -71,7 +72,7 @@ class AbstractSearchHandler extends AbstractCommandHandler {
     const collector = message.createReactionCollector({
       filter,
       dispose: true,
-      time: config.dict.reactionExpireTime
+      time: this._config.dict.reactionExpireTime
     });
 
     const postEditor = async (reaction) => {
@@ -98,27 +99,17 @@ class AbstractSearchHandler extends AbstractCommandHandler {
   }
 }
 
-class ItemSearchHandler extends AbstractSearchHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('search_item')
-      .setDescription('Search items on Elsword market')
-      .addStringOption((option) => {
-        return option.setName('query').setDescription('Enter a string').setRequired(true);
-      });
-    super(command, itemCache, new ItemSearchFormatter());
+class ItemSearchHandler extends AbstractSearchHandler<IItem> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger, itemCache, new ItemSearchFormatter());
+    this._command = mandatoryQueryCommand('search_item', 'Search items on Elsword market');
   }
 }
 
-class TearSearchHandler extends AbstractSearchHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('search_tear')
-      .setDescription('Search el tears on Elsword market')
-      .addStringOption((option) => {
-        return option.setName('query').setDescription('Enter a string').setRequired(true);
-      });
-    super(command, tearCache, new TearSearchFormatter());
+class TearSearchHandler extends AbstractSearchHandler<ITear> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger, tearCache, new TearSearchFormatter());
+    this._command = mandatoryQueryCommand('search_tear', 'Search el tears on Elsword market');
   }
 }
 

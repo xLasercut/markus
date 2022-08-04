@@ -1,146 +1,140 @@
-import { LOG_BASE } from '../app/logging';
+import { LOG_BASE } from '../app/logging/log-base';
 import * as lunr from 'lunr';
 import * as cron from 'node-cron';
 import { IItem, IRawUserPosts, ITear, IUserPosts } from '../interfaces';
+import { Config } from '../app/config';
+import { Logger } from '../app/logging/logger';
 import axios from 'axios';
-import { config, logger } from '../app/init';
+import { POST_TYPES } from '../app/constants';
 
-class AbstractMarketCache {
-  protected _name: string;
+abstract class AbstractMarketCache<T extends IItem | ITear> {
   protected _searchIndex: lunr.Index;
   protected _loading = false;
-  protected _reloadSchedule: cron.ScheduledTask;
-  protected _posts;
+  protected _reloadTask: cron.ScheduledTask;
+  protected _config: Config;
+  protected _logger: Logger;
   protected _userPosts: IUserPosts;
-  protected _fieldsToEncode: Array<string>;
+  protected _posts: { [key: number]: T };
+  protected _userPostsApiUrl: string;
+  protected _postsApiUrl: string;
+  protected _fieldsToEncode: string[];
+  protected _name: string;
 
-  constructor(name: string, fieldsToEncode: Array<string>) {
-    this._name = name;
-    this._fieldsToEncode = fieldsToEncode;
+  protected constructor(config: Config, logger: Logger) {
+    this._config = config;
+    this._logger = logger;
   }
 
   public isLoading(): boolean {
     return this._loading;
   }
 
-  public search(query: string): Array<any> {
-    let results = this._searchIndex.search(query);
-    let output = [];
-    for (let result of results) {
-      output.push(this._posts[result.ref]);
-    }
-    return output;
+  public search(query: string): T[] {
+    const results = this._searchIndex.search(query);
+    return results.map((result) => {
+      return this._posts[result.ref];
+    });
   }
 
-  public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<any> {
-    let posts = [];
+  public getUserPosts(userId: string, type: 'buy' | 'sell'): T[] {
     if (userId in this._userPosts) {
-      for (let postId of this._userPosts[userId][type]) {
-        posts.push(this._posts[postId]);
-      }
+      return this._userPosts[userId][type].map((postId) => {
+        return this._posts[postId];
+      });
     }
-    return posts;
+    return [];
   }
 
-  public getUserList(): Array<string> {
-    let userList = [];
-    for (let userId in this._userPosts) {
-      userList.push(userId);
-    }
-    return userList;
+  public getUserList(): string[] {
+    return Object.keys(this._userPosts);
   }
 
-  public async startCache(): Promise<any> {
-    if (this._reloadSchedule) {
-      this._reloadSchedule.stop();
+  public async startCache(): Promise<void> {
+    if (this._reloadTask) {
+      this._reloadTask.stop();
     }
     await this._reloadCache();
-    this._reloadSchedule = cron.schedule(config.dict.cacheRefreshRate, async () => {
+    this._reloadTask = cron.schedule(this._config.dict.cacheRefreshRate, async () => {
       await this._reloadCache();
     });
   }
 
-  protected async _reloadCache(): Promise<any> {
+  protected async _reloadCache(): Promise<void> {
     try {
-      logger.writeLog(LOG_BASE.CACHE001, {
+      this._logger.writeLog(LOG_BASE.MARKET_CACHE_RELOAD, {
         type: this._name,
         stage: 'start',
-        rate: config.dict.cacheRefreshRate
+        rate: this._config.dict.cacheRefreshRate
       });
       this._loading = true;
       const body = JSON.stringify({
-        password: config.dict.apiPassword
+        password: this._config.dict.apiPassword
       });
 
       await this._reloadPosts(body);
       await this._reloadUserPosts(body);
 
-      logger.writeLog(LOG_BASE.CACHE001, {
+      this._logger.writeLog(LOG_BASE.MARKET_CACHE_RELOAD, {
         type: this._name,
         stage: 'finish',
-        rate: config.dict.cacheRefreshRate
+        rate: this._config.dict.cacheRefreshRate
       });
 
       this._loading = false;
     } catch (e) {
-      logger.writeLog(LOG_BASE.CACHE002, {
+      this._logger.writeLog(LOG_BASE.MARKET_CACHE_RELOAD_FAILED, {
         error: e
       });
       this._loading = false;
     }
   }
 
-  protected async _reloadPosts(body): Promise<any> {
-    let response = await axios.post(config.dict[`${this._name}PostsApiUrl`], body);
-    let apiData = [];
-
-    if (Array.isArray(response.data.posts)) {
-      apiData = response.data.posts;
-    }
+  protected async _reloadPosts(body): Promise<void> {
+    const response = await axios.post(this._postsApiUrl, body);
+    const posts: T[] = Array.isArray(response.data.posts) ? response.data.posts : [];
 
     this._posts = {};
 
-    for (let post of apiData) {
-      this._encodeHtml(post);
-      this._posts[post.id] = post;
+    for (const post of posts) {
+      this._posts[post.id] = this._decodeHtml(post);
     }
 
-    this._searchIndex = this._generateSearchIndex(apiData);
+    this._searchIndex = this._generateSearchIndex(posts);
   }
 
-  protected async _reloadUserPosts(body): Promise<any> {
-    let response = await axios.post(config.dict[`${this._name}PostsUserApiUrl`], body);
-    let userPosts: IRawUserPosts = response.data.users;
+  protected async _reloadUserPosts(body): Promise<void> {
+    const response = await axios.post(this._userPostsApiUrl, body);
+    const userPosts: IRawUserPosts = response.data.users ? response.data.users : {};
     this._userPosts = {};
 
-    for (let userId in userPosts) {
-      if (!(userId in this._userPosts)) {
-        this._userPosts[userId] = {
-          buy: [],
-          sell: []
-        };
-      }
-      for (let post of userPosts[userId]) {
-        if (post.type === 'B>') {
-          this._userPosts[userId].buy.push(post.id);
-        } else if (post.type === 'S>') {
-          this._userPosts[userId].sell.push(post.id);
-        }
-      }
+    for (const userId in userPosts) {
+      this._userPosts[userId] = {
+        buy: [],
+        sell: []
+      };
+      this._userPosts[userId][POST_TYPES.BUY] = userPosts[userId]
+        .filter((post) => post.type === 'B>')
+        .map((post) => post.id);
+
+      this._userPosts[userId][POST_TYPES.SELL] = userPosts[userId]
+        .filter((post) => post.type === 'S>')
+        .map((post) => post.id);
     }
   }
 
-  protected _generateSearchIndex(apiData: Array<IItem | ITear>): lunr.Index {
+  protected _generateSearchIndex(apiData: T[]): lunr.Index {
     throw new Error('Not implemented');
   }
 
-  protected _encodeHtml(post): void {
-    for (let field of this._fieldsToEncode) {
-      post[field] = this._encodeHtmlString(post[field]);
+  protected _decodeHtml(post: T): T {
+    const itemEncoded = Object.assign({}, post);
+    for (const field of this._fieldsToEncode) {
+      itemEncoded[field] = this._decodeHtmlString(itemEncoded[field]);
     }
+    return itemEncoded;
   }
 
-  protected _encodeHtmlString(inputString: string): string {
+  protected _decodeHtmlString(inputString: string): string {
     const map = {
       '&': '&amp;',
       '<': '&lt;',
@@ -151,7 +145,7 @@ class AbstractMarketCache {
     };
 
     let outputString = inputString;
-    for (let key in map) {
+    for (const key in map) {
       outputString = outputString.replace(new RegExp(map[key], 'g'), key);
     }
     return outputString;

@@ -1,29 +1,31 @@
-import { config, logger } from '../app/init';
-import { LOG_BASE } from '../app/logging';
+import { LOG_BASE } from '../app/logging/log-base';
 import { AbstractCommandHandler } from './abtract';
 import { reloadCache } from '../cache/init';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { MessageEmbed } from 'discord.js';
+import { simpleCommand } from './command';
+import { Config } from '../app/config';
+import { Logger } from '../app/logging/logger';
 
 class AdminHandler extends AbstractCommandHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('update_cache')
-      .setDescription('Reload cache');
-    super(command, [], [config.dict.ownerUserId]);
+  protected _logger: Logger;
+
+  constructor(config: Config, logger: Logger) {
+    super(config, [], [config.dict.ownerUserId]);
+    this._command = simpleCommand('update_cache', 'Reload cache');
+    this._logger = logger;
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
-    logger.writeLog(LOG_BASE.SERVER004, {
-      command: this._name,
+    this._logger.writeLog(LOG_BASE.ADMIN_COMMAND, {
+      command: this.name,
       user: interaction.user.username,
       id: interaction.user.id
     });
     await interaction.reply({
       embeds: [new MessageEmbed().setColor(COLORS.WARNING).setDescription('Reloading config...')]
     });
-    config.load();
+    this._config.load();
     await reloadCache();
     return interaction.editReply({
       embeds: [new MessageEmbed().setColor(COLORS.SUCCESS).setDescription('Config reloaded')]

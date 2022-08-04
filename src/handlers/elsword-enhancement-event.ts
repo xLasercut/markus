@@ -1,14 +1,13 @@
 import { AbstractCommandHandler } from './abtract';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { MessageEmbed } from 'discord.js';
+import { Config } from '../app/config';
+import { simpleCommand } from './command';
 
 class ElswordEnhancementEventHandler extends AbstractCommandHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('enhancement_event')
-      .setDescription('Thanks KoG!');
-    super(command);
+  constructor(config: Config) {
+    super(config);
+    this._command = simpleCommand('enhancement_event', 'Thanks KoG!');
   }
 
   protected async _runWorkflow(interaction): Promise<any> {

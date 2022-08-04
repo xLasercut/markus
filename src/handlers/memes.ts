@@ -1,12 +1,13 @@
 import { AbstractCommandHandler } from './abtract';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
+import { Config } from '../app/config';
+import { optionalUserPingCommand, simpleCommand } from './command';
 
 class PtrHandler extends AbstractCommandHandler {
-  constructor() {
-    const command = new SlashCommandBuilder().setName('ptr').setDescription('Push the rules!');
-    super(command);
+  constructor(config: Config) {
+    super(config);
+    this._command = simpleCommand('ptr', 'Push the rules!');
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -19,14 +20,9 @@ class PtrHandler extends AbstractCommandHandler {
 }
 
 class BonkHandler extends AbstractCommandHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('bonk')
-      .setDescription('BONK!')
-      .addUserOption((option) => {
-        return option.setName('user').setDescription('Select a user');
-      });
-    super(command);
+  constructor(config: Config) {
+    super(config);
+    this._command = optionalUserPingCommand('bonk', 'BONK!');
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -49,9 +45,9 @@ class BonkHandler extends AbstractCommandHandler {
 }
 
 class ChristianServerHandler extends AbstractCommandHandler {
-  constructor() {
-    const command = new SlashCommandBuilder().setName('christian_server').setDescription('AMEN!');
-    super(command);
+  constructor(config: Config) {
+    super(config);
+    this._command = simpleCommand('christian_server', 'AMEN!');
   }
 
   protected async _runWorkflow(interaction): Promise<any> {

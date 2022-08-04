@@ -1,23 +1,19 @@
 import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
 import { AbstractCommandHandler } from './abtract';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { config } from '../app/init';
 import { COLORS } from '../app/constants';
 import { AnimeCache } from '../cache/anime';
-import { animeCache } from '../cache/init';
+import { Config } from '../app/config';
+import { mandatoryToggleActionCommand, optionalUserPingCommand } from './command';
 
 class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _cache: AnimeCache;
+  protected _config: Config;
 
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('dont_get_attached')
-      .setDescription("Don't get attached!")
-      .addUserOption((option) => {
-        return option.setName('user').setDescription('Select a user');
-      });
-    super(command, [config.dict.botsChannelId, config.dict.testChannelId]);
-    this._cache = animeCache;
+  constructor(cache: AnimeCache, config: Config) {
+    super(config, [config.dict.botsChannelId]);
+    this._cache = cache;
+    this._command = optionalUserPingCommand('dont_get_attached', "Don't get attached!");
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
@@ -39,25 +35,17 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
 }
 
 class AnimeStreamAlertHandler extends AbstractCommandHandler {
-  constructor() {
-    const command = new SlashCommandBuilder()
-      .setName('anime_stream_alert')
-      .setDescription('Add, remove or ping anime stream role')
-      .addStringOption((option) => {
-        return option
-          .setName('action')
-          .setDescription('Select action')
-          .setRequired(true)
-          .addChoice('Enable', 'enable')
-          .addChoice('Disable', 'disable')
-          .addChoice('Ping', 'ping');
-      });
-    super(command);
+  constructor(config: Config) {
+    super(config);
+    this._command = mandatoryToggleActionCommand(
+      'anime_stream_alert',
+      'Add or remove anime stream role'
+    );
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
     const action = interaction.options.getString('action');
-    const role = interaction.guild.roles.cache.get(config.dict.animeRoleId);
+    const role = interaction.guild.roles.cache.get(this._config.dict.animeRoleId);
     if (action === 'enable') {
       await interaction.member.roles.add(role);
       return interaction.reply({
@@ -72,19 +60,6 @@ class AnimeStreamAlertHandler extends AbstractCommandHandler {
         content: 'Anime stream alert disabled',
         ephemeral: true
       });
-    }
-
-    if (action === 'ping') {
-      const response: InteractionReplyOptions = {
-        content: `<@&${config.dict.animeRoleId}> is starting`,
-        embeds: [
-          new MessageEmbed()
-            .setColor(COLORS.INFO)
-            .setTitle("It's Anime Time. DON'T BE LATE!")
-            .setImage('https://i.imgur.com/R0v1uDe.jpg')
-        ]
-      };
-      return interaction.reply(response);
     }
   }
 }

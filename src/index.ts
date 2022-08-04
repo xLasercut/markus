@@ -1,6 +1,6 @@
 import { client, config, logger, rest } from './app/init';
 import { MessageComponentInteraction } from 'discord.js';
-import { LOG_BASE } from './app/logging';
+import { LOG_BASE } from './app/logging/log-base';
 import { Routes } from 'discord-api-types/v9';
 import {
   autoPostBuyItemHandler,
@@ -13,7 +13,7 @@ import {
 import { reloadCache } from './cache/init';
 
 client.on('ready', async () => {
-  logger.writeLog(LOG_BASE.SERVER001, { user: client.user.tag });
+  logger.writeLog(LOG_BASE.BOT_LOG_IN, { user: client.user.tag });
   await reloadCache();
   await rest.put(Routes.applicationCommands(config.dict.applicationId), { body: [] });
   await rest.put(Routes.applicationGuildCommands(config.dict.applicationId, config.dict.serverId), {
@@ -23,7 +23,7 @@ client.on('ready', async () => {
   await autoPostSellItemHandler.startAutoPost();
   await autoPostBuyTearHandler.startAutoPost();
   await autoPostSellTearHandler.startAutoPost();
-  logger.writeLog(LOG_BASE.SERVER005);
+  logger.writeLog(LOG_BASE.REGISTERED_APP_COMMANDS);
 });
 
 client.on('interactionCreate', async (interaction: MessageComponentInteraction) => {
@@ -37,12 +37,12 @@ client.on('interactionCreate', async (interaction: MessageComponentInteraction) 
     try {
       await handlers[commandName].executeCommand(interaction);
     } catch (error) {
-      logger.writeLog(LOG_BASE.SERVER002, { reason: error });
+      logger.writeLog(LOG_BASE.INTERNAL_SERVER_ERROR, { reason: error });
     }
   }
   return;
 });
 
 client.login(config.dict.discordToken).catch((reason) => {
-  logger.writeLog(LOG_BASE.SERVER003, { reason: reason });
+  logger.writeLog(LOG_BASE.DISCORD_LOGIN_ERROR, { reason: reason });
 });

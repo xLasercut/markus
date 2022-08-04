@@ -1,24 +1,20 @@
-import { IItem, IItems } from '../interfaces';
+import { IItem } from '../interfaces';
 import * as lunr from 'lunr';
 import { AbstractMarketCache } from './abstract';
+import { Config } from '../app/config';
+import { Logger } from '../app/logging/logger';
 
-class ItemCache extends AbstractMarketCache {
-  protected _posts: IItems;
-
-  constructor() {
-    super('item', ['detail', 'price']);
+class ItemCache extends AbstractMarketCache<IItem> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger);
+    this._name = 'item';
+    this._fieldsToEncode = ['detail', 'price'];
+    this._userPostsApiUrl = config.dict.itemPostsUserApiUrl;
+    this._postsApiUrl = config.dict.itemPostsApiUrl;
   }
 
-  public search(query: string): Array<IItem> {
-    return super.search(query);
-  }
-
-  public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<IItem> {
-    return super.getUserPosts(userId, type);
-  }
-
-  protected _generateSearchIndex(apiData: Array<IItem>): lunr.Index {
-    let searchFields = [
+  protected _generateSearchIndex(posts: IItem[]): lunr.Index {
+    const searchFields = [
       'name',
       'type',
       'user',
@@ -32,11 +28,11 @@ class ItemCache extends AbstractMarketCache {
     ];
     return lunr(function () {
       this.ref('id');
-      for (let field of searchFields) {
+      for (const field of searchFields) {
         this.field(field);
       }
 
-      for (let post of apiData) {
+      for (const post of posts) {
         this.add({
           id: post.id,
           name: post.name,

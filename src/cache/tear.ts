@@ -1,24 +1,20 @@
-import { ITear, ITears } from '../interfaces';
+import { ITear } from '../interfaces';
 import * as lunr from 'lunr';
 import { AbstractMarketCache } from './abstract';
+import { Config } from '../app/config';
+import { Logger } from '../app/logging/logger';
 
-class TearCache extends AbstractMarketCache {
-  protected _posts: ITears;
-
-  constructor() {
-    super('tear', ['price']);
+class TearCache extends AbstractMarketCache<ITear> {
+  constructor(config: Config, logger: Logger) {
+    super(config, logger);
+    this._name = 'tear';
+    this._fieldsToEncode = ['price'];
+    this._postsApiUrl = config.dict.tearPostsApiUrl;
+    this._userPostsApiUrl = config.dict.tearPostsUserApiUrl;
   }
 
-  public search(query: string): Array<ITear> {
-    return super.search(query);
-  }
-
-  public getUserPosts(userId: string, type: 'buy' | 'sell'): Array<ITear> {
-    return super.getUserPosts(userId, type);
-  }
-
-  protected _generateSearchIndex(apiData: Array<ITear>): lunr.Index {
-    let searchFields = [
+  protected _generateSearchIndex(posts: ITear[]): lunr.Index {
+    const searchFields = [
       'name',
       'type',
       'user',
@@ -33,11 +29,11 @@ class TearCache extends AbstractMarketCache {
     ];
     return lunr(function () {
       this.ref('id');
-      for (let field of searchFields) {
+      for (const field of searchFields) {
         this.field(field);
       }
 
-      for (let post of apiData) {
+      for (const post of posts) {
         this.add({
           id: post.id,
           name: post.name,
