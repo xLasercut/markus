@@ -11,29 +11,6 @@ abstract class AbstractFormatter<T extends ITear | IItem> {
     this._descriptionFields = descriptionFields;
   }
 
-  public generateOutput(
-    inputs: T[],
-    currentPage: number,
-    maxPage: number
-  ): InteractionReplyOptions {
-    const fields = inputs.map((input) => {
-      return {
-        name: this._formatItemNames(input),
-        value: this._formatItemDescriptions(input) + this._formatUserInfo(input)
-      };
-    });
-
-    return {
-      embeds: [
-        new MessageEmbed()
-          .setColor(COLORS.SUCCESS)
-          .setFooter({ text: `Page ${currentPage} of ${maxPage}` })
-          .setDescription('')
-          .setFields(fields)
-      ]
-    };
-  }
-
   public loadingScreen(): InteractionReplyOptions {
     return {
       embeds: [new MessageEmbed().setDescription('Processing...').setColor(COLORS.WARNING)]

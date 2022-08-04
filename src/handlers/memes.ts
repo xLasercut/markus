@@ -2,7 +2,7 @@ import { AbstractCommandHandler } from './abtract';
 import { COLORS } from '../app/constants';
 import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
 import { Config } from '../app/config';
-import { optionalUserPingCommand, simpleCommand } from './command';
+import { mandatoryQueryCommand, optionalUserPingCommand, simpleCommand } from './command';
 
 class PtrHandler extends AbstractCommandHandler {
   constructor(config: Config) {
@@ -58,4 +58,54 @@ class ChristianServerHandler extends AbstractCommandHandler {
   }
 }
 
-export { PtrHandler, BonkHandler, ChristianServerHandler };
+class EightBallHandler extends AbstractCommandHandler {
+  protected _answers: string[];
+
+  constructor(config: Config) {
+    super(config);
+    this._command = mandatoryQueryCommand('8ball', 'Question?');
+    this._answers = [
+      'It is certain',
+      'It is decidedly so',
+      'Without a doubt',
+      'Yes definitely',
+      'You may rely on it',
+      'As I see it, yes',
+      'Most likely',
+      'Outlook good',
+      'Yes',
+      'Signs point to yes',
+      'Reply hazy, try again',
+      'Ask again later',
+      'Better not tell you now',
+      'Cannot predict now',
+      'Concentrate and ask again',
+      "Don't count on it",
+      'My reply is no',
+      'My sources say no',
+      'Outlook not so good',
+      'Very doubtful'
+    ];
+  }
+
+  protected async _runWorkflow(interaction): Promise<any> {
+    const question = interaction.options.getString('query');
+    const user = interaction.user.username;
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new MessageEmbed()
+          .setTitle(`${user} asked: ${question}`)
+          .setDescription(this._getAnswer())
+          .setColor(COLORS.INFO)
+      ]
+    };
+    return interaction.reply(response);
+  }
+
+  protected _getAnswer(): string {
+    const index = Math.floor(Math.random() * this._answers.length);
+    return this._answers[index];
+  }
+}
+
+export { PtrHandler, BonkHandler, ChristianServerHandler, EightBallHandler };

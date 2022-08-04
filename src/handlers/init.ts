@@ -11,7 +11,7 @@ import { ElswordEnhancementEventHandler } from './elsword-enhancement-event';
 import { MarketHelpHandler } from './help';
 import { AnimeStreamAlertHandler, DontGetAttachedHandler } from './anime';
 import { PingHandler } from './ping';
-import { BonkHandler, ChristianServerHandler, PtrHandler } from './memes';
+import { BonkHandler, ChristianServerHandler, EightBallHandler, PtrHandler } from './memes';
 import { animeCache } from '../cache/init';
 import { config, logger } from '../app/init';
 
@@ -32,6 +32,7 @@ const ptrHandler = new PtrHandler(config);
 const animeStreamAlertHandler = new AnimeStreamAlertHandler(config);
 const bonkHandler = new BonkHandler(config);
 const christianServerHandler = new ChristianServerHandler(config);
+const eightBallHandler = new EightBallHandler(config)
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -50,7 +51,8 @@ const handlers = {
   [ptrHandler.name]: ptrHandler,
   [animeStreamAlertHandler.name]: animeStreamAlertHandler,
   [bonkHandler.name]: bonkHandler,
-  [christianServerHandler.name]: christianServerHandler
+  [christianServerHandler.name]: christianServerHandler,
+  [eightBallHandler.name]: eightBallHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {

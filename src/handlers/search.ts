@@ -3,7 +3,11 @@ import { IItem, ITear } from '../interfaces';
 import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
 import { itemCache, tearCache } from '../cache/init';
-import { ItemSearchFormatter, TearSearchFormatter } from '../formatters/search';
+import {
+  AbstractSearchFormatter,
+  ItemSearchFormatter,
+  TearSearchFormatter
+} from '../formatters/search';
 import { REACTIONS } from '../app/constants';
 import { Config } from '../app/config';
 import { AbstractFormatter } from '../formatters/abstract';
@@ -12,7 +16,7 @@ import { mandatoryQueryCommand } from './command';
 
 abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCommandHandler {
   protected _cache: AbstractMarketCache<T>;
-  protected _formatter: AbstractFormatter<T>;
+  protected _formatter: AbstractSearchFormatter<T>;
   protected _reactionList = [REACTIONS.BACK, REACTIONS.FORWARD];
   protected _logger: Logger;
 
@@ -20,7 +24,7 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
     config: Config,
     logger: Logger,
     cache: AbstractMarketCache<T>,
-    formatter: AbstractFormatter<T>
+    formatter: AbstractSearchFormatter<T>
   ) {
     super(config, [config.dict.searchChannelId]);
     this._cache = cache;
@@ -58,7 +62,7 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
 
     await interaction.reply(this._formatter.loadingScreen());
     const message = await interaction.editReply(
-      this._formatter.generateOutput(slicedResults(), currentPage, maxPage)
+      this._formatter.generateOutput(slicedResults(), searchQuery, currentPage, maxPage)
     );
 
     for (let emoji of this._reactionList) {
@@ -79,12 +83,12 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
       if (currentPage > 1 && reaction.emoji.name === REACTIONS.BACK) {
         currentPage -= 1;
         await interaction.editReply(
-          this._formatter.generateOutput(slicedResults(), currentPage, maxPage)
+          this._formatter.generateOutput(slicedResults(), searchQuery, currentPage, maxPage)
         );
       } else if (currentPage < maxPage && reaction.emoji.name === REACTIONS.FORWARD) {
         currentPage += 1;
         await interaction.editReply(
-          this._formatter.generateOutput(slicedResults(), currentPage, maxPage)
+          this._formatter.generateOutput(slicedResults(), searchQuery, currentPage, maxPage)
         );
       }
     };
