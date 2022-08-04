@@ -77,7 +77,6 @@ ITEM_POSTS_API_URL=<api endpoint for item posts - OPTIONAL>
 TEAR_POSTS_API_URL=<api endpoint for el tear posts - OPTIONAL>
 CACHE_REFRESH_RATE=<refresh rate of cache - crontab - OPTIONAL>
 AUTO_POST_RATE=<autopost check rate - crontab - OPTIONAL>
-AUTO_POST_REFRESH_RATE=<autopost refresh rate - crontab - OPTIONAL>
 ITEM_POSTS_USER_API_URL=<api endpoint for user item posts - OPTIONAL>
 TEAR_POSTS_USER_API_URL=<api endpoint for user tear posts - OPTIONAL>
 ```

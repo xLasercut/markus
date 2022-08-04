@@ -1,18 +1,13 @@
 import { AbstractCommandHandler } from './abtract';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
 import { Config } from '../app/config';
+import { optionalUserPingCommand } from './command';
 
 class MarketHelpHandler extends AbstractCommandHandler {
   constructor(config: Config) {
-    const command = new SlashCommandBuilder()
-      .setName('market_help')
-      .setDescription('How to access the market')
-      .addUserOption((option) => {
-        return option.setName('user').setDescription('Select a user');
-      });
-    super(command, config);
+    super(config);
+    this._command = optionalUserPingCommand('market_help', 'How to access the market');
   }
 
   protected async _runWorkflow(interaction): Promise<any> {

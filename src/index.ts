@@ -3,10 +3,10 @@ import { MessageComponentInteraction } from 'discord.js';
 import { LOG_BASE } from './app/logging/log-base';
 import { Routes } from 'discord-api-types/v9';
 import {
-  // autoPostBuyItemHandler,
-  // autoPostBuyTearHandler,
-  // autoPostSellItemHandler,
-  // autoPostSellTearHandler,
+  autoPostBuyItemHandler,
+  autoPostBuyTearHandler,
+  autoPostSellItemHandler,
+  autoPostSellTearHandler,
   commands,
   handlers
 } from './handlers/init';
@@ -19,10 +19,10 @@ client.on('ready', async () => {
   await rest.put(Routes.applicationGuildCommands(config.dict.applicationId, config.dict.serverId), {
     body: commands
   });
-  // await autoPostBuyItemHandler.startAutoPost();
-  // await autoPostSellItemHandler.startAutoPost();
-  // await autoPostBuyTearHandler.startAutoPost();
-  // await autoPostSellTearHandler.startAutoPost();
+  await autoPostBuyItemHandler.startAutoPost();
+  await autoPostSellItemHandler.startAutoPost();
+  await autoPostBuyTearHandler.startAutoPost();
+  await autoPostSellTearHandler.startAutoPost();
   logger.writeLog(LOG_BASE.REGISTERED_APP_COMMANDS);
 });
 

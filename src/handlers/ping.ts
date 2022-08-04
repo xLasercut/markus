@@ -1,13 +1,13 @@
 import { AbstractCommandHandler } from './abtract';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { MessageEmbed } from 'discord.js';
 import { Config } from '../app/config';
+import { simpleCommand } from './command';
 
 class PingHandler extends AbstractCommandHandler {
   constructor(config: Config) {
-    const command = new SlashCommandBuilder().setName('ping').setDescription('Pong!');
-    super(command, config);
+    super(config);
+    this._command = simpleCommand('ping', 'Pong!');
   }
 
   protected async _runWorkflow(interaction): Promise<any> {

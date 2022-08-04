@@ -15,7 +15,9 @@ const LOG_REFERENCES = {
   MARKUS007: 'MARKUS007',
   MARKUS008: 'MARKUS008',
   MARKUS009: 'MARKUS009',
-  MARKUS010: 'MARKUS010'
+  MARKUS010: 'MARKUS010',
+  MARKUS011: 'MARKUS011',
+  MARKUS012: 'MARKUS012'
 };
 
 const LOG_BASE = {
@@ -29,15 +31,10 @@ const LOG_BASE = {
     level: LOG_LEVEL.INFO,
     message: 'market cache reload'
   },
-  CACHE002: {
+  MARKET_CACHE_RELOAD_FAILED: {
     reference: LOG_REFERENCES.MARKUS003,
     level: LOG_LEVEL.ERROR,
-    message: 'market cache reload failed - error="{{{error}}}"'
-  },
-  CACHE003: {
-    reference: LOG_REFERENCES.MARKUS004,
-    level: LOG_LEVEL.INFO,
-    message: 'user cache reload - stage="{{{stage}}}" rate="{{{rate}}}"'
+    message: 'market cache reload failed'
   },
   ANIME_CACHE_RELOAD: {
     reference: LOG_REFERENCES.MARKUS005,
@@ -59,41 +56,25 @@ const LOG_BASE = {
     level: LOG_LEVEL.ERROR,
     message: 'could not connect to discord'
   },
-  SERVER004: {
+  ADMIN_COMMAND: {
     reference: LOG_REFERENCES.MARKUS009,
     level: LOG_LEVEL.INFO,
-    message: 'admin command - command="{{{command}}}" user="{{{user}}}" id="{{{id}}}"'
+    message: 'admin command'
   },
   REGISTERED_APP_COMMANDS: {
     reference: LOG_REFERENCES.MARKUS010,
     level: LOG_LEVEL.INFO,
     message: 'Successfully registered application commands'
   },
-  AUTO001: {
-    reference: 'AUTO001',
+  AUTOPOST_OPERATION: {
+    reference: LOG_REFERENCES.MARKUS012,
     level: LOG_LEVEL.INFO,
-    message: 'autopost operation - type="{{{type}}}" status="{{{status}}}" rate="{{{rate}}}"'
+    message: 'autopost operation'
   },
-  AUTO002: {
-    reference: 'AUTO002',
+  SEARCH_MARKET: {
+    reference: LOG_REFERENCES.MARKUS011,
     level: LOG_LEVEL.INFO,
-    message: 'added user to autopost - type="{{{type}}}" id="{{{id}}}"'
-  },
-  SEARCH001: {
-    reference: 'SEARCH001',
-    level: LOG_LEVEL.INFO,
-    message:
-      'search - type="{{{type}}}" userId="{{{userId}}}" user="{{{user}}}" query="{{{query}}}" channel="{{{channel}}}"'
-  },
-  EXPIRE001: {
-    reference: 'EXPIRE001',
-    level: LOG_LEVEL.INFO,
-    message: 'expiry notification - users="{{{users}}}" rate="{{{rate}}}"'
-  },
-  EXPIRE002: {
-    reference: 'EXPIRE002',
-    level: LOG_LEVEL.INFO,
-    message: 'clearing reactivation list - rate="{{{rate}}}"'
+    message: 'search market'
   }
 };
 

@@ -1,20 +1,16 @@
 import { IItem, ITear } from '../interfaces';
-import { formatItemDescriptions, formatItemNames, getLoadingScreen } from './helper';
 import { InteractionReplyOptions, MessageEmbed } from 'discord.js';
 import { COLORS } from '../app/constants';
+import { AbstractFormatter } from './abstract';
 
-class AbstractAutoPostFormatter {
-  protected _nameFields: Array<string>;
-  protected _descriptionFields: { [key: string]: string };
-
-  constructor(nameFields: Array<string>, descriptionFields: { [key: string]: string } = {}) {
-    this._nameFields = nameFields;
-    this._descriptionFields = descriptionFields;
+abstract class AbstractAutoPostFormatter<T extends IItem | ITear> extends AbstractFormatter<T> {
+  protected constructor(nameFields: string[], descriptionFields: { [key: string]: string } = {}) {
+    super(nameFields, descriptionFields);
   }
 
-  generateOutput(inputs: Array<IItem | ITear>): InteractionReplyOptions {
-    let firstPost = inputs[0];
-    let title = [`User: __${firstPost.displayname}__`];
+  public generateOutput(inputs: T[]): InteractionReplyOptions {
+    const firstPost = inputs[0];
+    const title = [`User: __${firstPost.displayname}__`];
     if (firstPost.contact_discord || firstPost.discord_id) {
       title.push('Discord:');
       if (firstPost.discord_id && firstPost.discord_id != '0') {
@@ -26,43 +22,37 @@ class AbstractAutoPostFormatter {
       }
     }
 
-    let fields = [];
-
-    for (let post of inputs) {
-      fields.push({
-        name: formatItemNames(post, this._nameFields),
-        value: formatItemDescriptions(post, this._descriptionFields)
-      });
-    }
+    const fields = inputs.map((input) => {
+      return {
+        name: this._formatItemNames(input),
+        value: this._formatItemDescriptions(input)
+      };
+    });
 
     return {
       embeds: [
         new MessageEmbed()
           .setDescription(title.join(' '))
-          .setFooter('')
+          .setFooter({ text: '' })
           .setColor(COLORS.PRIMARY)
           .setFields(fields)
       ]
     };
   }
-
-  public loadingScreen(): InteractionReplyOptions {
-    return getLoadingScreen();
-  }
 }
 
-class AutoPostItemFormatter extends AbstractAutoPostFormatter {
+class AutoPostItemFormatter extends AbstractAutoPostFormatter<IItem> {
   constructor() {
-    let itemFields = ['name'];
-    let optionalFields = { detail: '', price: '**' };
+    const itemFields = ['name'];
+    const optionalFields = { detail: '', price: '**' };
     super(itemFields, optionalFields);
   }
 }
 
-class AutoPostTearFormatter extends AbstractAutoPostFormatter {
+class AutoPostTearFormatter extends AbstractAutoPostFormatter<ITear> {
   constructor() {
-    let itemFields = ['name', 'value', 'color', 'slot'];
-    let optionalFields = { price: '**' };
+    const itemFields = ['name', 'value', 'color', 'slot'];
+    const optionalFields = { price: '**' };
     super(itemFields, optionalFields);
   }
 }

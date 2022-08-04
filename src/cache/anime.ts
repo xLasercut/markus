@@ -32,7 +32,7 @@ class AnimeCache {
     this._currentImageCount = 0;
   }
 
-  protected async _getImgurAlbumImages(): Promise<Array<string>> {
+  protected async _getImgurAlbumImages(): Promise<string[]> {
     if (this._config.dict.imgurClientId && this._config.dict.imgurAlbumHash) {
       const url = `https://api.imgur.com/3/album/${this._config.dict.imgurAlbumHash}`;
       const response = await axios.get(url, {

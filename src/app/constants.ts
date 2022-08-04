@@ -13,4 +13,9 @@ const REACTIONS = {
   FORWARD: '➡️'
 };
 
-export { COLORS, REACTIONS };
+const POST_TYPES = {
+  BUY: 'buy',
+  SELL: 'sell'
+};
+
+export { COLORS, REACTIONS, POST_TYPES };

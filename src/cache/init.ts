@@ -1,19 +1,16 @@
-// import { ItemCache } from './item';
-// import { TearCache } from './tear';
-// import { UserCache } from './user';
+import { ItemCache } from './item';
+import { TearCache } from './tear';
 import { AnimeCache } from './anime';
 import { config, logger } from '../app/init';
 
-// const itemCache = new ItemCache();
-// const tearCache = new TearCache();
-// const userCache = new UserCache();
+const itemCache = new ItemCache(config, logger);
+const tearCache = new TearCache(config, logger);
 const animeCache = new AnimeCache(config, logger);
 
 async function reloadCache() {
-  // await itemCache.startCache();
-  // await tearCache.startCache();
-  // await userCache.startCache();
+  await itemCache.startCache();
+  await tearCache.startCache();
   await animeCache.startCache();
 }
 
-export { reloadCache, animeCache };
+export { itemCache, tearCache, reloadCache, animeCache };
