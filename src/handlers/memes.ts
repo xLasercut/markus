@@ -94,8 +94,7 @@ class EightBallHandler extends AbstractCommandHandler {
     const response: InteractionReplyOptions = {
       embeds: [
         new MessageEmbed()
-          .setTitle(`${user} asked: ${question}`)
-          .setDescription(this._getAnswer())
+          .setDescription(`${user} asked: **${question}**\nAnswer: **${this._getAnswer()}**`)
           .setColor(COLORS.INFO)
       ]
     };

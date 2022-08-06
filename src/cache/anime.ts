@@ -2,20 +2,21 @@ import axios from 'axios';
 import { LOG_BASE } from '../app/logging/log-base';
 import { Logger } from '../app/logging/logger';
 import { Config } from '../app/config';
+import { shuffleArray } from '../helper';
 
 class AnimeCache {
   protected _images: Array<string>;
   protected _imagesToSend: Array<string>;
   protected _currentImageCount: number;
-  protected _logger: Logger
-  protected _config: Config
+  protected _logger: Logger;
+  protected _config: Config;
 
   constructor(config: Config, logger: Logger) {
     this._images = [];
     this._imagesToSend = [];
     this._currentImageCount = 0;
     this._logger = logger;
-    this._config = config
+    this._config = config;
   }
 
   public async startCache(): Promise<any> {
@@ -28,7 +29,7 @@ class AnimeCache {
       stage: 'finish',
       count: this._images.length
     });
-    this._imagesToSend = this._shuffleArray(this._images);
+    this._imagesToSend = shuffleArray(this._images);
     this._currentImageCount = 0;
   }
 
@@ -48,7 +49,7 @@ class AnimeCache {
 
   public getRandomImage(): string {
     if (this._currentImageCount >= this._imagesToSend.length) {
-      this._imagesToSend = this._shuffleArray(this._images);
+      this._imagesToSend = shuffleArray(this._images);
       this._currentImageCount = 0;
     }
 
@@ -58,21 +59,6 @@ class AnimeCache {
     });
     this._currentImageCount += 1;
     return imageUrl;
-  }
-
-  protected _shuffleArray(array: string[]): string[] {
-    const shuffledList = [...array];
-    let currentIndex = shuffledList.length,
-      randomIndex;
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-      [shuffledList[currentIndex], shuffledList[randomIndex]] = [
-        shuffledList[randomIndex],
-        shuffledList[currentIndex]
-      ];
-    }
-    return shuffledList;
   }
 }
 

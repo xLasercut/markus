@@ -6,6 +6,7 @@ import { Config } from '../app/config';
 import { Logger } from '../app/logging/logger';
 import axios from 'axios';
 import { POST_TYPES } from '../app/constants';
+import { shuffleArray } from '../helper';
 
 abstract class AbstractMarketCache<T extends IItem | ITear> {
   protected _searchIndex: lunr.Index;
@@ -46,7 +47,7 @@ abstract class AbstractMarketCache<T extends IItem | ITear> {
   }
 
   public getUserList(): string[] {
-    return Object.keys(this._userPosts);
+    return shuffleArray(Object.keys(this._userPosts));
   }
 
   public async startCache(): Promise<void> {
