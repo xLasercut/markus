@@ -1,7 +1,7 @@
 {
-  "name": "ashal-market-bot",
+  "name": "markus",
   "version": "1.0.0",
-  "description": "Discord bot for ashal's market",
+  "description": "Discord bot for ashal's market and memes",
   "main": "src/index.ts",
   "scripts": {
     "compile": "node clean.js && tsc -b",
