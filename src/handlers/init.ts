@@ -9,7 +9,12 @@ import { AdminHandler } from './admin';
 import { ElswordCalcHandler, GenshinCalcHandler } from './calculators';
 import { ElswordEnhancementEventHandler } from './elsword-enhancement-event';
 import { MarketHelpHandler } from './help';
-import { AnimeStreamAlertHandler, DontGetAttachedHandler } from './anime';
+import {
+  AnimeStreamAlertHandler,
+  DontGetAttachedHandler,
+  SosuHandler,
+  WakuWakuHandler
+} from './anime';
 import { PingHandler } from './ping';
 import { BonkHandler, ChristianServerHandler, EightBallHandler, PtrHandler } from './memes';
 import { animeCache } from '../cache/init';
@@ -32,7 +37,9 @@ const ptrHandler = new PtrHandler(config);
 const animeStreamAlertHandler = new AnimeStreamAlertHandler(config);
 const bonkHandler = new BonkHandler(config);
 const christianServerHandler = new ChristianServerHandler(config);
-const eightBallHandler = new EightBallHandler(config)
+const eightBallHandler = new EightBallHandler(config);
+const wakuWakuHandler = new WakuWakuHandler(config);
+const sosuHandler = new SosuHandler(config);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -52,7 +59,9 @@ const handlers = {
   [animeStreamAlertHandler.name]: animeStreamAlertHandler,
   [bonkHandler.name]: bonkHandler,
   [christianServerHandler.name]: christianServerHandler,
-  [eightBallHandler.name]: eightBallHandler
+  [eightBallHandler.name]: eightBallHandler,
+  [wakuWakuHandler.name]: wakuWakuHandler,
+  [sosuHandler.name]: sosuHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {
