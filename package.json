@@ -7,7 +7,7 @@
     "compile": "node clean.js && tsc -b",
     "start": "node dist/index.js",
     "serve": "env-cmd -f ./config.env ts-node src/index.ts",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "lint:fix": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "author": "xLasercut",
   "license": "MIT",
