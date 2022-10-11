@@ -4,7 +4,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { AnimeCache } from '../cache/anime';
 import { Config } from '../app/config';
-import { mandatoryToggleActionCommand, optionalUserPingCommand } from './command';
+import { mandatoryToggleActionCommand, optionalUserPingCommand, simpleCommand } from './command';
 
 class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _cache: AnimeCache;
@@ -64,4 +64,37 @@ class AnimeStreamAlertHandler extends AbstractCommandHandler {
   }
 }
 
-export { DontGetAttachedHandler, AnimeStreamAlertHandler };
+class SosuHandler extends AbstractCommandHandler {
+  constructor(config: Config) {
+    super(config);
+    this._command = simpleCommand('sosu', 'SOSU');
+  }
+
+  protected async _runWorkflow(interaction): Promise<any> {
+    const response: InteractionReplyOptions = {
+      embeds: [new MessageEmbed().setImage('https://i.imgur.com/4UClTI0.jpg').setColor(COLORS.INFO)]
+    };
+    return interaction.reply(response);
+  }
+}
+
+class WakuWakuHandler extends AbstractCommandHandler {
+  constructor(config: Config) {
+    super(config);
+    this._command = simpleCommand('waku_waku', 'Waku Waku!');
+  }
+
+  protected async _runWorkflow(interaction): Promise<any> {
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new MessageEmbed()
+          .setTitle('WAKU WAKU')
+          .setImage('https://i.imgur.com/a2WpfN2.jpg')
+          .setColor(COLORS.INFO)
+      ]
+    };
+    return interaction.reply(response);
+  }
+}
+
+export { DontGetAttachedHandler, AnimeStreamAlertHandler, SosuHandler, WakuWakuHandler };
