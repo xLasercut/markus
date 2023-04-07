@@ -97,4 +97,28 @@ class WakuWakuHandler extends AbstractCommandHandler {
   }
 }
 
-export { DontGetAttachedHandler, AnimeStreamAlertHandler, SosuHandler, WakuWakuHandler };
+class AtomicHandler extends AbstractCommandHandler {
+  constructor(config: Config) {
+    super(config);
+    this._command = optionalUserPingCommand('i_am', 'I AM...');
+  }
+
+  protected async _runWorkflow(interaction): Promise<any> {
+    const user: User = interaction.options.getUser('user');
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new MessageEmbed()
+          .setColor(COLORS.PURPLE)
+          .setTitle('ᵃᵗᵒᵐⁱᶜ')
+          .setImage('https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif')
+      ]
+    };
+    if (user) {
+      response.content = `Hey <@${user.id}>`;
+    }
+
+    return interaction.reply(response);
+  }
+}
+
+export { DontGetAttachedHandler, AnimeStreamAlertHandler, SosuHandler, WakuWakuHandler, AtomicHandler };

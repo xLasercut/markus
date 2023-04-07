@@ -5,7 +5,8 @@ const COLORS: { [key: string]: ColorResolvable } = {
   WARNING: '#faa61a',
   SUCCESS: '#3fb581',
   PRIMARY: '#00FFFF',
-  INFO: '#8e9297'
+  INFO: '#8e9297',
+  PURPLE: '#7c2bf1'
 };
 
 const REACTIONS = {

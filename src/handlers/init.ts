@@ -11,6 +11,7 @@ import { ElswordEnhancementEventHandler } from './elsword-enhancement-event';
 import { MarketHelpHandler } from './help';
 import {
   AnimeStreamAlertHandler,
+  AtomicHandler,
   DontGetAttachedHandler,
   SosuHandler,
   WakuWakuHandler
@@ -40,6 +41,7 @@ const christianServerHandler = new ChristianServerHandler(config);
 const eightBallHandler = new EightBallHandler(config);
 const wakuWakuHandler = new WakuWakuHandler(config);
 const sosuHandler = new SosuHandler(config);
+const atomicHandler = new AtomicHandler(config);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -61,7 +63,8 @@ const handlers = {
   [christianServerHandler.name]: christianServerHandler,
   [eightBallHandler.name]: eightBallHandler,
   [wakuWakuHandler.name]: wakuWakuHandler,
-  [sosuHandler.name]: sosuHandler
+  [sosuHandler.name]: sosuHandler,
+  [atomicHandler.name]: atomicHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {
