@@ -105,4 +105,19 @@ interface IUserData {
   role: string;
 }
 
-export { IItem, ITear, IUserPosts, ILog, IAutoPosterList, IConfig, IRawUserPosts, IUserData };
+interface IAtomic {
+  title: string;
+  image: string;
+}
+
+export {
+  IItem,
+  ITear,
+  IUserPosts,
+  ILog,
+  IAutoPosterList,
+  IConfig,
+  IRawUserPosts,
+  IUserData,
+  IAtomic
+};

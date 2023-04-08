@@ -5,6 +5,7 @@ import { COLORS } from '../app/constants';
 import { AnimeCache } from '../cache/anime';
 import { Config } from '../app/config';
 import { mandatoryToggleActionCommand, optionalUserPingCommand, simpleCommand } from './command';
+import { IAtomic } from '../interfaces';
 
 class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _cache: AnimeCache;
@@ -98,19 +99,30 @@ class WakuWakuHandler extends AbstractCommandHandler {
 }
 
 class AtomicHandler extends AbstractCommandHandler {
+  protected _atomics: Array<IAtomic>;
+
   constructor(config: Config) {
     super(config);
     this._command = optionalUserPingCommand('i_am', 'I AM...');
+    this._atomics = [
+      {
+        title: 'ᵃᵗᵒᵐⁱᶜ',
+        image: 'https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif'
+      },
+      { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/ZhmtllT.jpg' }
+    ];
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
     const user: User = interaction.options.getUser('user');
+    const randomIndex = Math.round(Math.random());
+    const atomic = this._atomics[randomIndex]
     const response: InteractionReplyOptions = {
       embeds: [
         new MessageEmbed()
           .setColor(COLORS.PURPLE)
-          .setTitle('ᵃᵗᵒᵐⁱᶜ')
-          .setImage('https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif')
+          .setTitle(atomic.title)
+          .setImage(atomic.image)
       ]
     };
     if (user) {
@@ -121,4 +133,10 @@ class AtomicHandler extends AbstractCommandHandler {
   }
 }
 
-export { DontGetAttachedHandler, AnimeStreamAlertHandler, SosuHandler, WakuWakuHandler, AtomicHandler };
+export {
+  DontGetAttachedHandler,
+  AnimeStreamAlertHandler,
+  SosuHandler,
+  WakuWakuHandler,
+  AtomicHandler
+};
