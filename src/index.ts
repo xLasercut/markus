@@ -9,7 +9,7 @@ import {
   handlers
 } from './handlers/init';
 import { reloadCache } from './cache/init';
-import { Routes } from 'discord.js';
+import { Routes, Events } from 'discord.js';
 
 client.on('ready', async () => {
   logger.writeLog(LOG_BASE.BOT_LOG_IN, { user: client.user.tag });
@@ -29,8 +29,8 @@ client.on('ready', async () => {
   logger.writeLog(LOG_BASE.APP_INIT_COMPLETE);
 });
 
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isChatInputCommand()) {
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isCommand()) {
     return;
   }
 
