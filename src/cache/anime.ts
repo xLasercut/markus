@@ -42,7 +42,7 @@ class AnimeCache {
         }
       });
 
-      return response.data.data.images.map((image) => image.link);
+      return response.data.data.images.map((image) => image.link.replace(image.id, `${image.id}m`));
     }
     return [];
   }
