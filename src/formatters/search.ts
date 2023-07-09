@@ -1,6 +1,6 @@
 import { AbstractFormatter } from './abstract';
 import { IItem, ITear } from '../interfaces';
-import { InteractionReplyOptions, MessageEmbed } from 'discord.js';
+import { InteractionReplyOptions, EmbedBuilder } from 'discord.js';
 import { COLORS } from '../app/constants';
 
 abstract class AbstractSearchFormatter<T extends IItem | ITear> extends AbstractFormatter<T> {
@@ -23,7 +23,7 @@ abstract class AbstractSearchFormatter<T extends IItem | ITear> extends Abstract
 
     return {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setColor(COLORS.SUCCESS)
           .setFooter({ text: `Page ${currentPage} of ${maxPage}` })
           .setDescription(`Search query: **${query}**`)

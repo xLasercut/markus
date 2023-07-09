@@ -10,7 +10,6 @@ import {
 } from '../formatters/search';
 import { REACTIONS } from '../app/constants';
 import { Config } from '../app/config';
-import { AbstractFormatter } from '../formatters/abstract';
 import { Logger } from '../app/logging/logger';
 import { mandatoryQueryCommand } from './command';
 

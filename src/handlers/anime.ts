@@ -1,6 +1,5 @@
-import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
+import { EmbedBuilder, InteractionReplyOptions, User } from 'discord.js';
 import { AbstractCommandHandler } from './abtract';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { COLORS } from '../app/constants';
 import { AnimeCache } from '../cache/anime';
 import { Config } from '../app/config';
@@ -21,7 +20,7 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
     const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setColor(COLORS.ERROR)
           .setTitle("DON'T GET ATTACHED")
           .setImage(this._cache.getRandomImage())
@@ -73,7 +72,7 @@ class SosuHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction): Promise<any> {
     const response: InteractionReplyOptions = {
-      embeds: [new MessageEmbed().setImage('https://i.imgur.com/4UClTI0.jpg').setColor(COLORS.INFO)]
+      embeds: [new EmbedBuilder().setImage('https://i.imgur.com/4UClTI0.jpg').setColor(COLORS.INFO)]
     };
     return interaction.reply(response);
   }
@@ -88,7 +87,7 @@ class WakuWakuHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction): Promise<any> {
     const response: InteractionReplyOptions = {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setTitle('WAKU WAKU')
           .setImage('https://i.imgur.com/a2WpfN2.jpg')
           .setColor(COLORS.INFO)
@@ -119,7 +118,7 @@ class AtomicHandler extends AbstractCommandHandler {
     const atomic = this._atomics[randomIndex];
     const response: InteractionReplyOptions = {
       embeds: [
-        new MessageEmbed().setColor(COLORS.PURPLE).setTitle(atomic.title).setImage(atomic.image)
+        new EmbedBuilder().setColor(COLORS.PURPLE).setTitle(atomic.title).setImage(atomic.image)
       ]
     };
     if (user) {

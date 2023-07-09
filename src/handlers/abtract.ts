@@ -1,4 +1,4 @@
-import { MessageComponentInteraction } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { DiscordCommand } from '../types';
 import { Config } from '../app/config';
 
@@ -38,7 +38,7 @@ abstract class AbstractCommandHandler {
     );
   }
 
-  public async executeCommand(interaction: MessageComponentInteraction): Promise<any> {
+  public async executeCommand(interaction: ChatInputCommandInteraction): Promise<any> {
     if (this._isNotAllowedUser(interaction.user.id)) {
       return interaction.reply({
         content: 'You do not have permission to use this command',
@@ -59,7 +59,7 @@ abstract class AbstractCommandHandler {
     return this._runWorkflow(interaction);
   }
 
-  protected async _runWorkflow(interaction: MessageComponentInteraction): Promise<any> {
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<any> {
     throw new Error('Not implemented');
   }
 }

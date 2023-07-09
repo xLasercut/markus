@@ -1,7 +1,5 @@
 import { client, config, logger, rest } from './app/init';
-import { MessageComponentInteraction } from 'discord.js';
 import { LOG_BASE } from './app/logging/log-base';
-import { Routes } from 'discord-api-types/v9';
 import {
   autoPostBuyItemHandler,
   autoPostBuyTearHandler,
@@ -11,6 +9,7 @@ import {
   handlers
 } from './handlers/init';
 import { reloadCache } from './cache/init';
+import { Routes } from 'discord.js';
 
 client.on('ready', async () => {
   logger.writeLog(LOG_BASE.BOT_LOG_IN, { user: client.user.tag });
@@ -26,21 +25,22 @@ client.on('ready', async () => {
   logger.writeLog(LOG_BASE.REGISTERED_APP_COMMANDS);
 });
 
-client.on('interactionCreate', async (interaction: MessageComponentInteraction) => {
-  if (interaction.isCommand()) {
-    const { commandName } = interaction;
-
-    if (!(commandName in handlers)) {
-      return;
-    }
-
-    try {
-      await handlers[commandName].executeCommand(interaction);
-    } catch (error) {
-      logger.writeLog(LOG_BASE.INTERNAL_SERVER_ERROR, { reason: error });
-    }
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isChatInputCommand()) {
+    return;
   }
-  return;
+
+  const { commandName } = interaction;
+
+  if (!(commandName in handlers)) {
+    return;
+  }
+
+  try {
+    await handlers[commandName].executeCommand(interaction);
+  } catch (error) {
+    logger.writeLog(LOG_BASE.INTERNAL_SERVER_ERROR, { reason: error });
+  }
 });
 
 client.login(config.dict.discordToken).catch((reason) => {

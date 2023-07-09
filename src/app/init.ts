@@ -1,13 +1,12 @@
 import { Logger } from './logging/logger';
 import { Config } from './config';
-import { Client, Intents } from 'discord.js';
-import { REST } from '@discordjs/rest';
+import { Client, REST, GatewayIntentBits } from 'discord.js';
 
 const client = new Client({
   intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions
   ]
 });
 const config = new Config();

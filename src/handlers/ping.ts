@@ -1,6 +1,6 @@
 import { AbstractCommandHandler } from './abtract';
 import { COLORS } from '../app/constants';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Config } from '../app/config';
 import { simpleCommand } from './command';
 
@@ -12,7 +12,7 @@ class PingHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction): Promise<any> {
     return interaction.reply({
-      embeds: [new MessageEmbed().setDescription('Pong!').setColor(COLORS.SUCCESS)]
+      embeds: [new EmbedBuilder().setDescription('Pong!').setColor(COLORS.SUCCESS)]
     });
   }
 }

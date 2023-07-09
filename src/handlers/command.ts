@@ -23,8 +23,7 @@ function mandatoryToggleActionCommand(name: string, description: string): Discor
       .setName('action')
       .setDescription('Select action')
       .setRequired(true)
-      .addChoice('Enable', 'enable')
-      .addChoice('Disable', 'disable');
+      .addChoices({ name: 'Enable', value: 'enable' }, { name: 'Disable', value: 'disable' });
   });
 }
 

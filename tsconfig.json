@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "target": "es2020",
     "experimentalDecorators": true,
     "outDir": "dist",
     "module": "CommonJS",
     "lib": [
-      "es2018",
+      "es2020",
       "dom"
     ]
   },

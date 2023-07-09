@@ -1,4 +1,4 @@
-import { InteractionReplyOptions, MessageEmbed } from 'discord.js';
+import { InteractionReplyOptions, EmbedBuilder } from 'discord.js';
 import { COLORS } from '../app/constants';
 import { IItem, ITear } from '../interfaces';
 
@@ -13,20 +13,20 @@ abstract class AbstractFormatter<T extends ITear | IItem> {
 
   public loadingScreen(): InteractionReplyOptions {
     return {
-      embeds: [new MessageEmbed().setDescription('Processing...').setColor(COLORS.WARNING)]
+      embeds: [new EmbedBuilder().setDescription('Processing...').setColor(COLORS.WARNING)]
     };
   }
 
   public noResultsScreen(): InteractionReplyOptions {
     return {
-      embeds: [new MessageEmbed().setColor(COLORS.ERROR).setDescription('No results found.')]
+      embeds: [new EmbedBuilder().setColor(COLORS.ERROR).setDescription('No results found.')]
     };
   }
 
   public updateCacheScreen(): InteractionReplyOptions {
     return {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setColor(COLORS.WARNING)
           .setDescription('Updating items list. Please try again later.')
       ],

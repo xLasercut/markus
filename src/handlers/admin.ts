@@ -2,7 +2,7 @@ import { LOG_BASE } from '../app/logging/log-base';
 import { AbstractCommandHandler } from './abtract';
 import { reloadCache } from '../cache/init';
 import { COLORS } from '../app/constants';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { simpleCommand } from './command';
 import { Config } from '../app/config';
 import { Logger } from '../app/logging/logger';
@@ -23,12 +23,12 @@ class AdminHandler extends AbstractCommandHandler {
       id: interaction.user.id
     });
     await interaction.reply({
-      embeds: [new MessageEmbed().setColor(COLORS.WARNING).setDescription('Reloading config...')]
+      embeds: [new EmbedBuilder().setColor(COLORS.WARNING).setDescription('Reloading config...')]
     });
     this._config.load();
     await reloadCache();
     return interaction.editReply({
-      embeds: [new MessageEmbed().setColor(COLORS.SUCCESS).setDescription('Config reloaded')]
+      embeds: [new EmbedBuilder().setColor(COLORS.SUCCESS).setDescription('Config reloaded')]
     });
   }
 }

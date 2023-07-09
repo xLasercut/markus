@@ -1,6 +1,6 @@
 import { AbstractCommandHandler } from './abtract';
 import { COLORS } from '../app/constants';
-import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
+import { InteractionReplyOptions, EmbedBuilder, User } from 'discord.js';
 import { Config } from '../app/config';
 import { optionalUserPingCommand } from './command';
 
@@ -14,7 +14,7 @@ class MarketHelpHandler extends AbstractCommandHandler {
     const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setColor(COLORS.PRIMARY)
           .setTitle('Market Help')
           .setDescription(

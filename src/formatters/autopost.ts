@@ -1,5 +1,5 @@
 import { IItem, ITear } from '../interfaces';
-import { InteractionReplyOptions, MessageEmbed } from 'discord.js';
+import { InteractionReplyOptions, EmbedBuilder } from 'discord.js';
 import { COLORS } from '../app/constants';
 import { AbstractFormatter } from './abstract';
 
@@ -31,7 +31,7 @@ abstract class AbstractAutoPostFormatter<T extends IItem | ITear> extends Abstra
 
     return {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setDescription(title.join(' '))
           .setFooter({ text: '' })
           .setColor(COLORS.PRIMARY)

@@ -1,6 +1,6 @@
 import { AbstractCommandHandler } from './abtract';
 import { COLORS } from '../app/constants';
-import { InteractionReplyOptions, MessageEmbed, User } from 'discord.js';
+import { InteractionReplyOptions, EmbedBuilder, User } from 'discord.js';
 import { Config } from '../app/config';
 import { mandatoryQueryCommand, optionalUserPingCommand, simpleCommand } from './command';
 
@@ -13,7 +13,7 @@ class PtrHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction): Promise<any> {
     return interaction.reply({
       embeds: [
-        new MessageEmbed().setImage('https://i.imgur.com/X7aB8pQ.png').setColor(COLORS.SUCCESS)
+        new EmbedBuilder().setImage('https://i.imgur.com/X7aB8pQ.png').setColor(COLORS.SUCCESS)
       ]
     });
   }
@@ -29,7 +29,7 @@ class BonkHandler extends AbstractCommandHandler {
     const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setImage(
             'https://cdn.discordapp.com/attachments/200128243200688129/966950355000758342/bonk.png'
           )
@@ -52,7 +52,7 @@ class ChristianServerHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction): Promise<any> {
     const response: InteractionReplyOptions = {
-      embeds: [new MessageEmbed().setImage('https://i.imgur.com/xDw8nXF.png').setColor(COLORS.INFO)]
+      embeds: [new EmbedBuilder().setImage('https://i.imgur.com/xDw8nXF.png').setColor(COLORS.INFO)]
     };
     return interaction.reply(response);
   }
@@ -93,7 +93,7 @@ class EightBallHandler extends AbstractCommandHandler {
     const user = interaction.user.username;
     const response: InteractionReplyOptions = {
       embeds: [
-        new MessageEmbed()
+        new EmbedBuilder()
           .setDescription(`${user} asked: **${question}**\nAnswer: **${this._getAnswer()}**`)
           .setColor(COLORS.INFO)
       ]
