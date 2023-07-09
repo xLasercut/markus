@@ -116,13 +116,10 @@ class AtomicHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction): Promise<any> {
     const user: User = interaction.options.getUser('user');
     const randomIndex = Math.round(Math.random());
-    const atomic = this._atomics[randomIndex]
+    const atomic = this._atomics[randomIndex];
     const response: InteractionReplyOptions = {
       embeds: [
-        new MessageEmbed()
-          .setColor(COLORS.PURPLE)
-          .setTitle(atomic.title)
-          .setImage(atomic.image)
+        new MessageEmbed().setColor(COLORS.PURPLE).setTitle(atomic.title).setImage(atomic.image)
       ]
     };
     if (user) {
