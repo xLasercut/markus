@@ -17,7 +17,8 @@ const LOG_REFERENCES = {
   MARKUS009: 'MARKUS009',
   MARKUS010: 'MARKUS010',
   MARKUS011: 'MARKUS011',
-  MARKUS012: 'MARKUS012'
+  MARKUS012: 'MARKUS012',
+  MARKUS013: 'MARKUS013'
 };
 
 const LOG_BASE = {
@@ -75,6 +76,11 @@ const LOG_BASE = {
     reference: LOG_REFERENCES.MARKUS011,
     level: LOG_LEVEL.INFO,
     message: 'search market'
+  },
+  APP_INIT_COMPLETE: {
+    reference: LOG_REFERENCES.MARKUS013,
+    level: LOG_LEVEL.INFO,
+    message: 'app init complete'
   }
 };
 

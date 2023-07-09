@@ -11,6 +11,6 @@ const client = new Client({
 });
 const config = new Config();
 const logger = new Logger(config.dict.logDir);
-const rest = new REST({ version: '9' }).setToken(config.dict.discordToken);
+const rest = new REST({ version: '10' }).setToken(config.dict.discordToken);
 
 export { client, logger, config, rest };
