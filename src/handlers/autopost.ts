@@ -12,7 +12,7 @@ import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
 import { itemCache, tearCache } from '../cache/init';
 import { Config } from '../app/config';
-import { mandatoryToggleActionCommand } from './command';
+import { autoPostToggleActionCommand, mandatoryToggleActionCommand } from './command';
 import { Logger } from '../app/logging/logger';
 
 abstract class AbstractAutoPostHandler<T extends ITear | IItem> extends AbstractCommandHandler {
@@ -43,6 +43,12 @@ abstract class AbstractAutoPostHandler<T extends ITear | IItem> extends Abstract
 
     if (action === 'disable') {
       return this._stopAutoPost(interaction);
+    }
+
+    if (action === 'test') {
+      await interaction.deferReply();
+      await this._postItemList();
+      return interaction.editReply('Test complete');
     }
   }
 
@@ -106,7 +112,7 @@ abstract class AbstractAutoPostHandler<T extends ITear | IItem> extends Abstract
 class AutoPostBuyItemHandler extends AbstractAutoPostHandler<IItem> {
   constructor(config: Config, logger: Logger) {
     super(config, logger, itemCache, new AutoPostItemFormatter());
-    this._command = mandatoryToggleActionCommand(
+    this._command = autoPostToggleActionCommand(
       'autopost_buy_item',
       'Toggle auto posting buy items'
     );
@@ -118,7 +124,7 @@ class AutoPostBuyItemHandler extends AbstractAutoPostHandler<IItem> {
 class AutoPostSellItemHandler extends AbstractAutoPostHandler<IItem> {
   constructor(config: Config, logger: Logger) {
     super(config, logger, itemCache, new AutoPostItemFormatter());
-    this._command = mandatoryToggleActionCommand(
+    this._command = autoPostToggleActionCommand(
       'autopost_sell_item',
       'Toggle auto posting sell items'
     );
@@ -130,7 +136,7 @@ class AutoPostSellItemHandler extends AbstractAutoPostHandler<IItem> {
 class AutoPostBuyTearHandler extends AbstractAutoPostHandler<ITear> {
   constructor(config: Config, logger: Logger) {
     super(config, logger, tearCache, new AutoPostTearFormatter());
-    this._command = mandatoryToggleActionCommand(
+    this._command = autoPostToggleActionCommand(
       'autopost_buy_tear',
       'Toggle auto posting buy tears'
     );
@@ -142,7 +148,7 @@ class AutoPostBuyTearHandler extends AbstractAutoPostHandler<ITear> {
 class AutoPostSellTearHandler extends AbstractAutoPostHandler<ITear> {
   constructor(config: Config, logger: Logger) {
     super(config, logger, tearCache, new AutoPostTearFormatter());
-    this._command = mandatoryToggleActionCommand(
+    this._command = autoPostToggleActionCommand(
       'autopost_sell_tear',
       'Toggle auto posting sell tears'
     );

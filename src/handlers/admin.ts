@@ -22,9 +22,7 @@ class AdminHandler extends AbstractCommandHandler {
       user: interaction.user.username,
       id: interaction.user.id
     });
-    await interaction.reply({
-      embeds: [new EmbedBuilder().setColor(COLORS.WARNING).setDescription('Reloading config...')]
-    });
+    await interaction.deferReply();
     this._config.load();
     await reloadCache();
     return interaction.editReply({

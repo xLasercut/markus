@@ -43,7 +43,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   try {
     await handlers[commandName].executeCommand(interaction);
   } catch (error) {
-    logger.writeLog(LOG_BASE.INTERNAL_SERVER_ERROR, { reason: error });
+    logger.writeLog(LOG_BASE.INTERNAL_SERVER_ERROR, { reason: error, stack: error.stack });
   }
 });
 

@@ -27,9 +27,24 @@ function mandatoryToggleActionCommand(name: string, description: string): Discor
   });
 }
 
+function autoPostToggleActionCommand(name: string, description: string): DiscordCommand {
+  return simpleCommand(name, description).addStringOption((option) => {
+    return option
+      .setName('action')
+      .setDescription('Select action')
+      .setRequired(true)
+      .addChoices(
+        { name: 'Enable', value: 'enable' },
+        { name: 'Disable', value: 'disable' },
+        { name: 'Test', value: 'test' }
+      );
+  });
+}
+
 export {
   simpleCommand,
   optionalUserPingCommand,
   mandatoryQueryCommand,
-  mandatoryToggleActionCommand
+  mandatoryToggleActionCommand,
+  autoPostToggleActionCommand
 };

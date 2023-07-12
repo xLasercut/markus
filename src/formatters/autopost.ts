@@ -33,7 +33,6 @@ abstract class AbstractAutoPostFormatter<T extends IItem | ITear> extends Abstra
       embeds: [
         new EmbedBuilder()
           .setDescription(title.join(' '))
-          .setFooter({ text: '' })
           .setColor(COLORS.PRIMARY)
           .setFields(fields)
       ]

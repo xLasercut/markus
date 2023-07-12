@@ -32,8 +32,9 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
+    await interaction.deferReply();
     if (this._cache.isLoading()) {
-      return interaction.reply(this._formatter.updateCacheScreen());
+      return interaction.editReply(this._formatter.updateCacheScreen());
     }
     const searchQuery = interaction.options.getString('query');
     this._logger.writeLog(LOG_BASE.SEARCH_MARKET, {
@@ -47,7 +48,7 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
     const results = this._cache.search(searchQuery);
 
     if (results.length < 1) {
-      return interaction.reply(this._formatter.noResultsScreen());
+      return interaction.editReply(this._formatter.noResultsScreen());
     }
 
     const maxPage = Math.ceil(results.length / this._config.dict.searchResultsPerPage);
@@ -59,7 +60,6 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
       return results.slice(startIndex, endIndex);
     };
 
-    await interaction.reply(this._formatter.loadingScreen());
     const message = await interaction.editReply(
       this._formatter.generateOutput(slicedResults(), searchQuery, currentPage, maxPage)
     );

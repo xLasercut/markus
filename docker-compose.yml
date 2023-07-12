@@ -9,11 +9,7 @@ services:
       - ./log/:/home/markus/log
     env_file:
       - config.env
+    network_mode: host
     logging:
       options:
         max-size: 50m
-    networks:
-      markus:
-
-networks:
-  markus:
