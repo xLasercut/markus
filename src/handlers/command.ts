@@ -1,5 +1,5 @@
 import { DiscordCommand } from '../types';
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder } from 'discord.js';
 
 function simpleCommand(name: string, description: string): DiscordCommand {
   return new SlashCommandBuilder().setName(name).setDescription(description);

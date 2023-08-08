@@ -1,24 +1,24 @@
-FROM node:16-alpine
+FROM node:16-bookworm-slim
 
 LABEL maintainer=xLasercut
 
 ARG WORK_DIR=/home/markus
 
-RUN apk update \
- && apk -q add curl \
- && apk -q add bash \
- && apk -q add bash-completion \
+RUN apt update -y \
+ && apt install -y curl bash bash-completion \
  && mkdir ${WORK_DIR}
+
+RUN npm install -g pnpm
 
 WORKDIR ${WORK_DIR}
 
 COPY ./package.json ${WORK_DIR}/package.json
-COPY ./package-lock.json ${WORK_DIR}/package-lock.json
+COPY ./pnpm-lock.yaml ${WORK_DIR}/pnpm-lock.yaml
 
-RUN npm ci
+RUN pnpm install
 
 COPY . ${WORK_DIR}/.
 
-RUN npm run compile
+RUN pnpm compile
 
-CMD ["npm", "run", "start"]
+CMD ["pnpm", "start"]
