@@ -1,11 +1,11 @@
-FROM node:16-bookworm-slim
+FROM node:18-bookworm
 
 LABEL maintainer=xLasercut
 
 ARG WORK_DIR=/home/markus
 
 RUN apt update -y \
- && apt install -y curl bash bash-completion sqlite3 \
+ && apt install -y curl bash bash-completion sqlite3 python3 \
  && mkdir ${WORK_DIR}
 
 RUN npm install -g pnpm
