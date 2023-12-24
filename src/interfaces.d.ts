@@ -92,6 +92,7 @@ interface IConfig {
   testChannelId: string;
   animeRoleId: string;
   logDir: string;
+  dataDir: string;
 }
 
 interface IUserData {

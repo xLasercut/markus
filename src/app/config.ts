@@ -39,7 +39,8 @@ class Config {
       imgurClientId: process.env.IMGUR_CLIENT_ID || '',
       testChannelId: process.env.TEST_CHANNEL_ID || '',
       animeRoleId: process.env.ANIME_ROLE_ID || '',
-      logDir: path.join(BASE_DIR, 'log')
+      logDir: path.join(BASE_DIR, 'log'),
+      dataDir: path.join(BASE_DIR, 'data')
     };
   }
 
