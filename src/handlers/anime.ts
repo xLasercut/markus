@@ -115,7 +115,7 @@ class AtomicHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction): Promise<any> {
     const user: User = interaction.options.getUser('user');
-    const randomIndex = Math.round(Math.random());
+    const randomIndex = Math.floor(Math.random() * this._atomics.length);
     const atomic = this._atomics[randomIndex];
     const response: InteractionReplyOptions = {
       embeds: [
