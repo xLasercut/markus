@@ -116,7 +116,7 @@ class RatioHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction): Promise<any> {
     const response: InteractionReplyOptions = {
       embeds: [
-        new EmbedBuilder().setImage('https://i.imgur.com/4XwCRWU.gifv').setColor(COLORS.PRIMARY)
+        new EmbedBuilder().setImage('https://i.imgur.com/4XwCRWU.gif').setColor(COLORS.PRIMARY)
       ]
     };
     return interaction.reply(response);

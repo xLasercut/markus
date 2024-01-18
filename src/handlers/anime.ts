@@ -110,7 +110,7 @@ class AtomicHandler extends AbstractCommandHandler {
       },
       { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/ZhmtllT.jpg' },
       { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/8VNgF3X.png' },
-      { title: 'ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/THvN4ln.gifv' }
+      { title: 'ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/THvN4ln.gif' }
     ];
   }
 
