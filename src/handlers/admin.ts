@@ -2,7 +2,7 @@ import { LOG_BASE } from '../app/logging/log-base';
 import { AbstractCommandHandler } from './abtract';
 import { reloadCache } from '../cache/init';
 import { COLORS } from '../app/constants';
-import { EmbedBuilder } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { simpleCommand } from './command';
 import { Config } from '../app/config';
 import { Logger } from '../app/logging/logger';
@@ -16,7 +16,7 @@ class AdminHandler extends AbstractCommandHandler {
     this._logger = logger;
   }
 
-  protected async _runWorkflow(interaction): Promise<any> {
+  protected async _runWorkflow(interaction: CommandInteraction): Promise<any> {
     this._logger.writeLog(LOG_BASE.ADMIN_COMMAND, {
       command: this.name,
       user: interaction.user.username,

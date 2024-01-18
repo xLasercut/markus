@@ -1,4 +1,4 @@
-import { EmbedBuilder, InteractionReplyOptions, User } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, InteractionReplyOptions, User } from 'discord.js';
 import { AbstractCommandHandler } from './abtract';
 import { COLORS } from '../app/constants';
 import { AnimeCache } from '../cache/anime';
@@ -109,11 +109,12 @@ class AtomicHandler extends AbstractCommandHandler {
         image: 'https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif'
       },
       { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/ZhmtllT.jpg' },
-      { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/8VNgF3X.png' }
+      { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/8VNgF3X.png' },
+      { title: 'ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/THvN4ln.gifv' }
     ];
   }
 
-  protected async _runWorkflow(interaction): Promise<any> {
+  protected async _runWorkflow(interaction: CommandInteraction): Promise<any> {
     const user: User = interaction.options.getUser('user');
     const randomIndex = Math.floor(Math.random() * this._atomics.length);
     const atomic = this._atomics[randomIndex];

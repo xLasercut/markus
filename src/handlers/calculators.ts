@@ -1,6 +1,6 @@
 import { AbstractCommandHandler } from './abtract';
 import { COLORS } from '../app/constants';
-import { InteractionReplyOptions, EmbedBuilder, User } from 'discord.js';
+import { InteractionReplyOptions, EmbedBuilder, User, CommandInteraction } from 'discord.js';
 import { Config } from '../app/config';
 import { optionalUserPingCommand } from './command';
 
@@ -10,7 +10,7 @@ class GenshinCalcHandler extends AbstractCommandHandler {
     this._command = optionalUserPingCommand('genshin_calc', 'Genshin calculator');
   }
 
-  protected async _runWorkflow(interaction): Promise<any> {
+  protected async _runWorkflow(interaction: CommandInteraction): Promise<any> {
     const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [

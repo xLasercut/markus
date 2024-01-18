@@ -17,7 +17,13 @@ import {
   WakuWakuHandler
 } from './anime';
 import { PingHandler } from './ping';
-import { BonkHandler, ChristianServerHandler, EightBallHandler, PtrHandler } from './memes';
+import {
+  BonkHandler,
+  ChristianServerHandler,
+  EightBallHandler,
+  PtrHandler,
+  RatioHandler
+} from './memes';
 import { animeCache } from '../cache/init';
 import { config, logger } from '../app/init';
 
@@ -42,6 +48,7 @@ const eightBallHandler = new EightBallHandler(config);
 const wakuWakuHandler = new WakuWakuHandler(config);
 const sosuHandler = new SosuHandler(config);
 const atomicHandler = new AtomicHandler(config);
+const ratioHandler = new RatioHandler(config);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -64,7 +71,8 @@ const handlers = {
   [eightBallHandler.name]: eightBallHandler,
   [wakuWakuHandler.name]: wakuWakuHandler,
   [sosuHandler.name]: sosuHandler,
-  [atomicHandler.name]: atomicHandler
+  [atomicHandler.name]: atomicHandler,
+  [ratioHandler.name]: ratioHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {

@@ -107,4 +107,20 @@ class EightBallHandler extends AbstractCommandHandler {
   }
 }
 
-export { PtrHandler, BonkHandler, ChristianServerHandler, EightBallHandler };
+class RatioHandler extends AbstractCommandHandler {
+  constructor(config: Config) {
+    super(config);
+    this._command = simpleCommand('l+ratio', "Get RATIO'D!");
+  }
+
+  protected async _runWorkflow(interaction): Promise<any> {
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new EmbedBuilder().setImage('https://i.imgur.com/4XwCRWU.gifv').setColor(COLORS.PRIMARY)
+      ]
+    };
+    return interaction.reply(response);
+  }
+}
+
+export { PtrHandler, BonkHandler, ChristianServerHandler, EightBallHandler, RatioHandler };
