@@ -110,7 +110,7 @@ class EightBallHandler extends AbstractCommandHandler {
 class RatioHandler extends AbstractCommandHandler {
   constructor(config: Config) {
     super(config);
-    this._command = simpleCommand('l+ratio', "Get RATIO'D!");
+    this._command = simpleCommand('ratio', "Get RATIO'D!");
   }
 
   protected async _runWorkflow(interaction): Promise<any> {
