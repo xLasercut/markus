@@ -1,74 +1,80 @@
-import { LOG_BASE } from '../app/logging/log-base';
-import { Logger } from '../app/logging/logger';
-import { Config } from '../app/config';
-import { shuffleArray } from '../helper';
-import * as Database from 'better-sqlite3';
-import { Database as SqliteDb } from 'better-sqlite3';
-import * as path from 'path';
+import { getRandomItem, shuffleArray } from '../helper';
+import { Logger } from 'winston';
+import { AtomicType } from '../interfaces/anime-cache';
 
-function _databaseConnection(currentDb: SqliteDb | null, filepath: string): SqliteDb {
-  if (currentDb) {
-    currentDb.close();
-  }
-  const db = new Database(filepath);
-  db.pragma('journal_mode = WAL');
-  return db;
-}
+const DONT_GET_ATTACHED_IMAGES = [
+  'https://i.imgur.com/gqlRV4m.jpg',
+  'https://i.imgur.com/eA9Zc6W.png',
+  'https://i.imgur.com/mjmsfoc.jpg',
+  'https://i.imgur.com/edtRys1.png',
+  'https://i.imgur.com/zczdTTX.jpg',
+  'https://i.imgur.com/sZ5a2V1.jpg',
+  'https://i.imgur.com/GvnjMHq.jpg',
+  'https://i.imgur.com/6M4NoER.jpg',
+  'https://i.imgur.com/acy6acJ.jpg',
+  'https://i.imgur.com/mpeec4d.jpg',
+  'https://i.imgur.com/MfMtAY1.jpg',
+  'https://i.imgur.com/OHNsoXO.png',
+  'https://i.imgur.com/3jlkqtf.jpg',
+  'https://i.imgur.com/WLmJgVe.png',
+  'https://i.imgur.com/vSabqZF.jpg',
+  'https://i.imgur.com/P9UiOrS.jpg',
+  'https://i.imgur.com/JmKq9U7.jpg',
+  'https://i.imgur.com/e0MoeR7.jpg',
+  'https://i.imgur.com/HQNapc5.png',
+  'https://i.imgur.com/QnkVRE1.jpg',
+  'https://i.imgur.com/BGp3Ouj.jpg',
+  'https://i.imgur.com/5sraNzp.png',
+  'https://i.imgur.com/HF226oH.png',
+  'https://i.imgur.com/do3Bm9P.jpg',
+  'https://i.imgur.com/OY9Uu5R.jpg',
+  'https://i.imgur.com/LXxF9eN.png',
+  'https://i.imgur.com/qwa3024.jpg',
+  'https://i.imgur.com/j9aWWeB.png',
+  'https://i.imgur.com/pG6rzZa.jpg',
+  'https://i.imgur.com/DPeQuOr.jpg',
+  'https://i.imgur.com/7aQuGGm.jpg',
+  'https://i.imgur.com/W8BGH7I.jpg',
+  'https://i.imgur.com/DmoNJa4.jpg',
+  'https://i.imgur.com/KKcOUl7.png',
+  'https://i.imgur.com/ERHAMag.png'
+];
+
+const ATOMIC_IMAGES: AtomicType[] = [
+  {
+    title: 'ᵃᵗᵒᵐⁱᶜ',
+    image: 'https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif'
+  },
+  { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/ZhmtllT.jpg' },
+  { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/8VNgF3X.png' },
+  { title: 'ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/THvN4ln.gif' }
+];
 
 class AnimeCache {
-  protected _images: Array<string>;
-  protected _imagesToSend: Array<string>;
-  protected _currentImageCount: number;
+  protected _dontGetAttachedImagesToSend: string[] = shuffleArray<string>(DONT_GET_ATTACHED_IMAGES);
+  protected _dontGetAttachedCurrentImage: number = 0;
   protected _logger: Logger;
-  protected _config: Config;
-  protected _db: SqliteDb;
-  protected _filepath: string;
 
-  constructor(config: Config, logger: Logger) {
-    this._images = [];
-    this._imagesToSend = [];
-    this._currentImageCount = 0;
+  constructor(logger: Logger) {
     this._logger = logger;
-    this._config = config;
-    this._filepath = path.join(config.dict.dataDir, 'markus.db');
-    this._db = _databaseConnection(this._db, this._filepath);
   }
 
-  public async startCache(): Promise<any> {
-    this._db = _databaseConnection(this._db, this._filepath);
-    this._logger.writeLog(LOG_BASE.ANIME_CACHE_RELOAD, {
-      stage: 'start',
-      count: 0
-    });
-    this._images = this._getImgurAlbumImages();
-    this._logger.writeLog(LOG_BASE.ANIME_CACHE_RELOAD, {
-      stage: 'finish',
-      count: this._images.length
-    });
-    this._imagesToSend = shuffleArray(this._images);
-    this._currentImageCount = 0;
-  }
-
-  protected _getImgurAlbumImages(): string[] {
-    const statement = this._db.prepare(`SELECT source FROM dont_get_attached`);
-    const response = statement.all();
-    return response.map((item) => {
-      return item['source'];
-    });
-  }
-
-  public getRandomImage(): string {
-    if (this._currentImageCount >= this._imagesToSend.length) {
-      this._imagesToSend = shuffleArray(this._images);
-      this._currentImageCount = 0;
+  public getDontGetAttachedImage(): string {
+    if (this._dontGetAttachedCurrentImage >= this._dontGetAttachedImagesToSend.length) {
+      this._dontGetAttachedImagesToSend = shuffleArray<string>(DONT_GET_ATTACHED_IMAGES);
+      this._dontGetAttachedCurrentImage = 0;
     }
 
-    const imageUrl = this._imagesToSend[this._currentImageCount];
-    this._logger.writeLog(LOG_BASE.FETCHED_ANIME_IMAGE, {
+    const imageUrl = this._dontGetAttachedImagesToSend[this._dontGetAttachedCurrentImage];
+    this._logger.info('fetched dont get attached image', {
       imageUrl: imageUrl
     });
-    this._currentImageCount += 1;
+    this._dontGetAttachedCurrentImage += 1;
     return imageUrl;
+  }
+
+  public getAtomic(): AtomicType {
+    return getRandomItem<AtomicType>(ATOMIC_IMAGES);
   }
 }
 

@@ -1,17 +1,13 @@
 import { AbstractCommandHandler } from './abtract';
-import { COLORS } from '../app/constants';
-import { EmbedBuilder } from 'discord.js';
-import { Config } from '../app/config';
+import { COLORS } from '../constants';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { simpleCommand } from './command';
 
 class ElswordEnhancementEventHandler extends AbstractCommandHandler {
-  constructor(config: Config) {
-    super(config);
-    this._command = simpleCommand('enhancement_event', 'Thanks KoG!');
-  }
+  protected _command = simpleCommand('enhancement_event', 'Thanks KoG!');
 
-  protected async _runWorkflow(interaction): Promise<any> {
-    return interaction.reply({
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
+    await interaction.reply({
       embeds: [
         new EmbedBuilder()
           .setColor(COLORS.ERROR)

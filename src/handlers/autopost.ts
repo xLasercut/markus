@@ -1,85 +1,82 @@
 import * as cron from 'node-cron';
-import { IItem, ITear } from '../interfaces';
-import {
-  AbstractAutoPostFormatter,
-  AutoPostItemFormatter,
-  AutoPostTearFormatter
-} from '../formatters/autopost';
-import { Message } from 'discord.js';
+import { AbstractAutoPostFormatter, AutoPostItemFormatter } from '../formatters/autopost';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { client } from '../app/init';
-import { LOG_BASE } from '../app/logging/log-base';
 import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
-import { itemCache, tearCache } from '../cache/init';
-import { Config } from '../app/config';
-import { autoPostToggleActionCommand, mandatoryToggleActionCommand } from './command';
-import { Logger } from '../app/logging/logger';
+import { autoPostToggleActionCommand } from './command';
+import { ItemType, PostType, UserItemType } from '../types';
+import { HandlerDependenciesType } from '../interfaces/handler';
+import { POST_TYPES } from '../constants';
 
-abstract class AbstractAutoPostHandler<T extends ITear | IItem> extends AbstractCommandHandler {
-  protected _logger: Logger;
+abstract class AbstractAutoPostHandler<
+  T extends ItemType,
+  UT extends UserItemType
+> extends AbstractCommandHandler {
   protected _postSchedule: cron.ScheduledTask;
-  protected _type: 'buy' | 'sell';
+  protected abstract _type: PostType;
   protected _channel: string;
-  protected _cache: AbstractMarketCache<T>;
+  protected _cache: AbstractMarketCache<T, UT>;
   protected _formatter: AbstractAutoPostFormatter<T>;
 
   protected constructor(
-    config: Config,
-    logger: Logger,
-    cache: AbstractMarketCache<T>,
-    formatter: AbstractAutoPostFormatter<T>
+    dependencies: HandlerDependenciesType,
+    cache: AbstractMarketCache<T, UT>,
+    formatter: AbstractAutoPostFormatter<T>,
+    channel: string
   ) {
-    super(config, [], [config.dict.ownerUserId]);
+    super(dependencies, [], [dependencies.config.OWNER_USER_ID]);
     this._cache = cache;
     this._formatter = formatter;
-    this._logger = logger;
+    this._channel = channel;
   }
 
-  protected async _runWorkflow(interaction): Promise<any> {
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const action = interaction.options.getString('action');
     if (action === 'enable') {
-      return this.startAutoPost(interaction);
+      await this.startAutoPost();
+      await interaction.reply(`${this.name} enabled`);
+      return;
     }
 
     if (action === 'disable') {
-      return this._stopAutoPost(interaction);
+      await this._stopAutoPost();
+      await interaction.reply(`${this.name} disabled`);
+      return;
     }
 
     if (action === 'test') {
       await interaction.deferReply();
       await this._postItemList();
-      return interaction.editReply('Test complete');
+      await interaction.editReply('Test complete');
+      return;
     }
   }
 
-  public async startAutoPost(interaction = null): Promise<any> {
-    if (!this._postSchedule) {
-      this._postSchedule = cron.schedule(this._config.dict.autoPostRate, async () => {
-        await this._postItemList();
-      });
-      this._logger.writeLog(LOG_BASE.AUTOPOST_OPERATION, {
-        type: `${this.name} post`,
-        status: 'enable',
-        rate: this._config.dict.autoPostRate
-      });
-      return this._reply(interaction, `${this.name} enabled`);
+  public async startAutoPost(): Promise<void> {
+    if (this._postSchedule) {
+      await this._stopAutoPost();
     }
 
-    return this._reply(interaction, `${this.name} already enabled`);
+    this._postSchedule = cron.schedule(this._config.AUTO_POST_RATE, async () => {
+      await this._postItemList();
+    });
+    this._logger.info('enabled auto post', {
+      type: this.name,
+      rate: this._config.AUTO_POST_RATE
+    });
   }
 
-  protected async _stopAutoPost(message: Message = null): Promise<any> {
+  protected async _stopAutoPost(): Promise<void> {
     this._postSchedule.stop();
-    this._logger.writeLog(LOG_BASE.AUTOPOST_OPERATION, {
-      type: `${this.name} post`,
-      status: 'disable',
-      rate: this._config.dict.autoPostRate
+    this._logger.info('disabled auto post', {
+      type: this.name,
+      rate: this._config.AUTO_POST_RATE
     });
     this._postSchedule = null;
-    await this._reply(message, `${this.name} disabled`);
   }
 
-  protected async _postItemList(): Promise<any> {
+  protected async _postItemList(): Promise<void> {
     const userList = this._cache.getUserList();
     for (const userId of userList) {
       const posts = this._cache.getUserPosts(userId, this._type).slice(0, 11);
@@ -94,12 +91,6 @@ abstract class AbstractAutoPostHandler<T extends ITear | IItem> extends Abstract
     }
   }
 
-  protected async _reply(interaction = null, text: string = ''): Promise<any> {
-    if (interaction) {
-      return interaction.reply(text);
-    }
-  }
-
   protected async _delay(time: number): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -109,57 +100,38 @@ abstract class AbstractAutoPostHandler<T extends ITear | IItem> extends Abstract
   }
 }
 
-class AutoPostBuyItemHandler extends AbstractAutoPostHandler<IItem> {
-  constructor(config: Config, logger: Logger) {
-    super(config, logger, itemCache, new AutoPostItemFormatter());
-    this._command = autoPostToggleActionCommand(
-      'autopost_buy_item',
-      'Toggle auto posting buy items'
+class AutoPostBuyItemHandler extends AbstractAutoPostHandler<ItemType, UserItemType> {
+  protected _command = autoPostToggleActionCommand(
+    'autopost_buy_item',
+    'Toggle auto posting buy items'
+  );
+  protected _type = POST_TYPES.BUY;
+
+  constructor(dependencies: HandlerDependenciesType) {
+    super(
+      dependencies,
+      dependencies.itemCache,
+      new AutoPostItemFormatter(),
+      dependencies.config.AUTO_POST_BUY_CHANNEL_ID
     );
-    this._type = 'buy';
-    this._channel = config.dict.autoPostBuyChannelId;
   }
 }
 
-class AutoPostSellItemHandler extends AbstractAutoPostHandler<IItem> {
-  constructor(config: Config, logger: Logger) {
-    super(config, logger, itemCache, new AutoPostItemFormatter());
-    this._command = autoPostToggleActionCommand(
-      'autopost_sell_item',
-      'Toggle auto posting sell items'
+class AutoPostSellItemHandler extends AbstractAutoPostHandler<ItemType, UserItemType> {
+  protected _command = autoPostToggleActionCommand(
+    'autopost_sell_item',
+    'Toggle auto posting sell items'
+  );
+  protected _type = POST_TYPES.SELL;
+
+  constructor(dependencies: HandlerDependenciesType) {
+    super(
+      dependencies,
+      dependencies.itemCache,
+      new AutoPostItemFormatter(),
+      dependencies.config.AUTO_POST_SELL_CHANNEL_ID
     );
-    this._type = 'sell';
-    this._channel = config.dict.autoPostSellChannelId;
   }
 }
 
-class AutoPostBuyTearHandler extends AbstractAutoPostHandler<ITear> {
-  constructor(config: Config, logger: Logger) {
-    super(config, logger, tearCache, new AutoPostTearFormatter());
-    this._command = autoPostToggleActionCommand(
-      'autopost_buy_tear',
-      'Toggle auto posting buy tears'
-    );
-    this._type = 'buy';
-    this._channel = config.dict.autoPostBuyChannelId;
-  }
-}
-
-class AutoPostSellTearHandler extends AbstractAutoPostHandler<ITear> {
-  constructor(config: Config, logger: Logger) {
-    super(config, logger, tearCache, new AutoPostTearFormatter());
-    this._command = autoPostToggleActionCommand(
-      'autopost_sell_tear',
-      'Toggle auto posting sell tears'
-    );
-    this._type = 'sell';
-    this._channel = config.dict.autoPostSellChannelId;
-  }
-}
-
-export {
-  AutoPostSellTearHandler,
-  AutoPostBuyItemHandler,
-  AutoPostSellItemHandler,
-  AutoPostBuyTearHandler
-};
+export { AutoPostBuyItemHandler, AutoPostSellItemHandler };

@@ -1,36 +1,32 @@
-import { client, config, logger, rest } from './app/init';
-import { LOG_BASE } from './app/logging/log-base';
+import { client, logger, rest } from './app/init';
 import {
   autoPostBuyItemHandler,
-  autoPostBuyTearHandler,
   autoPostSellItemHandler,
-  autoPostSellTearHandler,
   commands,
   handlers
 } from './handlers/init';
+import { Events, Routes } from 'discord.js';
+import { CONFIG } from './app/config';
 import { reloadCache } from './cache/init';
-import { Routes, Events } from 'discord.js';
 
 client.on('ready', async () => {
-  logger.writeLog(LOG_BASE.BOT_LOG_IN, { user: client.user.tag });
+  logger.info('bot logged in', { user: client.user.tag });
   await reloadCache();
-  await rest.put(Routes.applicationCommands(config.dict.applicationId), { body: [] });
+  await rest.put(Routes.applicationCommands(CONFIG.APPLICATION_ID), { body: [] });
   const data = await rest.put(
-    Routes.applicationGuildCommands(config.dict.applicationId, config.dict.serverId),
+    Routes.applicationGuildCommands(CONFIG.APPLICATION_ID, CONFIG.SERVER_ID),
     {
       body: commands
     }
   );
-  logger.writeLog(LOG_BASE.REGISTERED_APP_COMMANDS, { response: data });
+  logger.info('registered app commands', { response: data });
   await autoPostBuyItemHandler.startAutoPost();
   await autoPostSellItemHandler.startAutoPost();
-  await autoPostBuyTearHandler.startAutoPost();
-  await autoPostSellTearHandler.startAutoPost();
-  logger.writeLog(LOG_BASE.APP_INIT_COMPLETE);
+  logger.info('app init complete');
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isCommand()) {
+  if (!interaction.isCommand() || !interaction.isChatInputCommand()) {
     return;
   }
 
@@ -43,10 +39,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
   try {
     await handlers[commandName].executeCommand(interaction);
   } catch (error) {
-    logger.writeLog(LOG_BASE.INTERNAL_SERVER_ERROR, { reason: error, stack: error.stack });
+    logger.error('internal server error', error);
   }
 });
 
-client.login(config.dict.discordToken).catch((reason) => {
-  logger.writeLog(LOG_BASE.DISCORD_LOGIN_ERROR, { reason: reason });
+client.login(CONFIG.DISCORD_TOKEN).catch((error) => {
+  logger.error('discord login error', error);
 });

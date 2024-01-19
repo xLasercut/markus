@@ -1,43 +1,38 @@
-import { LOG_BASE } from '../app/logging/log-base';
-import { IItem, ITear } from '../interfaces';
 import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
-import { itemCache, tearCache } from '../cache/init';
-import {
-  AbstractSearchFormatter,
-  ItemSearchFormatter,
-  TearSearchFormatter
-} from '../formatters/search';
-import { REACTIONS } from '../app/constants';
-import { Config } from '../app/config';
-import { Logger } from '../app/logging/logger';
+import { AbstractSearchFormatter, ItemSearchFormatter } from '../formatters/search';
+import { REACTIONS } from '../constants';
 import { mandatoryQueryCommand } from './command';
+import { HandlerDependenciesType } from '../interfaces/handler';
+import { ChatInputCommandInteraction, MessageReaction } from 'discord.js';
+import { ItemType, UserItemType } from '../types';
 
-abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCommandHandler {
-  protected _cache: AbstractMarketCache<T>;
+abstract class AbstractSearchHandler<
+  T extends ItemType,
+  UT extends UserItemType
+> extends AbstractCommandHandler {
+  protected _cache: AbstractMarketCache<T, UT>;
   protected _formatter: AbstractSearchFormatter<T>;
   protected _reactionList = [REACTIONS.BACK, REACTIONS.FORWARD];
-  protected _logger: Logger;
 
   protected constructor(
-    config: Config,
-    logger: Logger,
-    cache: AbstractMarketCache<T>,
+    dependencies: HandlerDependenciesType,
+    cache: AbstractMarketCache<T, UT>,
     formatter: AbstractSearchFormatter<T>
   ) {
-    super(config, [config.dict.searchChannelId]);
+    super(dependencies, [dependencies.config.SEARCH_CHANNEL_ID]);
     this._cache = cache;
     this._formatter = formatter;
-    this._logger = logger;
   }
 
-  protected async _runWorkflow(interaction): Promise<any> {
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     await interaction.deferReply();
-    if (this._cache.isLoading()) {
-      return interaction.editReply(this._formatter.updateCacheScreen());
+    if (this._cache.loading) {
+      await interaction.editReply(this._formatter.updateCacheScreen());
+      return;
     }
     const searchQuery = interaction.options.getString('query');
-    this._logger.writeLog(LOG_BASE.SEARCH_MARKET, {
+    this._logger.info('search market', {
       type: this.name,
       userId: interaction.user.id,
       user: interaction.user.username,
@@ -48,15 +43,16 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
     const results = this._cache.search(searchQuery);
 
     if (results.length < 1) {
-      return interaction.editReply(this._formatter.noResultsScreen());
+      await interaction.editReply(this._formatter.noResultsScreen());
+      return;
     }
 
-    const maxPage = Math.ceil(results.length / this._config.dict.searchResultsPerPage);
+    const maxPage = Math.ceil(results.length / this._config.SEARCH_RESULTS_PER_PAGE);
     let currentPage = 1;
 
     const slicedResults = (): T[] => {
-      const startIndex = (currentPage - 1) * this._config.dict.searchResultsPerPage;
-      const endIndex = startIndex + this._config.dict.searchResultsPerPage;
+      const startIndex = (currentPage - 1) * this._config.SEARCH_RESULTS_PER_PAGE;
+      const endIndex = startIndex + this._config.SEARCH_RESULTS_PER_PAGE;
       return results.slice(startIndex, endIndex);
     };
 
@@ -68,17 +64,15 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
       await message.react(emoji);
     }
 
-    const filter = (reaction, user) => {
-      return user.id === message.interaction.user.id;
-    };
-
     const collector = message.createReactionCollector({
-      filter,
+      filter: (_, user) => {
+        return user.id === message.interaction.user.id;
+      },
       dispose: true,
-      time: this._config.dict.reactionExpireTime
+      time: this._config.REACTION_EXPIRE_TIME
     });
 
-    const postEditor = async (reaction) => {
+    const postEditor = async (reaction: MessageReaction) => {
       if (currentPage > 1 && reaction.emoji.name === REACTIONS.BACK) {
         currentPage -= 1;
         await interaction.editReply(
@@ -102,18 +96,12 @@ abstract class AbstractSearchHandler<T extends IItem | ITear> extends AbstractCo
   }
 }
 
-class ItemSearchHandler extends AbstractSearchHandler<IItem> {
-  constructor(config: Config, logger: Logger) {
-    super(config, logger, itemCache, new ItemSearchFormatter());
-    this._command = mandatoryQueryCommand('search_item', 'Search items on Elsword market');
+class ItemSearchHandler extends AbstractSearchHandler<ItemType, UserItemType> {
+  protected _command = mandatoryQueryCommand('search_item', 'Search items on Elsword market');
+
+  constructor(dependencies: HandlerDependenciesType) {
+    super(dependencies, dependencies.itemCache, new ItemSearchFormatter());
   }
 }
 
-class TearSearchHandler extends AbstractSearchHandler<ITear> {
-  constructor(config: Config, logger: Logger) {
-    super(config, logger, tearCache, new TearSearchFormatter());
-    this._command = mandatoryQueryCommand('search_tear', 'Search el tears on Elsword market');
-  }
-}
-
-export { ItemSearchHandler, TearSearchHandler };
+export { ItemSearchHandler };

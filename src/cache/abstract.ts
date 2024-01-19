@@ -1,32 +1,28 @@
-import { LOG_BASE } from '../app/logging/log-base';
 import * as lunr from 'lunr';
 import * as cron from 'node-cron';
-import { IItem, IRawUserPosts, ITear, IUserPosts } from '../interfaces';
-import { Config } from '../app/config';
-import { Logger } from '../app/logging/logger';
-import axios from 'axios';
-import { POST_TYPES } from '../app/constants';
+import { POST_TYPES } from '../constants';
 import { shuffleArray } from '../helper';
+import { ItemType, PostType, UserItemType } from '../types';
+import { Logger } from 'winston';
+import { ConfigType } from '../interfaces/config';
 
-abstract class AbstractMarketCache<T extends IItem | ITear> {
+abstract class AbstractMarketCache<T extends ItemType, UT extends UserItemType> {
   protected _searchIndex: lunr.Index;
   protected _loading = false;
   protected _reloadTask: cron.ScheduledTask;
-  protected _config: Config;
+  protected _config: ConfigType;
   protected _logger: Logger;
-  protected _userPosts: IUserPosts;
-  protected _posts: { [key: number]: T };
-  protected _userPostsApiUrl: string;
-  protected _postsApiUrl: string;
-  protected _fieldsToEncode: string[];
-  protected _name: string;
+  protected _userPosts: Record<string, { buy: string[]; sell: string[] }> = {};
+  protected _posts: Record<string, T> = {};
+  protected abstract _fieldsToEncode: string[];
+  protected abstract _name: string;
 
-  protected constructor(config: Config, logger: Logger) {
+  constructor(config: ConfigType, logger: Logger) {
     this._config = config;
     this._logger = logger;
   }
 
-  public isLoading(): boolean {
+  public get loading(): boolean {
     return this._loading;
   }
 
@@ -37,7 +33,7 @@ abstract class AbstractMarketCache<T extends IItem | ITear> {
     });
   }
 
-  public getUserPosts(userId: string, type: 'buy' | 'sell'): T[] {
+  public getUserPosts(userId: string, type: PostType): T[] {
     if (userId in this._userPosts) {
       return this._userPosts[userId][type].map((postId) => {
         return this._posts[postId];
@@ -47,7 +43,7 @@ abstract class AbstractMarketCache<T extends IItem | ITear> {
   }
 
   public getUserList(): string[] {
-    return shuffleArray(Object.keys(this._userPosts));
+    return shuffleArray<string>(Object.keys(this._userPosts));
   }
 
   public async startCache(): Promise<void> {
@@ -55,76 +51,68 @@ abstract class AbstractMarketCache<T extends IItem | ITear> {
       this._reloadTask.stop();
     }
     await this._reloadCache();
-    this._reloadTask = cron.schedule(this._config.dict.cacheRefreshRate, async () => {
+    this._reloadTask = cron.schedule(this._config.CACHE_REFRESH_RATE, async () => {
       await this._reloadCache();
     });
   }
 
+  protected abstract _generateSearchIndex(apiData: T[]): lunr.Index;
+
+  protected abstract _getApiPosts(): Promise<T[]>;
+
+  protected abstract _getApiUserPosts(): Promise<Record<string, UT[]>>;
+
   protected async _reloadCache(): Promise<void> {
     try {
-      this._logger.writeLog(LOG_BASE.MARKET_CACHE_RELOAD, {
+      this._logger.info('market cache reload start', {
         type: this._name,
-        stage: 'start',
-        rate: this._config.dict.cacheRefreshRate
+        rate: this._config.CACHE_REFRESH_RATE
       });
       this._loading = true;
-      const body = JSON.stringify({
-        password: this._config.dict.apiPassword
-      });
 
-      await this._reloadPosts(body);
-      await this._reloadUserPosts(body);
+      await this._reloadPosts();
+      await this._reloadUserPosts();
 
-      this._logger.writeLog(LOG_BASE.MARKET_CACHE_RELOAD, {
+      this._logger.info('market cache reload finished', {
         type: this._name,
-        stage: 'finish',
-        rate: this._config.dict.cacheRefreshRate
+        rate: this._config.CACHE_REFRESH_RATE
       });
 
       this._loading = false;
     } catch (e) {
-      this._logger.writeLog(LOG_BASE.MARKET_CACHE_RELOAD_FAILED, {
-        error: e
-      });
+      this._logger.error('market cache reload failed', e);
       this._loading = false;
     }
   }
 
-  protected async _reloadPosts(body): Promise<void> {
-    const response = await axios.post(this._postsApiUrl, body);
-    const posts: T[] = Array.isArray(response.data.posts) ? response.data.posts : [];
-
+  protected async _reloadPosts(): Promise<void> {
+    const apiPosts: T[] = await this._getApiPosts();
     this._posts = {};
 
-    for (const post of posts) {
-      this._posts[post.id] = this._decodeHtml(post);
+    for (const apiPost of apiPosts) {
+      this._posts[apiPost.id] = this._decodeHtml(apiPost);
     }
 
-    this._searchIndex = this._generateSearchIndex(posts);
+    this._searchIndex = this._generateSearchIndex(apiPosts);
   }
 
-  protected async _reloadUserPosts(body): Promise<void> {
-    const response = await axios.post(this._userPostsApiUrl, body);
-    const userPosts: IRawUserPosts = response.data.users ? response.data.users : {};
+  protected async _reloadUserPosts(): Promise<void> {
+    const apiUserPosts = await this._getApiUserPosts();
     this._userPosts = {};
 
-    for (const userId in userPosts) {
+    for (const userId in apiUserPosts) {
       this._userPosts[userId] = {
         buy: [],
         sell: []
       };
-      this._userPosts[userId][POST_TYPES.BUY] = userPosts[userId]
+      this._userPosts[userId][POST_TYPES.BUY] = apiUserPosts[userId]
         .filter((post) => post.type === 'B>')
         .map((post) => post.id);
 
-      this._userPosts[userId][POST_TYPES.SELL] = userPosts[userId]
+      this._userPosts[userId][POST_TYPES.SELL] = apiUserPosts[userId]
         .filter((post) => post.type === 'S>')
         .map((post) => post.id);
     }
-  }
-
-  protected _generateSearchIndex(apiData: T[]): lunr.Index {
-    throw new Error('Not implemented');
   }
 
   protected _decodeHtml(post: T): T {

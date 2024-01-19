@@ -1,19 +1,43 @@
-import { IItem } from '../interfaces';
 import * as lunr from 'lunr';
 import { AbstractMarketCache } from './abstract';
-import { Config } from '../app/config';
-import { Logger } from '../app/logging/logger';
+import { ItemType, UserItemType } from '../types';
+import axios from 'axios';
+import { ItemApiResponse, UserItemApiResponse } from '../models';
+import { POST_TYPES } from '../constants';
 
-class ItemCache extends AbstractMarketCache<IItem> {
-  constructor(config: Config, logger: Logger) {
-    super(config, logger);
-    this._name = 'item';
-    this._fieldsToEncode = ['detail', 'price'];
-    this._userPostsApiUrl = config.dict.itemPostsUserApiUrl;
-    this._postsApiUrl = config.dict.itemPostsApiUrl;
+class ItemCache extends AbstractMarketCache<ItemType, UserItemType> {
+  protected _name = 'item';
+  protected _fieldsToEncode = ['detail', 'price'];
+
+  protected async _getApiPosts(): Promise<ItemType[]> {
+    const response = await axios.post(
+      this._config.ITEM_POSTS_API_URL,
+      JSON.stringify({
+        password: this._config.API_PASSWORD
+      })
+    );
+    const parsedResponse = ItemApiResponse.parse(response.data);
+    this._logger.debug('item posts api response', {
+      response: parsedResponse
+    });
+    return parsedResponse.posts;
   }
 
-  protected _generateSearchIndex(posts: IItem[]): lunr.Index {
+  protected async _getApiUserPosts(): Promise<Record<string, UserItemType[]>> {
+    const response = await axios.post(
+      this._config.ITEM_POSTS_USER_API_URL,
+      JSON.stringify({
+        password: this._config.API_PASSWORD
+      })
+    );
+    const parsedResponse = UserItemApiResponse.parse(response.data);
+    this._logger.debug('user item posts api response', {
+      response: parsedResponse
+    });
+    return parsedResponse.users;
+  }
+
+  protected _generateSearchIndex(posts: ItemType[]): lunr.Index {
     const searchFields = [
       'name',
       'type',
@@ -36,7 +60,7 @@ class ItemCache extends AbstractMarketCache<IItem> {
         this.add({
           id: post.id,
           name: post.name,
-          type: post.type.replace('B>', 'Buy').replace('S>', 'Sell'),
+          type: post.type.replace('B>', POST_TYPES.BUY).replace('S>', POST_TYPES.SELL),
           slot: post.slot,
           character: post.character,
           detail: post.detail,
