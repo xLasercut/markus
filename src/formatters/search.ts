@@ -1,13 +1,9 @@
 import { AbstractFormatter } from './abstract';
-import { IItem, ITear } from '../interfaces';
-import { InteractionReplyOptions, EmbedBuilder } from 'discord.js';
-import { COLORS } from '../app/constants';
+import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
+import { COLORS } from '../constants';
+import { ItemType } from '../types';
 
-abstract class AbstractSearchFormatter<T extends IItem | ITear> extends AbstractFormatter<T> {
-  protected constructor(nameFields: string[], descriptionFields: { [key: string]: string } = {}) {
-    super(nameFields, descriptionFields);
-  }
-
+abstract class AbstractSearchFormatter<T extends ItemType> extends AbstractFormatter<T> {
   public generateOutput(
     inputs: T[],
     query: string,
@@ -33,20 +29,9 @@ abstract class AbstractSearchFormatter<T extends IItem | ITear> extends Abstract
   }
 }
 
-class ItemSearchFormatter extends AbstractSearchFormatter<IItem> {
-  constructor() {
-    const itemFields = ['type', 'name'];
-    const optionalFields = { detail: '', price: '**' };
-    super(itemFields, optionalFields);
-  }
+class ItemSearchFormatter extends AbstractSearchFormatter<ItemType> {
+  protected _nameFields = ['type', 'name'];
+  protected _descriptionFields = { detail: '', price: '**' };
 }
 
-class TearSearchFormatter extends AbstractSearchFormatter<ITear> {
-  constructor() {
-    const itemFields = ['type', 'name', 'value', 'color', 'slot'];
-    const optionalFields = { price: '**' };
-    super(itemFields, optionalFields);
-  }
-}
-
-export { ItemSearchFormatter, TearSearchFormatter, AbstractSearchFormatter };
+export { ItemSearchFormatter, AbstractSearchFormatter };

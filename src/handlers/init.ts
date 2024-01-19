@@ -1,22 +1,7 @@
-import { ItemSearchHandler, TearSearchHandler } from './search';
-import {
-  AutoPostBuyItemHandler,
-  AutoPostBuyTearHandler,
-  AutoPostSellItemHandler,
-  AutoPostSellTearHandler
-} from './autopost';
-import { AdminHandler } from './admin';
-import { ElswordCalcHandler, GenshinCalcHandler } from './calculators';
-import { ElswordEnhancementEventHandler } from './elsword-enhancement-event';
-import { MarketHelpHandler } from './help';
-import {
-  AnimeStreamAlertHandler,
-  AtomicHandler,
-  DontGetAttachedHandler,
-  SosuHandler,
-  WakuWakuHandler
-} from './anime';
 import { PingHandler } from './ping';
+import { logger } from '../app/init';
+import { HandlerDependenciesType } from '../interfaces/handler';
+import { CONFIG } from '../app/config';
 import {
   BonkHandler,
   ChristianServerHandler,
@@ -24,31 +9,47 @@ import {
   PtrHandler,
   RatioHandler
 } from './memes';
-import { animeCache } from '../cache/init';
-import { config, logger } from '../app/init';
+import { ElswordCalcHandler, GenshinCalcHandler } from './calculators';
+import { ElswordEnhancementEventHandler } from './elsword-enhancement-event';
+import { MarketHelpHandler } from './help';
+import { animeCache, itemCache } from '../cache/init';
+import {
+  AnimeStreamAlertHandler,
+  AtomicHandler,
+  DontGetAttachedHandler,
+  SosuHandler,
+  WakuWakuHandler
+} from './anime';
+import { ItemSearchHandler } from './search';
+import { AdminHandler } from './admin';
+import { AutoPostBuyItemHandler, AutoPostSellItemHandler } from './autopost';
 
-const pingHandler = new PingHandler(config);
-const dontGetAttachedHandler = new DontGetAttachedHandler(animeCache, config);
-const elswordEnhancementEventHandler = new ElswordEnhancementEventHandler(config);
-const elswordCalcHandler = new ElswordCalcHandler(config);
-const genshinCalcHandler = new GenshinCalcHandler(config);
-const marketHelpHandler = new MarketHelpHandler(config);
-const itemSearchHandler = new ItemSearchHandler(config, logger);
-const tearSearchHandler = new TearSearchHandler(config, logger);
-const adminHandler = new AdminHandler(config, logger);
-const autoPostBuyItemHandler = new AutoPostBuyItemHandler(config, logger);
-const autoPostSellItemHandler = new AutoPostSellItemHandler(config, logger);
-const autoPostBuyTearHandler = new AutoPostBuyTearHandler(config, logger);
-const autoPostSellTearHandler = new AutoPostSellTearHandler(config, logger);
-const ptrHandler = new PtrHandler(config);
-const animeStreamAlertHandler = new AnimeStreamAlertHandler(config);
-const bonkHandler = new BonkHandler(config);
-const christianServerHandler = new ChristianServerHandler(config);
-const eightBallHandler = new EightBallHandler(config);
-const wakuWakuHandler = new WakuWakuHandler(config);
-const sosuHandler = new SosuHandler(config);
-const atomicHandler = new AtomicHandler(config);
-const ratioHandler = new RatioHandler(config);
+const handlerDependencies: HandlerDependenciesType = {
+  logger: logger,
+  config: CONFIG,
+  animeCache: animeCache,
+  itemCache: itemCache
+};
+
+const pingHandler = new PingHandler(handlerDependencies);
+const dontGetAttachedHandler = new DontGetAttachedHandler(handlerDependencies);
+const elswordEnhancementEventHandler = new ElswordEnhancementEventHandler(handlerDependencies);
+const elswordCalcHandler = new ElswordCalcHandler(handlerDependencies);
+const genshinCalcHandler = new GenshinCalcHandler(handlerDependencies);
+const marketHelpHandler = new MarketHelpHandler(handlerDependencies);
+const itemSearchHandler = new ItemSearchHandler(handlerDependencies);
+const adminHandler = new AdminHandler(handlerDependencies);
+const autoPostBuyItemHandler = new AutoPostBuyItemHandler(handlerDependencies);
+const autoPostSellItemHandler = new AutoPostSellItemHandler(handlerDependencies);
+const ptrHandler = new PtrHandler(handlerDependencies);
+const animeStreamAlertHandler = new AnimeStreamAlertHandler(handlerDependencies);
+const bonkHandler = new BonkHandler(handlerDependencies);
+const christianServerHandler = new ChristianServerHandler(handlerDependencies);
+const eightBallHandler = new EightBallHandler(handlerDependencies);
+const wakuWakuHandler = new WakuWakuHandler(handlerDependencies);
+const sosuHandler = new SosuHandler(handlerDependencies);
+const atomicHandler = new AtomicHandler(handlerDependencies);
+const ratioHandler = new RatioHandler(handlerDependencies);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -58,12 +59,9 @@ const handlers = {
   [genshinCalcHandler.name]: genshinCalcHandler,
   [marketHelpHandler.name]: marketHelpHandler,
   [itemSearchHandler.name]: itemSearchHandler,
-  [tearSearchHandler.name]: tearSearchHandler,
   [adminHandler.name]: adminHandler,
   [autoPostBuyItemHandler.name]: autoPostBuyItemHandler,
   [autoPostSellItemHandler.name]: autoPostSellItemHandler,
-  [autoPostBuyTearHandler.name]: autoPostBuyTearHandler,
-  [autoPostSellTearHandler.name]: autoPostSellTearHandler,
   [ptrHandler.name]: ptrHandler,
   [animeStreamAlertHandler.name]: animeStreamAlertHandler,
   [bonkHandler.name]: bonkHandler,
@@ -79,11 +77,4 @@ const commands = Object.values(handlers).map((handler) => {
   return handler.command;
 });
 
-export {
-  handlers,
-  commands,
-  autoPostBuyItemHandler,
-  autoPostSellItemHandler,
-  autoPostBuyTearHandler,
-  autoPostSellTearHandler
-};
+export { handlers, commands, autoPostBuyItemHandler, autoPostSellItemHandler };

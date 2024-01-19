@@ -1,16 +1,17 @@
 import { AbstractCommandHandler } from './abtract';
-import { COLORS } from '../app/constants';
-import { InteractionReplyOptions, EmbedBuilder, User } from 'discord.js';
-import { Config } from '../app/config';
+import { COLORS } from '../constants';
+import {
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  InteractionReplyOptions,
+  User
+} from 'discord.js';
 import { optionalUserPingCommand } from './command';
 
 class MarketHelpHandler extends AbstractCommandHandler {
-  constructor(config: Config) {
-    super(config);
-    this._command = optionalUserPingCommand('market_help', 'How to access the market');
-  }
+  protected _command = optionalUserPingCommand('market_help', 'How to access the market');
 
-  protected async _runWorkflow(interaction): Promise<any> {
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
@@ -31,7 +32,7 @@ class MarketHelpHandler extends AbstractCommandHandler {
       response.content = `Hey <@${user.id}>`;
     }
 
-    return interaction.reply(response);
+    await interaction.reply(response);
   }
 }
 

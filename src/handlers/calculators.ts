@@ -1,16 +1,17 @@
 import { AbstractCommandHandler } from './abtract';
-import { COLORS } from '../app/constants';
-import { InteractionReplyOptions, EmbedBuilder, User, CommandInteraction } from 'discord.js';
-import { Config } from '../app/config';
+import { COLORS } from '../constants';
+import {
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  InteractionReplyOptions,
+  User
+} from 'discord.js';
 import { optionalUserPingCommand } from './command';
 
 class GenshinCalcHandler extends AbstractCommandHandler {
-  constructor(config: Config) {
-    super(config);
-    this._command = optionalUserPingCommand('genshin_calc', 'Genshin calculator');
-  }
+  protected _command = optionalUserPingCommand('genshin_calc', 'Genshin calculator');
 
-  protected async _runWorkflow(interaction: CommandInteraction): Promise<any> {
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
@@ -25,17 +26,14 @@ class GenshinCalcHandler extends AbstractCommandHandler {
       response.content = `Hey <@${user.id}>`;
     }
 
-    return interaction.reply(response);
+    await interaction.reply(response);
   }
 }
 
 class ElswordCalcHandler extends AbstractCommandHandler {
-  constructor(config: Config) {
-    super(config);
-    this._command = optionalUserPingCommand('elsword_calc', 'Elsword calculator');
-  }
+  protected _command = optionalUserPingCommand('elsword_calc', 'Elsword calculator');
 
-  protected async _runWorkflow(interaction): Promise<any> {
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const user: User = interaction.options.getUser('user');
     const response: InteractionReplyOptions = {
       embeds: [
@@ -49,7 +47,7 @@ class ElswordCalcHandler extends AbstractCommandHandler {
     if (user) {
       response.content = `Hey <@${user.id}>`;
     }
-    return interaction.reply(response);
+    await interaction.reply(response);
   }
 }
 

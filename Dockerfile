@@ -5,7 +5,7 @@ LABEL maintainer=xLasercut
 ARG WORK_DIR=/home/markus
 
 RUN apt update -y \
- && apt install -y curl bash bash-completion sqlite3 python3 \
+ && apt install -y curl bash bash-completion \
  && mkdir ${WORK_DIR}
 
 RUN npm install -g pnpm
@@ -19,6 +19,6 @@ RUN pnpm install
 
 COPY . ${WORK_DIR}/.
 
-RUN pnpm compile
+RUN pnpm build
 
 CMD ["pnpm", "start"]

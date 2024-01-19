@@ -1,15 +1,10 @@
-import { InteractionReplyOptions, EmbedBuilder } from 'discord.js';
-import { COLORS } from '../app/constants';
-import { IItem, ITear } from '../interfaces';
+import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
+import { COLORS } from '../constants';
+import { ItemType } from '../types';
 
-abstract class AbstractFormatter<T extends ITear | IItem> {
-  protected _nameFields: string[];
-  protected _descriptionFields: { [key: string]: string };
-
-  protected constructor(nameFields: string[], descriptionFields: { [key: string]: string } = {}) {
-    this._nameFields = nameFields;
-    this._descriptionFields = descriptionFields;
-  }
+abstract class AbstractFormatter<T extends ItemType> {
+  protected abstract _nameFields: string[];
+  protected abstract _descriptionFields: Record<string, string>;
 
   public loadingScreen(): InteractionReplyOptions {
     return {

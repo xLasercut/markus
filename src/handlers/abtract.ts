@@ -1,21 +1,25 @@
-import { CommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { DiscordCommand } from '../types';
-import { Config } from '../app/config';
+import { HandlerDependenciesType } from '../interfaces/handler';
+import { ConfigType } from '../interfaces/config';
+import { Logger } from 'winston';
 
 abstract class AbstractCommandHandler {
-  protected _command: DiscordCommand;
+  protected abstract _command: DiscordCommand;
   protected _allowedChannels: string[];
   protected _allowedUsers: string[];
-  protected _config: Config;
+  protected _config: ConfigType;
+  protected _logger: Logger;
 
-  protected constructor(
-    config: Config,
+  constructor(
+    dependencies: HandlerDependenciesType,
     allowedChannels: string[] = [],
     allowedUsers: string[] = []
   ) {
     this._allowedChannels = allowedChannels;
     this._allowedUsers = allowedUsers;
-    this._config = config;
+    this._config = dependencies.config;
+    this._logger = dependencies.logger;
   }
 
   get name(): string {
@@ -34,34 +38,49 @@ abstract class AbstractCommandHandler {
     return (
       this._allowedChannels.length > 0 &&
       !this._allowedChannels.includes(channelId) &&
-      channelId !== this._config.dict.testChannelId
+      channelId !== this._config.TEST_CHANNEL_ID
     );
   }
 
-  public async executeCommand(interaction: CommandInteraction): Promise<any> {
+  public async executeCommand(interaction: ChatInputCommandInteraction): Promise<void> {
     if (this._isNotAllowedUser(interaction.user.id)) {
-      return interaction.reply({
+      this._logger.warn('user not allowed', {
+        user: interaction.user,
+        command: interaction.commandName,
+        channel: interaction.channelId
+      });
+      await interaction.reply({
         content: 'You do not have permission to use this command',
         ephemeral: true
       });
+      return;
     }
 
     if (this._isNotAllowedChannel(interaction.channelId)) {
       const allowedChannels = this._allowedChannels.map((channelId) => {
         return `<#${channelId}>`;
       });
-      return interaction.reply({
+      this._logger.warn('channel not allowed', {
+        user: interaction.user,
+        command: interaction.commandName,
+        channel: interaction.channelId
+      });
+      await interaction.reply({
         content: `This command can only be used in channel(s): ${allowedChannels.join(', ')}`,
         ephemeral: true
       });
+      return;
     }
 
-    return this._runWorkflow(interaction);
+    this._logger.info('running command', {
+      user: interaction.user,
+      command: interaction.commandName,
+      channel: interaction.channelId
+    });
+    await this._runWorkflow(interaction);
   }
 
-  protected async _runWorkflow(interaction: CommandInteraction): Promise<any> {
-    throw new Error('Not implemented');
-  }
+  protected abstract _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void>;
 }
 
 export { AbstractCommandHandler };

@@ -1,13 +1,9 @@
-import { IItem, ITear } from '../interfaces';
-import { InteractionReplyOptions, EmbedBuilder } from 'discord.js';
-import { COLORS } from '../app/constants';
+import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
+import { COLORS } from '../constants';
 import { AbstractFormatter } from './abstract';
+import { ItemType } from '../types';
 
-abstract class AbstractAutoPostFormatter<T extends IItem | ITear> extends AbstractFormatter<T> {
-  protected constructor(nameFields: string[], descriptionFields: { [key: string]: string } = {}) {
-    super(nameFields, descriptionFields);
-  }
-
+abstract class AbstractAutoPostFormatter<T extends ItemType> extends AbstractFormatter<T> {
   public generateOutput(inputs: T[]): InteractionReplyOptions {
     const firstPost = inputs[0];
     const title = [`User: __${firstPost.displayname}__`];
@@ -40,20 +36,9 @@ abstract class AbstractAutoPostFormatter<T extends IItem | ITear> extends Abstra
   }
 }
 
-class AutoPostItemFormatter extends AbstractAutoPostFormatter<IItem> {
-  constructor() {
-    const itemFields = ['name'];
-    const optionalFields = { detail: '', price: '**' };
-    super(itemFields, optionalFields);
-  }
+class AutoPostItemFormatter extends AbstractAutoPostFormatter<ItemType> {
+  protected _nameFields = ['name'];
+  protected _descriptionFields = { detail: '', price: '**' };
 }
 
-class AutoPostTearFormatter extends AbstractAutoPostFormatter<ITear> {
-  constructor() {
-    const itemFields = ['name', 'value', 'color', 'slot'];
-    const optionalFields = { price: '**' };
-    super(itemFields, optionalFields);
-  }
-}
-
-export { AbstractAutoPostFormatter, AutoPostItemFormatter, AutoPostTearFormatter };
+export { AbstractAutoPostFormatter, AutoPostItemFormatter };

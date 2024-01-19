@@ -1,16 +1,16 @@
-function shuffleArray(array: string[]): string[] {
-  const shuffledList = [...array];
-  let currentIndex = shuffledList.length,
-    randomIndex;
-  while (currentIndex !== 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [shuffledList[currentIndex], shuffledList[randomIndex]] = [
-      shuffledList[randomIndex],
-      shuffledList[currentIndex]
-    ];
+function shuffleArray<T>(listToShuffle: T[]): T[] {
+  const shuffledList = [...listToShuffle];
+  for (let i = shuffledList.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledList[i], shuffledList[j]] = [shuffledList[j], shuffledList[i]];
   }
   return shuffledList;
 }
 
-export { shuffleArray };
+function getRandomItem<T>(array: T[]): T {
+  const shuffledList = shuffleArray(array);
+  const randomIndex = Math.floor(Math.random() * shuffledList.length);
+  return shuffledList[randomIndex];
+}
+
+export { shuffleArray, getRandomItem };

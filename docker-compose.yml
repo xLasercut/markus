@@ -7,7 +7,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./log/:/home/markus/log
-      - ./data/:/home/markus/data
     env_file:
       - config.env
     network_mode: host
