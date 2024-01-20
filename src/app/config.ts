@@ -38,7 +38,7 @@ const CONFIG: ConfigType = {
   REACTION_EXPIRE_TIME: 120000,
 
   LOG_DIR: path.join(BASE_DIR, 'log'),
-  LOG_LEVEL: process.env.LOG_LEVEL || 'warn',
+  LOG_LEVEL: process.env.LOG_LEVEL || 'warn'
 } as const;
 
 export { CONFIG };
