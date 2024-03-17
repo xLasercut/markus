@@ -5,7 +5,7 @@ LABEL maintainer=xLasercut
 ARG WORK_DIR=/home/markus
 
 RUN apt update -y \
- && apt install -y curl bash bash-completion \
+ && apt install -y curl bash \
  && mkdir ${WORK_DIR}
 
 RUN npm install -g pnpm
