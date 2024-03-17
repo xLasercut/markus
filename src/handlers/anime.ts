@@ -15,7 +15,7 @@ class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _cache: AnimeCache;
 
   constructor(dependencies: HandlerDependenciesType) {
-    super(dependencies, [dependencies.config.BOTS_CHANNEL_ID]);
+    super(dependencies);
     this._cache = dependencies.animeCache;
   }
 
