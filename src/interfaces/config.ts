@@ -22,7 +22,12 @@ interface DiscordConfigType {
   ANIME_ROLE_ID: string;
 }
 
-interface ConfigType extends ApiConfigType, DiscordConfigType {
+interface ImgurConfigType {
+  IMGUR_CLIENT_ID: string;
+  IMGUR_ALBUM_ID: string;
+}
+
+interface ConfigType extends ApiConfigType, DiscordConfigType, ImgurConfigType {
   CACHE_REFRESH_RATE: string;
   AUTO_POST_RATE: string;
   SEARCH_RESULTS_PER_PAGE: number;
@@ -32,4 +37,4 @@ interface ConfigType extends ApiConfigType, DiscordConfigType {
   LOG_LEVEL: string;
 }
 
-export { ApiConfigType, ConfigType, DiscordConfigType };
+export { ApiConfigType, ConfigType, DiscordConfigType, ImgurConfigType };

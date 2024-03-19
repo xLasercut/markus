@@ -1,5 +1,10 @@
 import * as path from 'path';
-import { ApiConfigType, ConfigType, DiscordConfigType } from '../interfaces/config';
+import {
+  ApiConfigType,
+  ConfigType,
+  DiscordConfigType,
+  ImgurConfigType
+} from '../interfaces/config';
 
 const BASE_DIR = path.join(__dirname, '../../');
 
@@ -28,9 +33,15 @@ const DISCORD_CONFIG: DiscordConfigType = {
   APPLICATION_ID: process.env.APPLICATION_ID
 } as const;
 
+const IMGUR_CONFIG: ImgurConfigType = {
+  IMGUR_CLIENT_ID: process.env.IMGUR_CLIENT_ID || '',
+  IMGUR_ALBUM_ID: process.env.IMGUR_ALBUM_ID || ''
+} as const;
+
 const CONFIG: ConfigType = {
   ...API_URL_CONFIG,
   ...DISCORD_CONFIG,
+  ...IMGUR_CONFIG,
 
   CACHE_REFRESH_RATE: process.env.CACHE_REFRESH_RATE || '*/10 * * * *',
   AUTO_POST_RATE: process.env.AUTO_POST_RATE || '5 */12 * * *',

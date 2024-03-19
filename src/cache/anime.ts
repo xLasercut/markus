@@ -1,44 +1,9 @@
 import { getRandomItem, shuffleArray } from '../helper';
 import { Logger } from 'winston';
 import { AtomicType } from '../interfaces/anime-cache';
-
-const DONT_GET_ATTACHED_IMAGES = [
-  'https://i.imgur.com/gqlRV4m.jpg',
-  'https://i.imgur.com/eA9Zc6W.png',
-  'https://i.imgur.com/mjmsfoc.jpg',
-  'https://i.imgur.com/edtRys1.png',
-  'https://i.imgur.com/zczdTTX.jpg',
-  'https://i.imgur.com/sZ5a2V1.jpg',
-  'https://i.imgur.com/GvnjMHq.jpg',
-  'https://i.imgur.com/6M4NoER.jpg',
-  'https://i.imgur.com/acy6acJ.jpg',
-  'https://i.imgur.com/mpeec4d.jpg',
-  'https://i.imgur.com/MfMtAY1.jpg',
-  'https://i.imgur.com/OHNsoXO.png',
-  'https://i.imgur.com/3jlkqtf.jpg',
-  'https://i.imgur.com/WLmJgVe.png',
-  'https://i.imgur.com/vSabqZF.jpg',
-  'https://i.imgur.com/P9UiOrS.jpg',
-  'https://i.imgur.com/JmKq9U7.jpg',
-  'https://i.imgur.com/e0MoeR7.jpg',
-  'https://i.imgur.com/HQNapc5.png',
-  'https://i.imgur.com/QnkVRE1.jpg',
-  'https://i.imgur.com/BGp3Ouj.jpg',
-  'https://i.imgur.com/5sraNzp.png',
-  'https://i.imgur.com/HF226oH.png',
-  'https://i.imgur.com/do3Bm9P.jpg',
-  'https://i.imgur.com/OY9Uu5R.jpg',
-  'https://i.imgur.com/LXxF9eN.png',
-  'https://i.imgur.com/qwa3024.jpg',
-  'https://i.imgur.com/j9aWWeB.png',
-  'https://i.imgur.com/pG6rzZa.jpg',
-  'https://i.imgur.com/DPeQuOr.jpg',
-  'https://i.imgur.com/7aQuGGm.jpg',
-  'https://i.imgur.com/W8BGH7I.jpg',
-  'https://i.imgur.com/DmoNJa4.jpg',
-  'https://i.imgur.com/KKcOUl7.png',
-  'https://i.imgur.com/ERHAMag.png'
-];
+import axios from 'axios';
+import { ImgurApiResponse } from '../models';
+import { ConfigType } from '../interfaces/config';
 
 const ATOMIC_IMAGES: AtomicType[] = [
   {
@@ -51,17 +16,37 @@ const ATOMIC_IMAGES: AtomicType[] = [
 ];
 
 class AnimeCache {
-  protected _dontGetAttachedImagesToSend: string[] = shuffleArray<string>(DONT_GET_ATTACHED_IMAGES);
+  protected _config: ConfigType;
+  protected _dontGetAttachedImages: string[] = [];
+  protected _dontGetAttachedImagesToSend: string[] = [];
   protected _dontGetAttachedCurrentImage: number = 0;
   protected _logger: Logger;
 
-  constructor(logger: Logger) {
+  constructor(config: ConfigType, logger: Logger) {
     this._logger = logger;
+    this._config = config;
+  }
+
+  public async startCache() {
+    this._logger.info('loading anime cache...');
+    const headers = {
+      Authorization: `Client-ID ${this._config.IMGUR_CLIENT_ID}`
+    };
+    const response = await axios.get(
+      `https://api.imgur.com/3/album/${this._config.IMGUR_ALBUM_ID}`,
+      { headers: headers }
+    );
+    const parsedResponse = ImgurApiResponse.parse(response.data);
+    this._dontGetAttachedImages = parsedResponse.data.images.map((image) => {
+      return image.link;
+    });
+    this._dontGetAttachedImagesToSend = shuffleArray<string>(this._dontGetAttachedImages);
+    this._logger.info('anime cache load complete');
   }
 
   public getDontGetAttachedImage(): string {
     if (this._dontGetAttachedCurrentImage >= this._dontGetAttachedImagesToSend.length) {
-      this._dontGetAttachedImagesToSend = shuffleArray<string>(DONT_GET_ATTACHED_IMAGES);
+      this._dontGetAttachedImagesToSend = shuffleArray<string>(this._dontGetAttachedImages);
       this._dontGetAttachedCurrentImage = 0;
     }
 
