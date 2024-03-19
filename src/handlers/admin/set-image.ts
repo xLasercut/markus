@@ -10,7 +10,7 @@ class AdminSetImageHandler extends AbstractCommandHandler {
   protected _cache: AnimeCache;
 
   constructor(dependencies: HandlerDependenciesType) {
-    super(dependencies, [], [dependencies.config.OWNER_USER_ID]);
+    super(dependencies, [dependencies.config.TEST_CHANNEL_ID], [dependencies.config.OWNER_USER_ID]);
     this._cache = dependencies.animeCache;
   }
 
