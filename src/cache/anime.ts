@@ -20,6 +20,8 @@ class AnimeCache {
   protected _dontGetAttachedImages: string[] = [];
   protected _dontGetAttachedImagesToSend: string[] = [];
   protected _dontGetAttachedCurrentImage: number = 0;
+  protected _imageOverrideUrl: string = '';
+  protected _imageOverride: boolean = false;
   protected _logger: Logger;
 
   constructor(config: ConfigType, logger: Logger) {
@@ -45,6 +47,11 @@ class AnimeCache {
   }
 
   public getDontGetAttachedImage(): string {
+    if (this._imageOverride) {
+      this._imageOverride = false;
+      return this._imageOverrideUrl;
+    }
+
     if (this._dontGetAttachedCurrentImage >= this._dontGetAttachedImagesToSend.length) {
       this._dontGetAttachedImagesToSend = shuffleArray<string>(this._dontGetAttachedImages);
       this._dontGetAttachedCurrentImage = 0;
@@ -56,6 +63,11 @@ class AnimeCache {
     });
     this._dontGetAttachedCurrentImage += 1;
     return imageUrl;
+  }
+
+  public set imageOverride(imageUrl: string) {
+    this._imageOverrideUrl = imageUrl;
+    this._imageOverride = true;
   }
 
   public getAtomic(): AtomicType {

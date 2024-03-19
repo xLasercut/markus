@@ -1,11 +1,11 @@
-import { AbstractCommandHandler } from './abtract';
-import { reloadCache } from '../cache/init';
-import { COLORS } from '../constants';
+import { AbstractCommandHandler } from '../abtract';
+import { reloadCache } from '../../cache/init';
+import { COLORS } from '../../constants';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { simpleCommand } from './command';
-import { HandlerDependenciesType } from '../interfaces/handler';
+import { simpleCommand } from '../command';
+import { HandlerDependenciesType } from '../../interfaces/handler';
 
-class AdminHandler extends AbstractCommandHandler {
+class AdminUpdateCacheHandler extends AbstractCommandHandler {
   protected _command = simpleCommand('update_cache', 'Reload cache');
 
   constructor(dependencies: HandlerDependenciesType) {
@@ -21,4 +21,4 @@ class AdminHandler extends AbstractCommandHandler {
   }
 }
 
-export { AdminHandler };
+export { AdminUpdateCacheHandler };

@@ -21,8 +21,9 @@ import {
   WakuWakuHandler
 } from './anime';
 import { ItemSearchHandler } from './search';
-import { AdminHandler } from './admin';
+import { AdminUpdateCacheHandler } from './admin/update-cache';
 import { AutoPostBuyItemHandler, AutoPostSellItemHandler } from './autopost';
+import { AdminSetImageHandler } from './admin/set-image';
 
 const handlerDependencies: HandlerDependenciesType = {
   logger: logger,
@@ -38,7 +39,8 @@ const elswordCalcHandler = new ElswordCalcHandler(handlerDependencies);
 const genshinCalcHandler = new GenshinCalcHandler(handlerDependencies);
 const marketHelpHandler = new MarketHelpHandler(handlerDependencies);
 const itemSearchHandler = new ItemSearchHandler(handlerDependencies);
-const adminHandler = new AdminHandler(handlerDependencies);
+const adnimUpdateCacheHandler = new AdminUpdateCacheHandler(handlerDependencies);
+const adminSetImageHandler = new AdminSetImageHandler(handlerDependencies);
 const autoPostBuyItemHandler = new AutoPostBuyItemHandler(handlerDependencies);
 const autoPostSellItemHandler = new AutoPostSellItemHandler(handlerDependencies);
 const ptrHandler = new PtrHandler(handlerDependencies);
@@ -59,7 +61,8 @@ const handlers = {
   [genshinCalcHandler.name]: genshinCalcHandler,
   [marketHelpHandler.name]: marketHelpHandler,
   [itemSearchHandler.name]: itemSearchHandler,
-  [adminHandler.name]: adminHandler,
+  [adnimUpdateCacheHandler.name]: adnimUpdateCacheHandler,
+  [adminSetImageHandler.name]: adminSetImageHandler,
   [autoPostBuyItemHandler.name]: autoPostBuyItemHandler,
   [autoPostSellItemHandler.name]: autoPostSellItemHandler,
   [ptrHandler.name]: ptrHandler,
