@@ -18,7 +18,8 @@ import {
   AtomicHandler,
   DontGetAttachedHandler,
   SosuHandler,
-  WakuWakuHandler
+  WakuWakuHandler,
+  ZoltraakHandler
 } from './anime';
 import { ItemSearchHandler } from './search';
 import { AdminUpdateCacheHandler } from './admin/update-cache';
@@ -52,6 +53,7 @@ const wakuWakuHandler = new WakuWakuHandler(handlerDependencies);
 const sosuHandler = new SosuHandler(handlerDependencies);
 const atomicHandler = new AtomicHandler(handlerDependencies);
 const ratioHandler = new RatioHandler(handlerDependencies);
+const zoltraakHandler = new ZoltraakHandler(handlerDependencies);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -73,7 +75,8 @@ const handlers = {
   [wakuWakuHandler.name]: wakuWakuHandler,
   [sosuHandler.name]: sosuHandler,
   [atomicHandler.name]: atomicHandler,
-  [ratioHandler.name]: ratioHandler
+  [ratioHandler.name]: ratioHandler,
+  [zoltraakHandler.name]: zoltraakHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {

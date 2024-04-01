@@ -118,10 +118,32 @@ class AtomicHandler extends AbstractCommandHandler {
   }
 }
 
+class ZoltraakHandler extends AbstractCommandHandler {
+  protected _command = optionalUserPingCommand('zoltraak', 'Zoltraak!');
+
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
+    const user: User = interaction.options.getUser('user');
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.INFO)
+          .setTitle('PEW PEW!')
+          .setImage('https://i.imgur.com/5w6cEvZ.gif')
+      ]
+    };
+    if (user) {
+      response.content = `Hey <@${user.id}>`;
+    }
+
+    await interaction.reply(response);
+  }
+}
+
 export {
   DontGetAttachedHandler,
   AnimeStreamAlertHandler,
   SosuHandler,
   WakuWakuHandler,
-  AtomicHandler
+  AtomicHandler,
+  ZoltraakHandler
 };

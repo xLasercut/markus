@@ -19,15 +19,14 @@ const LOG_FORMAT = combine(
   json({ deterministic: false })
 );
 
-const LOGGER_TRANSPORTS = [
-  new DailyRotateFile({
-    frequency: '24h',
-    filename: 'markus-%DATE%.log',
-    datePattern: 'YYYY-MM-DD',
-    dirname: CONFIG.LOG_DIR,
-    maxFiles: '5'
-  }),
-  new transports.Console()
-];
+const rotateFileTransport = new DailyRotateFile({
+  frequency: '24h',
+  filename: 'markus-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
+  dirname: CONFIG.LOG_DIR,
+  maxFiles: '5'
+});
+
+const LOGGER_TRANSPORTS = [rotateFileTransport, new transports.Console()];
 
 export { LOG_FORMAT, LOGGER_TRANSPORTS };

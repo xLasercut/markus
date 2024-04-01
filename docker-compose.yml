@@ -1,4 +1,3 @@
-version: '3'
 services:
   markus:
     container_name: markus
