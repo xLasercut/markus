@@ -3,12 +3,12 @@ import { reloadCache } from '../../cache/init';
 import { COLORS } from '../../constants';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { simpleCommand } from '../command';
-import { HandlerDependenciesType } from '../../interfaces/handler';
+import { THandlerDependencies } from '../../interfaces/handler';
 
 class AdminUpdateCacheHandler extends AbstractCommandHandler {
   protected _command = simpleCommand('update_cache', 'Reload cache');
 
-  constructor(dependencies: HandlerDependenciesType) {
+  constructor(dependencies: THandlerDependencies) {
     super(dependencies, [], [dependencies.config.OWNER_USER_ID]);
   }
 

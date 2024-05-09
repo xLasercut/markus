@@ -5,22 +5,22 @@ import { client } from '../app/init';
 import { AbstractCommandHandler } from './abtract';
 import { AbstractMarketCache } from '../cache/abstract';
 import { autoPostToggleActionCommand } from './command';
-import { ItemType, PostType, UserItemType } from '../types';
-import { HandlerDependenciesType } from '../interfaces/handler';
+import { TItem, TPost, TUserItem } from '../types';
+import { THandlerDependencies } from '../interfaces/handler';
 import { POST_TYPES } from '../constants';
 
 abstract class AbstractAutoPostHandler<
-  T extends ItemType,
-  UT extends UserItemType
+  T extends TItem,
+  UT extends TUserItem
 > extends AbstractCommandHandler {
   protected _postSchedule: cron.ScheduledTask;
-  protected abstract _type: PostType;
+  protected abstract _type: TPost;
   protected _channel: string;
   protected _cache: AbstractMarketCache<T, UT>;
   protected _formatter: AbstractAutoPostFormatter<T>;
 
   protected constructor(
-    dependencies: HandlerDependenciesType,
+    dependencies: THandlerDependencies,
     cache: AbstractMarketCache<T, UT>,
     formatter: AbstractAutoPostFormatter<T>,
     channel: string
@@ -100,14 +100,14 @@ abstract class AbstractAutoPostHandler<
   }
 }
 
-class AutoPostBuyItemHandler extends AbstractAutoPostHandler<ItemType, UserItemType> {
+class AutoPostBuyItemHandler extends AbstractAutoPostHandler<TItem, TUserItem> {
   protected _command = autoPostToggleActionCommand(
     'autopost_buy_item',
     'Toggle auto posting buy items'
   );
   protected _type = POST_TYPES.BUY;
 
-  constructor(dependencies: HandlerDependenciesType) {
+  constructor(dependencies: THandlerDependencies) {
     super(
       dependencies,
       dependencies.itemCache,
@@ -117,14 +117,14 @@ class AutoPostBuyItemHandler extends AbstractAutoPostHandler<ItemType, UserItemT
   }
 }
 
-class AutoPostSellItemHandler extends AbstractAutoPostHandler<ItemType, UserItemType> {
+class AutoPostSellItemHandler extends AbstractAutoPostHandler<TItem, TUserItem> {
   protected _command = autoPostToggleActionCommand(
     'autopost_sell_item',
     'Toggle auto posting sell items'
   );
   protected _type = POST_TYPES.SELL;
 
-  constructor(dependencies: HandlerDependenciesType) {
+  constructor(dependencies: THandlerDependencies) {
     super(
       dependencies,
       dependencies.itemCache,

@@ -6,8 +6,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./log/:/home/markus/log
-    env_file:
-      - config.env
+      - ./config/:/home/markus/config
     logging:
       options:
         max-size: 50m

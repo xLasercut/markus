@@ -1,6 +1,6 @@
-interface AtomicType {
+interface TAtomic {
   title: string;
   image: string;
 }
 
-export { AtomicType };
+export { TAtomic };

@@ -8,13 +8,13 @@ import { AbstractCommandHandler } from './abtract';
 import { COLORS } from '../constants';
 import { AnimeCache } from '../cache/anime';
 import { mandatoryToggleActionCommand, optionalUserPingCommand, simpleCommand } from './command';
-import { HandlerDependenciesType } from '../interfaces/handler';
+import { THandlerDependencies } from '../interfaces/handler';
 
 class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _command = optionalUserPingCommand('dont_get_attached', "Don't get attached!");
   protected _cache: AnimeCache;
 
-  constructor(dependencies: HandlerDependenciesType) {
+  constructor(dependencies: THandlerDependencies) {
     super(dependencies);
     this._cache = dependencies.animeCache;
   }
@@ -97,7 +97,7 @@ class AtomicHandler extends AbstractCommandHandler {
   protected _command = optionalUserPingCommand('i_am', 'I AM...');
   protected _cache: AnimeCache;
 
-  constructor(dependencies: HandlerDependenciesType) {
+  constructor(dependencies: THandlerDependencies) {
     super(dependencies);
     this._cache = dependencies.animeCache;
   }

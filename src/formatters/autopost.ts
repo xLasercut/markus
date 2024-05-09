@@ -1,9 +1,9 @@
 import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
 import { COLORS } from '../constants';
 import { AbstractFormatter } from './abstract';
-import { ItemType } from '../types';
+import { TItem } from '../types';
 
-abstract class AbstractAutoPostFormatter<T extends ItemType> extends AbstractFormatter<T> {
+abstract class AbstractAutoPostFormatter<T extends TItem> extends AbstractFormatter<T> {
   public generateOutput(inputs: T[]): InteractionReplyOptions {
     const firstPost = inputs[0];
     const title = [`User: __${firstPost.displayname}__`];
@@ -36,7 +36,7 @@ abstract class AbstractAutoPostFormatter<T extends ItemType> extends AbstractFor
   }
 }
 
-class AutoPostItemFormatter extends AbstractAutoPostFormatter<ItemType> {
+class AutoPostItemFormatter extends AbstractAutoPostFormatter<TItem> {
   protected _nameFields = ['name'];
   protected _descriptionFields = { detail: '', price: '**' };
 }

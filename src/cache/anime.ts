@@ -1,11 +1,11 @@
 import { getRandomItem, shuffleArray } from '../helper';
 import { Logger } from 'winston';
-import { AtomicType } from '../interfaces/anime-cache';
+import { TAtomic } from '../interfaces/anime-cache';
 import axios from 'axios';
-import { ImgurApiResponse } from '../models';
-import { ConfigType } from '../interfaces/config';
+import { ImgurApiResponse } from '../models/api';
+import { TConfig } from '../types';
 
-const ATOMIC_IMAGES: AtomicType[] = [
+const ATOMIC_IMAGES: TAtomic[] = [
   {
     title: 'ᵃᵗᵒᵐⁱᶜ',
     image: 'https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif'
@@ -16,7 +16,7 @@ const ATOMIC_IMAGES: AtomicType[] = [
 ];
 
 class AnimeCache {
-  protected _config: ConfigType;
+  protected _config: TConfig;
   protected _dontGetAttachedImages: string[] = [];
   protected _dontGetAttachedImagesToSend: string[] = [];
   protected _dontGetAttachedCurrentImage: number = 0;
@@ -24,7 +24,7 @@ class AnimeCache {
   protected _imageOverride: boolean = false;
   protected _logger: Logger;
 
-  constructor(config: ConfigType, logger: Logger) {
+  constructor(config: TConfig, logger: Logger) {
     this._logger = logger;
     this._config = config;
   }
@@ -70,8 +70,8 @@ class AnimeCache {
     this._imageOverride = true;
   }
 
-  public getAtomic(): AtomicType {
-    return getRandomItem<AtomicType>(ATOMIC_IMAGES);
+  public getAtomic(): TAtomic {
+    return getRandomItem<TAtomic>(ATOMIC_IMAGES);
   }
 }
 

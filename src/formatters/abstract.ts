@@ -1,8 +1,8 @@
 import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
 import { COLORS } from '../constants';
-import { ItemType } from '../types';
+import { TItem } from '../types';
 
-abstract class AbstractFormatter<T extends ItemType> {
+abstract class AbstractFormatter<T extends TItem> {
   protected abstract _nameFields: string[];
   protected abstract _descriptionFields: Record<string, string>;
 
