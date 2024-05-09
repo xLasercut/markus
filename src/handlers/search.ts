@@ -3,20 +3,20 @@ import { AbstractMarketCache } from '../cache/abstract';
 import { AbstractSearchFormatter, ItemSearchFormatter } from '../formatters/search';
 import { REACTIONS } from '../constants';
 import { mandatoryQueryCommand } from './command';
-import { HandlerDependenciesType } from '../interfaces/handler';
+import { THandlerDependencies } from '../interfaces/handler';
 import { ChatInputCommandInteraction, MessageReaction } from 'discord.js';
-import { ItemType, UserItemType } from '../types';
+import { TItem, TUserItem } from '../types';
 
 abstract class AbstractSearchHandler<
-  T extends ItemType,
-  UT extends UserItemType
+  T extends TItem,
+  UT extends TUserItem
 > extends AbstractCommandHandler {
   protected _cache: AbstractMarketCache<T, UT>;
   protected _formatter: AbstractSearchFormatter<T>;
   protected _reactionList = [REACTIONS.BACK, REACTIONS.FORWARD];
 
   protected constructor(
-    dependencies: HandlerDependenciesType,
+    dependencies: THandlerDependencies,
     cache: AbstractMarketCache<T, UT>,
     formatter: AbstractSearchFormatter<T>
   ) {
@@ -96,10 +96,10 @@ abstract class AbstractSearchHandler<
   }
 }
 
-class ItemSearchHandler extends AbstractSearchHandler<ItemType, UserItemType> {
+class ItemSearchHandler extends AbstractSearchHandler<TItem, TUserItem> {
   protected _command = mandatoryQueryCommand('search_item', 'Search items on Elsword market');
 
-  constructor(dependencies: HandlerDependenciesType) {
+  constructor(dependencies: THandlerDependencies) {
     super(dependencies, dependencies.itemCache, new ItemSearchFormatter());
   }
 }

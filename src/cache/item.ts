@@ -1,15 +1,15 @@
 import * as lunr from 'lunr';
 import { AbstractMarketCache } from './abstract';
-import { ItemType, UserItemType } from '../types';
+import { TItem, TUserItem } from '../types';
 import axios from 'axios';
-import { ItemApiResponse, UserItemApiResponse } from '../models';
+import { ItemApiResponse, UserItemApiResponse } from '../models/api';
 import { POST_TYPES } from '../constants';
 
-class ItemCache extends AbstractMarketCache<ItemType, UserItemType> {
+class ItemCache extends AbstractMarketCache<TItem, TUserItem> {
   protected _name = 'item';
   protected _fieldsToEncode = ['detail', 'price'];
 
-  protected async _getApiPosts(): Promise<ItemType[]> {
+  protected async _getApiPosts(): Promise<TItem[]> {
     const response = await axios.post(
       this._config.ITEM_POSTS_API_URL,
       JSON.stringify({
@@ -23,7 +23,7 @@ class ItemCache extends AbstractMarketCache<ItemType, UserItemType> {
     return parsedResponse.posts;
   }
 
-  protected async _getApiUserPosts(): Promise<Record<string, UserItemType[]>> {
+  protected async _getApiUserPosts(): Promise<Record<string, TUserItem[]>> {
     const response = await axios.post(
       this._config.ITEM_POSTS_USER_API_URL,
       JSON.stringify({
@@ -37,7 +37,7 @@ class ItemCache extends AbstractMarketCache<ItemType, UserItemType> {
     return parsedResponse.users;
   }
 
-  protected _generateSearchIndex(posts: ItemType[]): lunr.Index {
+  protected _generateSearchIndex(posts: TItem[]): lunr.Index {
     const searchFields = [
       'name',
       'type',

@@ -1,9 +1,9 @@
 import { AbstractFormatter } from './abstract';
 import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
 import { COLORS } from '../constants';
-import { ItemType } from '../types';
+import { TItem } from '../types';
 
-abstract class AbstractSearchFormatter<T extends ItemType> extends AbstractFormatter<T> {
+abstract class AbstractSearchFormatter<T extends TItem> extends AbstractFormatter<T> {
   public generateOutput(
     inputs: T[],
     query: string,
@@ -29,7 +29,7 @@ abstract class AbstractSearchFormatter<T extends ItemType> extends AbstractForma
   }
 }
 
-class ItemSearchFormatter extends AbstractSearchFormatter<ItemType> {
+class ItemSearchFormatter extends AbstractSearchFormatter<TItem> {
   protected _nameFields = ['type', 'name'];
   protected _descriptionFields = { detail: '', price: '**' };
 }

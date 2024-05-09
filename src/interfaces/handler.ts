@@ -1,13 +1,13 @@
 import { Logger } from 'winston';
-import { ConfigType } from './config';
 import { AnimeCache } from '../cache/anime';
 import { ItemCache } from '../cache/item';
+import { TConfig } from '../types';
 
-interface HandlerDependenciesType {
-  config: ConfigType;
+interface THandlerDependencies {
+  config: TConfig;
   logger: Logger;
   animeCache: AnimeCache;
   itemCache: ItemCache;
 }
 
-export { HandlerDependenciesType };
+export { THandlerDependencies };

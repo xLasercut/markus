@@ -2,14 +2,14 @@ import { AbstractCommandHandler } from '../abtract';
 import { COLORS } from '../../constants';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { mandatoryQueryCommand } from '../command';
-import { HandlerDependenciesType } from '../../interfaces/handler';
+import { THandlerDependencies } from '../../interfaces/handler';
 import { AnimeCache } from '../../cache/anime';
 
 class AdminSetImageHandler extends AbstractCommandHandler {
   protected _command = mandatoryQueryCommand('set_image', "Set don't get attached image");
   protected _cache: AnimeCache;
 
-  constructor(dependencies: HandlerDependenciesType) {
+  constructor(dependencies: THandlerDependencies) {
     super(dependencies, [dependencies.config.TEST_CHANNEL_ID], [dependencies.config.OWNER_USER_ID]);
     this._cache = dependencies.animeCache;
   }

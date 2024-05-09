@@ -2,22 +2,21 @@ import * as lunr from 'lunr';
 import * as cron from 'node-cron';
 import { POST_TYPES } from '../constants';
 import { shuffleArray } from '../helper';
-import { ItemType, PostType, UserItemType } from '../types';
+import { TConfig, TItem, TPost, TUserItem } from '../types';
 import { Logger } from 'winston';
-import { ConfigType } from '../interfaces/config';
 
-abstract class AbstractMarketCache<T extends ItemType, UT extends UserItemType> {
+abstract class AbstractMarketCache<T extends TItem, UT extends TUserItem> {
   protected _searchIndex: lunr.Index;
   protected _loading = false;
   protected _reloadTask: cron.ScheduledTask;
-  protected _config: ConfigType;
+  protected _config: TConfig;
   protected _logger: Logger;
   protected _userPosts: Record<string, { buy: string[]; sell: string[] }> = {};
   protected _posts: Record<string, T> = {};
   protected abstract _fieldsToEncode: string[];
   protected abstract _name: string;
 
-  constructor(config: ConfigType, logger: Logger) {
+  constructor(config: TConfig, logger: Logger) {
     this._config = config;
     this._logger = logger;
   }
@@ -33,7 +32,7 @@ abstract class AbstractMarketCache<T extends ItemType, UT extends UserItemType> 
     });
   }
 
-  public getUserPosts(userId: string, type: PostType): T[] {
+  public getUserPosts(userId: string, type: TPost): T[] {
     if (userId in this._userPosts) {
       return this._userPosts[userId][type].map((postId) => {
         return this._posts[postId];

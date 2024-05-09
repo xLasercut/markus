@@ -1,6 +1,6 @@
 import { PingHandler } from './ping';
 import { logger } from '../app/init';
-import { HandlerDependenciesType } from '../interfaces/handler';
+import { THandlerDependencies } from '../interfaces/handler';
 import { CONFIG } from '../app/config';
 import {
   BonkHandler,
@@ -26,7 +26,7 @@ import { AdminUpdateCacheHandler } from './admin/update-cache';
 import { AutoPostBuyItemHandler, AutoPostSellItemHandler } from './autopost';
 import { AdminSetImageHandler } from './admin/set-image';
 
-const handlerDependencies: HandlerDependenciesType = {
+const handlerDependencies: THandlerDependencies = {
   logger: logger,
   config: CONFIG,
   animeCache: animeCache,
