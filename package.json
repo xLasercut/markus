@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": "https://github.com/xLasercut/ashal-market-bot",
   "dependencies": {
-    "axios": "^1.6.8",
+    "axios": "^1.7.1",
     "discord.js": "^14.15.2",
     "lunr": "^2.3.9",
     "node-cron": "^3.0.3",
