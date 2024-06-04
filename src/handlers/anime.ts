@@ -139,11 +139,34 @@ class ZoltraakHandler extends AbstractCommandHandler {
   }
 }
 
+class SurvivalStrategyHandler extends AbstractCommandHandler {
+  protected _command = simpleCommand('survival_strategy', 'SEIZON SENRYAKU!');
+
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
+    await interaction.reply('SEIZON SENRYAKU!');
+    await this._wait(1000);
+    await interaction.followUp('◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－');
+    await this._wait(1000);
+    await interaction.followUp(
+      '◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－　☆══━━─－'
+    );
+    await this._wait(1000);
+    await interaction.followUp('◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－');
+    await this._wait(1000);
+    await interaction.followUp('◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－');
+    await this._wait(1000);
+    await interaction.followUp(
+      '◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－　☆══━━─－'
+    );
+  }
+}
+
 export {
   DontGetAttachedHandler,
   AnimeStreamAlertHandler,
   SosuHandler,
   WakuWakuHandler,
   AtomicHandler,
-  ZoltraakHandler
+  ZoltraakHandler,
+  SurvivalStrategyHandler
 };

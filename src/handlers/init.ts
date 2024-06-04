@@ -18,6 +18,7 @@ import {
   AtomicHandler,
   DontGetAttachedHandler,
   SosuHandler,
+  SurvivalStrategyHandler,
   WakuWakuHandler,
   ZoltraakHandler
 } from './anime';
@@ -54,6 +55,7 @@ const sosuHandler = new SosuHandler(handlerDependencies);
 const atomicHandler = new AtomicHandler(handlerDependencies);
 const ratioHandler = new RatioHandler(handlerDependencies);
 const zoltraakHandler = new ZoltraakHandler(handlerDependencies);
+const survivalStrategyHandler = new SurvivalStrategyHandler(handlerDependencies);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -76,7 +78,8 @@ const handlers = {
   [sosuHandler.name]: sosuHandler,
   [atomicHandler.name]: atomicHandler,
   [ratioHandler.name]: ratioHandler,
-  [zoltraakHandler.name]: zoltraakHandler
+  [zoltraakHandler.name]: zoltraakHandler,
+  [survivalStrategyHandler.name]: survivalStrategyHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {

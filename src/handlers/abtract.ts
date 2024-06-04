@@ -80,6 +80,14 @@ abstract class AbstractCommandHandler {
   }
 
   protected abstract _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void>;
+
+  protected async _wait(time: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, time);
+    });
+  }
 }
 
 export { AbstractCommandHandler };
