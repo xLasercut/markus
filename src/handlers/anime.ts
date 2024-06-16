@@ -9,6 +9,7 @@ import { COLORS } from '../constants';
 import { AnimeCache } from '../cache/anime';
 import { mandatoryToggleActionCommand, optionalUserPingCommand, simpleCommand } from './command';
 import { THandlerDependencies } from '../interfaces/handler';
+import { getRandomItem } from '../helper';
 
 class DontGetAttachedHandler extends AbstractCommandHandler {
   protected _command = optionalUserPingCommand('dont_get_attached', "Don't get attached!");
@@ -141,23 +142,55 @@ class ZoltraakHandler extends AbstractCommandHandler {
 
 class SurvivalStrategyHandler extends AbstractCommandHandler {
   protected _command = simpleCommand('survival_strategy', 'SEIZON SENRYAKU!');
+  protected _rocketTail: string[] = ['★═━┈┈', '☆══━━─－－', '☆══━━─－'];
+  protected _rocketBody: string[] = ['❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.', '❉ﾟ･*:.｡.｡.:*･゜'];
+
+  protected _createRocket(): string {
+    const rocket = ['◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜'];
+    const tailLength = Math.ceil(Math.random() * 3);
+    const bodyLength = Math.ceil(Math.random() * 2);
+
+    for (let i = 0; i < bodyLength; i++) {
+      rocket.push(getRandomItem(this._rocketBody));
+    }
+
+    for (let i = 0; i < tailLength; i++) {
+      rocket.push(getRandomItem(this._rocketTail));
+    }
+
+    return rocket.join(' ');
+  }
 
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     await interaction.reply('SEIZON SENRYAKU!');
-    await this._wait(1000);
-    await interaction.followUp('◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－');
-    await this._wait(1000);
-    await interaction.followUp(
-      '◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－　☆══━━─－'
-    );
-    await this._wait(1000);
-    await interaction.followUp('◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－');
-    await this._wait(1000);
-    await interaction.followUp('◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－');
-    await this._wait(1000);
-    await interaction.followUp(
-      '◀◘◙█Ε｡.:*❉ﾟ･*:.｡.｡.:*･゜❆ﾟ･*｡.:*❉ﾟ･*:.｡.｡.★═━┈┈ ☆══━━─－－　☆══━━─－'
-    );
+
+    const rocketNumber = Math.ceil(Math.random() * 5);
+
+    for (let i = 0; i < rocketNumber; i++) {
+      await this._wait(1000);
+      await interaction.followUp(this._createRocket());
+    }
+  }
+}
+
+class ThankYouHandler extends AbstractCommandHandler {
+  protected _command = optionalUserPingCommand('thank_you', 'Thank you so much!');
+
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
+    const user: User = interaction.options.getUser('user');
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.INFO)
+          .setTitle('Thank you so much!')
+          .setImage('https://i.imgur.com/JfqTFoU.png')
+      ]
+    };
+    if (user) {
+      response.content = `Hey <@${user.id}>`;
+    }
+
+    await interaction.reply(response);
   }
 }
 
@@ -168,5 +201,6 @@ export {
   WakuWakuHandler,
   AtomicHandler,
   ZoltraakHandler,
-  SurvivalStrategyHandler
+  SurvivalStrategyHandler,
+  ThankYouHandler
 };
