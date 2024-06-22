@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LOG_DIR } from '../app/constants';
+import { GACHA_DIR, LOG_DIR } from '../app/constants';
 
 const MandatoryString = z.string().trim().min(1);
 
@@ -38,6 +38,10 @@ const ImgurConfig = z.object({
   IMGUR_ALBUM_ID: MandatoryString
 });
 
+const GachaConfig = z.object({
+  GACHA_DIR: OptionalString(GACHA_DIR)
+});
+
 const GeneralConfig = z.object({
   CACHE_REFRESH_RATE: OptionalString('*/10 * * * *'),
   AUTO_POST_RATE: OptionalString('5 */12 * * *'),
@@ -47,6 +51,9 @@ const GeneralConfig = z.object({
   LOG_LEVEL: OptionalString('warn')
 });
 
-const Config = GeneralConfig.merge(ImgurConfig).merge(DiscordConfig).merge(ApiConfig);
+const Config = GeneralConfig.merge(ImgurConfig)
+  .merge(DiscordConfig)
+  .merge(ApiConfig)
+  .merge(GachaConfig);
 
 export { Config };
