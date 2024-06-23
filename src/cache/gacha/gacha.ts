@@ -1,18 +1,23 @@
-import { TConfig } from '../types';
+import { TConfig } from '../../types';
 import { Logger } from 'winston';
 import * as fs from 'fs';
 import * as path from 'path';
 import nodeHtmlToImage from 'node-html-to-image';
-import { TGachaItem } from '../interfaces/gacha';
-import { getRandomItem } from '../helper';
+import { getRandomItem } from '../../helper';
+import {
+  AbstractGachaItem,
+  FiveStarGachaItem,
+  FourStarGachaItem,
+  ThreeStarGachaItem
+} from './gacha-item';
 
 const GACHA_ITEMS = {
-  BASEBALL_HAT: 'BASBALL_HAT',
-  COWBOY_HAT: 'COWBOY_HAT',
-  FES: 'FES',
-  FEDORA: 'FEDORA',
-  TOQUE: 'TOQUE',
-  TOP_HAT: 'TOP_HAT'
+  BASEBALL_HAT: 'Home Run',
+  COWBOY_HAT: 'Yeehaw!',
+  FES: 'Are Cool',
+  FEDORA: "M'Lady",
+  TOQUE: 'Eggless Omelette',
+  TOP_HAT: "Bo'ohw'oWa'er"
 } as const;
 
 const THREE_STARS = [GACHA_ITEMS.TOQUE, GACHA_ITEMS.BASEBALL_HAT, GACHA_ITEMS.FEDORA];
@@ -46,9 +51,6 @@ class GachaCache {
     this._config = config;
     this._background = this._loadImage('splash-background.webp');
     this._itemBackground = this._loadImage('resultcard-bg.webp');
-    this._threeStar = this._loadImage('threestar.png');
-    this._fourStar = this._loadImage('fourstar.png');
-    this._fiveStar = this._loadImage('fivestar.png');
     this._template = fs.readFileSync(path.join(this._config.GACHA_DIR, 'index.html'), 'utf-8');
     this._images = {};
     for (const key in IMAGE_MAPS) {
@@ -62,56 +64,45 @@ class GachaCache {
     return 'data:image/jpeg;base64,' + base64Image;
   }
 
-  protected _rollGacha(): TGachaItem {
+  protected _doSingleRoll(): AbstractGachaItem {
     const roll = Math.floor(Math.random() * 1000);
 
     if (roll <= 16) {
       const item = getRandomItem(FIVE_STARS);
-      return {
-        image: this._images[item],
-        rarity: 'five-star',
-        star: this._fiveStar
-      };
+      return new FiveStarGachaItem(this._images[item], item);
     }
 
     if (roll <= 130) {
       const item = getRandomItem(FOUR_STARS);
-      return {
-        image: this._images[item],
-        rarity: 'four-star',
-        star: this._fourStar
-      };
+      return new FourStarGachaItem(this._images[item], item);
     }
 
     const item = getRandomItem(THREE_STARS);
-    return {
-      image: this._images[item],
-      rarity: 'three-star',
-      star: this._threeStar
-    };
+    return new ThreeStarGachaItem(this._images[item], item);
   }
 
-  protected _doTenRoll(): TGachaItem[] {
-    const items: TGachaItem[] = [];
+  protected _doTenRoll(): AbstractGachaItem[] {
+    const items: AbstractGachaItem[] = [];
 
     for (let i = 0; i < 10; i++) {
-      items.push(this._rollGacha());
+      items.push(this._doSingleRoll());
     }
 
-    return items;
+    return items.sort((a, b) => b.rarity - a.rarity);
   }
 
-  public async generateImage(): Promise<Buffer> {
+  public async roll() {
+    const items = this._doTenRoll();
     const image = (await nodeHtmlToImage({
       html: this._template,
       content: {
         backgroundImage: this._background,
         itemBackgroundImage: this._itemBackground,
-        items: this._doTenRoll()
+        items: items.map((item) => item.template)
       }
     })) as Buffer;
 
-    return image;
+    return { image: image, items: items.map((item) => item.details) };
   }
 }
 

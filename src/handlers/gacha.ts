@@ -1,6 +1,6 @@
 import { AbstractCommandHandler } from './abtract';
 import { simpleCommand } from './command';
-import { GachaCache } from '../cache/gacha';
+import { GachaCache } from '../cache/gacha/gacha';
 import { THandlerDependencies } from '../interfaces/handler';
 import {
   AttachmentBuilder,
@@ -21,14 +21,21 @@ class GachaHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     await interaction.deferReply();
-    const image = await this._cache.generateImage();
+    const { image, items } = await this._cache.roll();
     const imageAttachment = new AttachmentBuilder(image, { name: 'image-attachmeent.png' });
+    const fieldOne = items.slice(0, 5);
+    const fieldTwo = items.slice(5);
     const response: InteractionReplyOptions = {
       embeds: [
         new EmbedBuilder()
           .setColor(COLORS.INFO)
-          .setTitle('Hats rolled!')
+          .setTitle(`${interaction.user.displayName} has rolled:`)
+          .setThumbnail(interaction.user.displayAvatarURL())
           .setImage('attachment://image-attachmeent.png')
+          .addFields([
+            { name: '\u200B', value: fieldOne.join('\n'), inline: true },
+            { name: '\u200B', value: fieldTwo.join('\n'), inline: true }
+          ])
       ],
       files: [imageAttachment]
     };

@@ -25,15 +25,15 @@
       margin: 10px;
     }
 
-    .five-star {
+    .star-5 {
       filter: drop-shadow(0px 0px 10px #f9aa03);
     }
 
-    .four-star {
+    .star-4 {
       filter: drop-shadow(0px 0px 10px #c653db);
     }
 
-    .three-star {
+    .star-3 {
       filter: drop-shadow(0px 0px 10px #5e89a6);
     }
 
@@ -63,9 +63,12 @@
     .wish-item-star {
       width: 100%;
       position: absolute;
-      bottom: 30px;
+      bottom: 80px;
       left: 0;
       z-index: 10;
+      color: goldenrod;
+      text-align: center;
+      font-size: 25pt;
     }
   </style>
 </head>
@@ -73,10 +76,12 @@
 <img class="background" src="{{ backgroundImage }}">
 <div class="container">
   {{#each items }}
-  <div class="wish-item-shadow {{ this.rarity }}">
-    <div class="wish-item {{ this.rarity }}">
+  <div class="wish-item-shadow {{ this.rarityClass }}">
+    <div class="wish-item {{ this.rarityClass }}">
       <img class="wish-item-img" src="{{ this.image }}">
-      <img class="wish-item-star" src="{{ this.star }}">
+      <div class="wish-item-star">
+        {{ this.star }}
+      </div>
     </div>
   </div>
   {{/each}}
