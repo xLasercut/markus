@@ -19,4 +19,4 @@ RUN pnpm install
 
 COPY . ${WORK_DIR}/.
 
-CMD ["pnpm", "dev"]
+CMD ["pnpm", "start"]
