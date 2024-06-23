@@ -1,5 +1,5 @@
 import { format, transports } from 'winston';
-import * as DailyRotateFile from 'winston-daily-rotate-file';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import { CONFIG } from './config';
 
 const { combine, timestamp, json, errors } = format;

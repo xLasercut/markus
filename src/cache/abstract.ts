@@ -1,4 +1,4 @@
-import * as lunr from 'lunr';
+import lunr from 'lunr';
 import * as cron from 'node-cron';
 import { POST_TYPES } from '../constants';
 import { shuffleArray } from '../helper';

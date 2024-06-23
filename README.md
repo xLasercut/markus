@@ -82,3 +82,7 @@ TEAR_POSTS_USER_API_URL=<api endpoint for user tear posts - OPTIONAL>
 ```
 2. run `docker-compose build`
 3. run `docker-compose up`
+
+## Credits
+
+- Gacha images credits to: [Genshin Impact Wish Simulator](https://github.com/Mantan21/Genshin-Impact-Wish-Simulator)

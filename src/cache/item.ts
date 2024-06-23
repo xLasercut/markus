@@ -1,4 +1,4 @@
-import * as lunr from 'lunr';
+import lunr from 'lunr';
 import { AbstractMarketCache } from './abstract';
 import { TItem, TUserItem } from '../types';
 import axios from 'axios';

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2020",
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "outDir": "dist",
     "module": "CommonJS",
