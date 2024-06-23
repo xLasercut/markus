@@ -99,6 +99,9 @@ class GachaCache {
         backgroundImage: this._background,
         itemBackgroundImage: this._itemBackground,
         items: items.map((item) => item.template)
+      },
+      puppeteerArgs: {
+        args: ['--no-sandbox']
       }
     })) as Buffer;
 
