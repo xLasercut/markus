@@ -2,8 +2,8 @@
 <head>
   <style>
     body {
-      height: 1080px;
-      width: 1920px;
+      height: 720px;
+      width: 1280px;
       padding: 0;
       margin: 0;
     }
@@ -11,8 +11,8 @@
     .wish-item {
       background-image: url("{{ itemBackgroundImage }}");
       background-size: cover;
-      width: 158px;
-      height: 681px;
+      width: 105px;
+      height: 454px;
       align-items: center;
       display: flex;
     }
@@ -20,21 +20,25 @@
     .wish-item-shadow {
       background-image: url("{{ itemBackgroundImage }}");
       background-size: cover;
-      width: 158px;
-      height: 681px;
-      margin: 10px;
+      width: 105px;
+      height: 454px;
+      margin: 6px;
+    }
+
+    .star-6 {
+      filter: drop-shadow(0px 0px 6px #eb4315);
     }
 
     .star-5 {
-      filter: drop-shadow(0px 0px 10px #f9aa03);
+      filter: drop-shadow(0px 0px 6px #f9aa03);
     }
 
     .star-4 {
-      filter: drop-shadow(0px 0px 10px #c653db);
+      filter: drop-shadow(0px 0px 6px #c653db);
     }
 
     .star-3 {
-      filter: drop-shadow(0px 0px 10px #5e89a6);
+      filter: drop-shadow(0px 0px 6px #5e89a6);
     }
 
     .background {
@@ -55,20 +59,20 @@
     }
 
     .wish-item-img {
-      width: calc(100% - 20px);
-      margin: 10px;
-      filter: drop-shadow(0px 0px 5px);
+      width: calc(100% - 12px);
+      margin: 6px;
+      filter: drop-shadow(0px 0px 3px);
     }
 
     .wish-item-star {
       width: 100%;
       position: absolute;
-      bottom: 80px;
+      bottom: 53px;
       left: 0;
       z-index: 10;
       color: goldenrod;
       text-align: center;
-      font-size: 25pt;
+      font-size: 16pt;
     }
   </style>
 </head>
