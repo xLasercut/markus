@@ -8,32 +8,10 @@ import {
   AbstractGachaItem,
   FiveStarGachaItem,
   FourStarGachaItem,
+  SixStarGachaItem,
   ThreeStarGachaItem
 } from './gacha-item';
-
-const GACHA_ITEMS = {
-  BASEBALL_HAT: 'Home Run',
-  COWBOY_HAT: 'Yeehaw!',
-  FES: 'Are Cool',
-  FEDORA: "M'Lady",
-  TOQUE: 'Eggless Omelette',
-  TOP_HAT: "Bo'ohw'oWa'er"
-} as const;
-
-const THREE_STARS = [GACHA_ITEMS.TOQUE, GACHA_ITEMS.BASEBALL_HAT, GACHA_ITEMS.FEDORA];
-
-const FOUR_STARS = [GACHA_ITEMS.FES, GACHA_ITEMS.TOP_HAT];
-
-const FIVE_STARS = [GACHA_ITEMS.COWBOY_HAT];
-
-const IMAGE_MAPS = {
-  [GACHA_ITEMS.BASEBALL_HAT]: 'baseball.png',
-  [GACHA_ITEMS.COWBOY_HAT]: 'cowboy.png',
-  [GACHA_ITEMS.FES]: 'fes.png',
-  [GACHA_ITEMS.FEDORA]: 'fedora.png',
-  [GACHA_ITEMS.TOQUE]: 'toque.png',
-  [GACHA_ITEMS.TOP_HAT]: 'tophat.png'
-};
+import { FIVE_STARS, FOUR_STARS, IMAGE_MAPS, SIX_STARS, THREE_STARS } from './constants';
 
 class GachaCache {
   protected _config: TConfig;
@@ -65,14 +43,19 @@ class GachaCache {
   }
 
   protected _doSingleRoll(): AbstractGachaItem {
-    const roll = Math.floor(Math.random() * 1000);
+    const roll = Math.floor(Math.random() * 10000);
 
-    if (roll <= 16) {
+    if (roll <= 10) {
+      const item = getRandomItem(SIX_STARS);
+      return new SixStarGachaItem(this._images[item], item);
+    }
+
+    if (roll <= 160) {
       const item = getRandomItem(FIVE_STARS);
       return new FiveStarGachaItem(this._images[item], item);
     }
 
-    if (roll <= 130) {
+    if (roll <= 1300) {
       const item = getRandomItem(FOUR_STARS);
       return new FourStarGachaItem(this._images[item], item);
     }
@@ -101,7 +84,7 @@ class GachaCache {
         items: items.map((item) => item.template)
       },
       puppeteerArgs: {
-        args: ['--no-sandbox']
+        args: ['--no-sandbox', '--headless']
       }
     })) as Buffer;
 
