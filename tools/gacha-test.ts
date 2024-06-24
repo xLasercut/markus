@@ -1,4 +1,4 @@
-import { GachaCache } from '../src/cache/gacha/gacha';
+import { GachaRoller } from '../src/cache/gacha/gacha';
 import { CONFIG } from '../src/app/config';
 import { createLogger } from 'winston';
 import { LOG_FORMAT, LOGGER_TRANSPORTS } from '../src/app/logger';
@@ -10,11 +10,12 @@ const logger = createLogger({
   transports: LOGGER_TRANSPORTS
 });
 
-const gachaCache = new GachaCache(CONFIG, logger);
+const gachaRoller = new GachaRoller(CONFIG, logger);
 
-gachaCache
-  .roll()
+gachaRoller
+  .roll(85)
   .then((data) => {
+    console.log(data.fiveStarPity)
     fs.writeFileSync('./image.png', data.image);
   })
   .catch((err) => {

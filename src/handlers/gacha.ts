@@ -1,6 +1,6 @@
 import { AbstractCommandHandler } from './abtract';
 import { simpleCommand } from './command';
-import { GachaCache } from '../cache/gacha/gacha';
+import { GachaDatabase, GachaRoller } from '../cache/gacha/gacha';
 import { THandlerDependencies } from '../interfaces/handler';
 import {
   AttachmentBuilder,
@@ -10,18 +10,31 @@ import {
 } from 'discord.js';
 import { COLORS } from '../constants';
 
-class GachaHandler extends AbstractCommandHandler {
+class RollHatsHandler extends AbstractCommandHandler {
   protected _command = simpleCommand('roll_hats', 'Gacha for hats');
-  protected _cache: GachaCache;
+  protected _roller: GachaRoller;
+  protected _db: GachaDatabase;
 
   constructor(dependencies: THandlerDependencies) {
     super(dependencies);
-    this._cache = dependencies.gachaCache;
+    this._roller = dependencies.gachaRoller;
+    this._db = dependencies.gachaDatabase;
   }
 
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     await interaction.deferReply();
-    const { image, items } = await this._cache.roll();
+    const discordId = interaction.user.id;
+    const rollLock = this._db.getRollLock(discordId);
+
+    if (rollLock) {
+      await interaction.editReply('Please wait until previous roll has completed');
+      return;
+    }
+
+    this._db.setRollLock(discordId, true);
+    const currentFiveStarPity = this._db.getPity(discordId);
+    const { image, items, fiveStarPity } = await this._roller.roll(currentFiveStarPity);
+    this._db.setPity(discordId, fiveStarPity);
     const imageAttachment = new AttachmentBuilder(image, { name: 'image-attachmeent.png' });
     const fieldOne = items.slice(0, 5);
     const fieldTwo = items.slice(5);
@@ -36,12 +49,16 @@ class GachaHandler extends AbstractCommandHandler {
             { name: '\u200B', value: fieldOne.join('\n'), inline: true },
             { name: '\u200B', value: fieldTwo.join('\n'), inline: true }
           ])
+          .setFooter({
+            text: `You have rolled ${fiveStarPity} times without a five star`
+          })
       ],
       files: [imageAttachment]
     };
 
     await interaction.editReply(response);
+    this._db.setRollLock(discordId, false);
   }
 }
 
-export { GachaHandler };
+export { RollHatsHandler };

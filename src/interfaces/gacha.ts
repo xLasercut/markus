@@ -1,8 +1,8 @@
-interface TGachaItem {
-  image: string;
-  rarity: string;
-  star: string;
-  details: string;
+import { AbstractGachaItem } from '../cache/gacha/gacha-item';
+
+interface TDoTenRollResponse {
+  fiveStarPity: number;
+  items: AbstractGachaItem[];
 }
 
-export type { TGachaItem };
+export type { TDoTenRollResponse };

@@ -1,51 +1,37 @@
-const GACHA_ITEMS = {
-  BASEBALL_HAT: 'Home Run',
-  COWBOY_HAT: 'Yeehaw!',
-  FES: 'Are Cool',
-  FEDORA: "M'Lady",
-  TOQUE: 'Eggless Omelette',
-  TOP_HAT: "Bo'ohw'oWa'er",
-  WIZARD: 'Snape, Snape, Severus Snape',
-  COMRADE: 'Союз',
-  STRAW: 'Beach Episode',
-  LINK: 'Princess Zelda',
-  SOMBRERO: 'UNO!',
-  ASH: '11 Years Old',
-  GAS_MASK: 'Are you my mummy?',
-  SPACE: 'Hey, who turned out the lights?',
-  HELICOPTER: '+15 Defence'
-} as const;
+import {
+  FiveStarGachaItem,
+  FourStarGachaItem,
+  SixStarGachaItem,
+  ThreeStarGachaItem
+} from './gacha-item';
 
 const THREE_STARS = [
-  GACHA_ITEMS.TOQUE,
-  GACHA_ITEMS.BASEBALL_HAT,
-  GACHA_ITEMS.FEDORA,
-  GACHA_ITEMS.STRAW,
-  GACHA_ITEMS.SOMBRERO
+  new ThreeStarGachaItem('toque', 'Eggless Omelette'),
+  new ThreeStarGachaItem('baseball_cap', 'Home Run'),
+  new ThreeStarGachaItem('fedora', "M'Lady"),
+  new ThreeStarGachaItem('straw_hat', 'Beach Episode'),
+  new ThreeStarGachaItem('sombrero', 'UNO!')
 ];
 
-const FOUR_STARS = [GACHA_ITEMS.FES, GACHA_ITEMS.TOP_HAT, GACHA_ITEMS.COMRADE, GACHA_ITEMS.ASH];
+const FOUR_STARS = [
+  new FourStarGachaItem('fez', 'Are Cool'),
+  new FourStarGachaItem('top_hat', "Bo'ohw'oWa'er"),
+  new FourStarGachaItem('ushanka', 'Союз'),
+  new FourStarGachaItem('ash_cap', '10 Years Old')
+];
 
-const FIVE_STARS = [GACHA_ITEMS.COWBOY_HAT, GACHA_ITEMS.SPACE, GACHA_ITEMS.HELICOPTER];
+const FIVE_STARS = [
+  new FiveStarGachaItem('cowboy_hat', 'Yeehaw!'),
+  new FiveStarGachaItem('space_helm', 'Hey, who turned out the lights?'),
+  new FiveStarGachaItem('helicopter_cap', '+15 Defence')
+];
 
-const SIX_STARS = [GACHA_ITEMS.WIZARD, GACHA_ITEMS.LINK, GACHA_ITEMS.GAS_MASK];
+const SIX_STARS = [
+  new SixStarGachaItem('wizard_hat', 'Snape, Snape, Severus Snape'),
+  new SixStarGachaItem('link_cap', 'The Legend of "Zelda"'),
+  new SixStarGachaItem('gas_mask', 'Are you my mummy?')
+];
 
-const IMAGE_MAPS = {
-  [GACHA_ITEMS.BASEBALL_HAT]: 'baseball.png',
-  [GACHA_ITEMS.COWBOY_HAT]: 'cowboy.png',
-  [GACHA_ITEMS.FES]: 'fes.png',
-  [GACHA_ITEMS.FEDORA]: 'fedora.png',
-  [GACHA_ITEMS.TOQUE]: 'toque.png',
-  [GACHA_ITEMS.TOP_HAT]: 'tophat.png',
-  [GACHA_ITEMS.WIZARD]: 'wizard.png',
-  [GACHA_ITEMS.STRAW]: 'straw.png',
-  [GACHA_ITEMS.COMRADE]: 'comrade.png',
-  [GACHA_ITEMS.LINK]: 'link.png',
-  [GACHA_ITEMS.SOMBRERO]: 'sombrero.png',
-  [GACHA_ITEMS.ASH]: 'ash.png',
-  [GACHA_ITEMS.GAS_MASK]: 'gas_mask.png',
-  [GACHA_ITEMS.SPACE]: 'space.png',
-  [GACHA_ITEMS.HELICOPTER]: 'helicopter.png'
-};
+const FIVE_STAR_PITY = 90;
 
-export { GACHA_ITEMS, THREE_STARS, FOUR_STARS, FIVE_STARS, IMAGE_MAPS, SIX_STARS };
+export { THREE_STARS, FOUR_STARS, FIVE_STARS, SIX_STARS, FIVE_STAR_PITY };

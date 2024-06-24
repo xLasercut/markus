@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GACHA_DIR, LOG_DIR } from '../app/constants';
+import { GACHA_DATA_DIR, LOG_DIR } from '../app/constants';
 
 const MandatoryString = z.string().trim().min(1);
 
@@ -39,7 +39,7 @@ const ImgurConfig = z.object({
 });
 
 const GachaConfig = z.object({
-  GACHA_DIR: OptionalString(GACHA_DIR)
+  GACHA_DATA_DIR: OptionalString(GACHA_DATA_DIR)
 });
 
 const GeneralConfig = z.object({
