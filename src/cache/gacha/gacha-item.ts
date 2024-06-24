@@ -1,11 +1,15 @@
+import { loadImageToString } from './gacha-helpers';
+
 abstract class AbstractGachaItem {
   protected abstract _rarity: number;
   protected _image: string;
   protected _name: string;
+  protected _id: string;
 
-  constructor(image: string, name: string) {
-    this._image = image;
+  constructor(id: string, name: string) {
+    this._image = loadImageToString(id);
     this._name = name;
+    this._id = id;
   }
 
   protected _getStars(): string {

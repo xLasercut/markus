@@ -2,6 +2,7 @@ node_modules
 dist
 log/*
 config/*
+gacha/data/*
 
 # editor configs
 .vscode

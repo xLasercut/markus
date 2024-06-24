@@ -12,7 +12,7 @@ import {
 import { ElswordCalcHandler, GenshinCalcHandler } from './calculators';
 import { ElswordEnhancementEventHandler } from './elsword-enhancement-event';
 import { MarketHelpHandler } from './help';
-import { animeCache, gachaCache, itemCache } from '../cache/init';
+import { animeCache, gachaDatabase, gachaRoller, itemCache } from '../cache/init';
 import {
   AnimeStreamAlertHandler,
   AtomicHandler,
@@ -27,14 +27,15 @@ import { ItemSearchHandler } from './search';
 import { AdminUpdateCacheHandler } from './admin/update-cache';
 import { AutoPostBuyItemHandler, AutoPostSellItemHandler } from './autopost';
 import { AdminSetImageHandler } from './admin/set-image';
-import { GachaHandler } from './gacha';
+import { RollHatsHandler } from './gacha';
 
 const handlerDependencies: THandlerDependencies = {
   logger: logger,
   config: CONFIG,
   animeCache: animeCache,
   itemCache: itemCache,
-  gachaCache: gachaCache
+  gachaRoller: gachaRoller,
+  gachaDatabase: gachaDatabase
 };
 
 const pingHandler = new PingHandler(handlerDependencies);
@@ -60,7 +61,7 @@ const ratioHandler = new RatioHandler(handlerDependencies);
 const zoltraakHandler = new ZoltraakHandler(handlerDependencies);
 const survivalStrategyHandler = new SurvivalStrategyHandler(handlerDependencies);
 const thankYouHandler = new ThankYouHandler(handlerDependencies);
-const gachaHandler = new GachaHandler(handlerDependencies);
+const rollHatsHandler = new RollHatsHandler(handlerDependencies);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -86,7 +87,7 @@ const handlers = {
   [zoltraakHandler.name]: zoltraakHandler,
   [survivalStrategyHandler.name]: survivalStrategyHandler,
   [thankYouHandler.name]: thankYouHandler,
-  [gachaHandler.name]: gachaHandler
+  [rollHatsHandler.name]: rollHatsHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {
