@@ -46,7 +46,9 @@ class RollHatsHandler extends AbstractCommandHandler {
     const userStat = this._db.getUserStat(discordId);
 
     if (userStat.gems < 1600) {
-      await interaction.editReply('You do not have enough Fabrics to roll');
+      await interaction.editReply(
+        'You do not have enough Fabrics to roll. Use `/gacha_help` for more details.'
+      );
       return;
     }
 
@@ -229,7 +231,7 @@ class ZBucksTopupHandler extends AbstractCommandHandler {
 
     if (userStat.money_in_bank < -1000) {
       await interaction.editReply(
-        'You have too much debt. Please do your dailies to clear out your debt.'
+        'You have too much debt. Please do your dailies to clear out your debt. Use `/gacha_help` for more details.'
       );
       return;
     }
@@ -333,7 +335,7 @@ class GachaDailyHandler extends AbstractCommandHandler {
 
     if (this._db.doneDaily(discordId)) {
       await interaction.editReply(
-        'You have done daily quiz today. Daily quiz resets at midnight UTC.'
+        'You have done daily quiz today. Daily quiz resets at midnight UTC. Use `/gacha_help` for more details.'
       );
       return;
     }
@@ -432,4 +434,59 @@ class GachaDailyHandler extends AbstractCommandHandler {
   }
 }
 
-export { RollHatsHandler, HatsStatsHandler, ZBucksTopupHandler, GachaDailyHandler };
+class GachaHelpHandler extends AbstractCommandHandler {
+  protected _command = simpleCommand('gacha_help', 'How to play hat gacha');
+
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
+    await interaction.deferReply();
+
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.INFO)
+          .setTitle('How to play hat gacha')
+          .setDescription(
+            '**Commands:**\n' +
+              '`/roll_hats` - Roll for hats\n' +
+              '`/hats_stats` - Show your gacha inventory and stats\n' +
+              '`/zbucks_topup` - Buy Fabrics bundles using Z-Bucks\n' +
+              '`/gacha_daily` - Daily quiz to earn Fabrics and Z-Bucks\n' +
+              '\n' +
+              '**Currencies:**\n' +
+              '`Fabrics`: The currency used for rolling (equivalent of Primogems/Stellar Jades).\n' +
+              '`Z-Bucks`: Equivalent of real life money. Use this to buy `Fabrics` bundles.\n' +
+              '\n' +
+              '**Rolling for hats:**\n' +
+              "Each hats roll require 1600 Fabrics. You will not be able to roll if you don't have enough. You can earn Fabrics via dailies or top up.\n" +
+              '\n' +
+              '**Debt:**\n' +
+              'Your Z-Bucks bank balance is shown on the hats stats screen. You can incur up to -1000 ZB debt before unable to top up. You can earn 100 ZB every day through dailies.\n' +
+              '\n' +
+              '**Daily quiz:**\n' +
+              'Each day, you can earn up to 3200 Fabrics as well as 100 ZB. To answer the question, click the corresponding reaction numbers. If you get a question wrong, you will only earn half the Fabrics. You can cash out Fabrics by clicking the money bag reaction.\n' +
+              'You will earn 100 ZB guaranteed.\n' +
+              'Daily quiz resets daily at midnight UTC.\n' +
+              '\n' +
+              '**Rates:**\n' +
+              '[6★]: 0.1%\n' +
+              '[5★]: 1.6%\n' +
+              '[4★]: 13%\n' +
+              '\n' +
+              'A 5★ is guaranteed every 90 rolls. You can see the current pity count in the stats screen.\n' +
+              '\n' +
+              'Happy Rolling'
+          )
+      ]
+    };
+
+    await interaction.editReply(response);
+  }
+}
+
+export {
+  RollHatsHandler,
+  HatsStatsHandler,
+  ZBucksTopupHandler,
+  GachaDailyHandler,
+  GachaHelpHandler
+};
