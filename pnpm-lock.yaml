@@ -20,6 +20,9 @@ importers:
       lunr:
         specifier: ^2.3.9
         version: 2.3.9
+      moment:
+        specifier: ^2.30.1
+        version: 2.30.1
       node-cron:
         specifier: ^3.0.3
         version: 3.0.3

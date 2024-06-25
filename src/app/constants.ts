@@ -6,5 +6,14 @@ const LOG_DIR = path.join(BASE_DIR, 'log');
 const GACHA_DIR = path.join(BASE_DIR, 'gacha');
 const GACHA_IMAGE_DIR = path.join(GACHA_DIR, 'images');
 const GACHA_DATA_DIR = path.join(GACHA_DIR, 'data');
+const GACHA_QUIZ_DATA_DIR = path.join(GACHA_DIR, 'quiz');
 
-export { BASE_DIR, CONFIG_FILEPATH, LOG_DIR, GACHA_DIR, GACHA_IMAGE_DIR, GACHA_DATA_DIR };
+export {
+  BASE_DIR,
+  CONFIG_FILEPATH,
+  LOG_DIR,
+  GACHA_DIR,
+  GACHA_IMAGE_DIR,
+  GACHA_DATA_DIR,
+  GACHA_QUIZ_DATA_DIR
+};

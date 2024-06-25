@@ -15,8 +15,10 @@ import {
 } from './constants';
 import { loadImageToString } from './gacha-helpers';
 import { GACHA_IMAGE_DIR } from '../../app/constants';
-import Database, { Database as SqliteDb, Statement } from 'better-sqlite3';
+import Database, { Database as SqliteDb } from 'better-sqlite3';
 import { DbGachaUserStat, TDbGachaUserStat } from '../../models/gacha';
+import { StatementFactory } from './common';
+import moment from 'moment';
 
 class GachaRoller {
   protected _config: TConfig;
@@ -115,7 +117,8 @@ class GachaRoller {
 const STATEMENTS = {
   SELECT_BY_DISCORD_ID: 'SELECT_BY_DISCORD_ID',
   CREATE_NEW_RECORD: 'CREATE_NEW_RECORD',
-  TOP_UP: 'TOP_UP'
+  TOP_UP: 'TOP_UP',
+  DAILY: 'DAILY'
 };
 
 const RAW_STATEMENTS = {
@@ -133,27 +136,18 @@ const RAW_STATEMENTS = {
     SET
       money_spent = money_spent + @moneySpent,
       money_in_bank = money_in_bank - @moneySpent,
-      gems = money_spent + @gems
+      gems = gems + @gems
+    WHERE id = @id
+  `,
+  [STATEMENTS.DAILY]: `
+    UPDATE user_stats
+    SET
+      money_in_bank = money_in_bank + 100,
+      gems = gems + @gems,
+      last_daily_date = @lastDailyDate
     WHERE id = @id
   `
 };
-
-class StatementFactory {
-  protected _db: SqliteDb;
-  protected _statements: { [key: string]: Statement };
-
-  constructor(db: SqliteDb, rawStatements: { [key: string]: string }) {
-    this._db = db;
-    this._statements = {};
-    for (const [key, sql] of Object.entries(rawStatements)) {
-      this._statements[key] = this._db.prepare(sql);
-    }
-  }
-
-  public getStatement(name: string): Statement {
-    return this._statements[name];
-  }
-}
 
 class GachaDatabase {
   protected _config: TConfig;
@@ -203,12 +197,33 @@ class GachaDatabase {
     return DbGachaUserStat.parse(response);
   }
 
+  public doneDaily(discordId: string): boolean {
+    const userStat = this.getUserStat(discordId);
+
+    if (!userStat.last_daily_date) {
+      return false;
+    }
+
+    const currentDate = moment.utc().startOf('day');
+    const lastDailyDate = moment.utc(userStat.last_daily_date).startOf('day');
+    return lastDailyDate >= currentDate;
+  }
+
   public topUp(discordId: string, moneySpent: number, gemsAdded: number) {
     const statement = this._statements.getStatement(STATEMENTS.TOP_UP);
     statement.run({
       id: discordId,
       moneySpent: moneySpent,
       gems: gemsAdded
+    });
+  }
+
+  public daily(discordId: string, gemsAdded: number) {
+    const statement = this._statements.getStatement(STATEMENTS.DAILY);
+    statement.run({
+      id: discordId,
+      gems: gemsAdded,
+      lastDailyDate: moment.utc().toISOString()
     });
   }
 

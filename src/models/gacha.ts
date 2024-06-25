@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { isValidJson } from './common';
+import { shuffleArray } from '../helper';
 
 const DbGachaThreeStarItems = z.object({
   toque: z.number(),
@@ -41,7 +43,21 @@ const DbGachaUserStat = DbGachaUser.merge(DbGachaSixStarItems)
   .merge(DbGachaFourStarItems)
   .merge(DbGachaThreeStarItems);
 
-type TDbGachaUserStat = z.infer<typeof DbGachaUserStat>;
+const DbGachaQuizQuestion = z.object({
+  question: z.string().trim().min(1),
+  answer: z.string().trim().min(1),
+  choices: z
+    .string()
+    .trim()
+    .min(1)
+    .refine((val) => isValidJson(val), { message: 'Invalid json string' })
+    .transform((val) => JSON.parse(val))
+    .pipe(z.array(z.string().trim().min(1)))
+    .transform((val) => shuffleArray(val))
+});
 
-export { DbGachaUserStat };
-export type { TDbGachaUserStat };
+type TDbGachaUserStat = z.infer<typeof DbGachaUserStat>;
+type TDbGachaQuizQuestion = z.infer<typeof DbGachaQuizQuestion>;
+
+export { DbGachaUserStat, DbGachaQuizQuestion };
+export type { TDbGachaUserStat, TDbGachaQuizQuestion };
