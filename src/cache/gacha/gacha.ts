@@ -153,6 +153,7 @@ class GachaDatabase {
   protected _config: TConfig;
   protected _logger: Logger;
   protected _rollLocks: Record<string, boolean> = {};
+  protected _help: string;
   protected _db: SqliteDb;
   protected _statements: StatementFactory;
 
