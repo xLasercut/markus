@@ -216,6 +216,7 @@ class ZBucksTopupHandler extends AbstractCommandHandler {
     const bundle = interaction.options.getString('bundle');
     const moneySpent = parseInt(bundle);
     const gemsAdded = TOPUP_CHART[bundle];
+    this._db.getUserStat(user.id);
     this._db.topUp(user.id, moneySpent, gemsAdded);
 
     const response: InteractionReplyOptions = {
