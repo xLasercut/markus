@@ -31,6 +31,7 @@ const DbGachaUser = z.object({
   id: z.string().trim().min(1),
   gems: z.number(),
   money_spent: z.number(),
+  money_in_bank: z.number(),
   five_star_pity: z.number(),
   last_daily_date: z.string().trim().nullable()
 });

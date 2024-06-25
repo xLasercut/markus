@@ -132,6 +132,7 @@ const RAW_STATEMENTS = {
     UPDATE user_stats
     SET
       money_spent = money_spent + @moneySpent,
+      money_in_bank = money_in_bank - @moneySpent,
       gems = money_spent + @gems
     WHERE id = @id
   `

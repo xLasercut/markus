@@ -158,6 +158,7 @@ class HatsStatsHandler extends AbstractCommandHandler {
               value: `${userStat.money_spent} ZB (${this._getZBucksTitle(userStat.money_spent)})`,
               inline: true
             },
+            { name: 'Z-Bucks in Bank', value: `${userStat.money_in_bank} ZB`, inline: true },
             { name: 'Five Star Pity', value: `${userStat.five_star_pity}`, inline: true },
             {
               name: '[6★]',
