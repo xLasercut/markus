@@ -7,6 +7,7 @@ services:
     volumes:
       - ./log/:/home/markus/log
       - ./config/:/home/markus/config
+      - ./gacha/data/:/home/markus/gacha/data
     logging:
       options:
         max-size: 50m

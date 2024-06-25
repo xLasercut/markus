@@ -27,7 +27,7 @@ import { ItemSearchHandler } from './search';
 import { AdminUpdateCacheHandler } from './admin/update-cache';
 import { AutoPostBuyItemHandler, AutoPostSellItemHandler } from './autopost';
 import { AdminSetImageHandler } from './admin/set-image';
-import { RollHatsHandler } from './gacha';
+import { HatsStatsHandler, RollHatsHandler, ZBucksTopupHandler } from './gacha';
 
 const handlerDependencies: THandlerDependencies = {
   logger: logger,
@@ -62,6 +62,8 @@ const zoltraakHandler = new ZoltraakHandler(handlerDependencies);
 const survivalStrategyHandler = new SurvivalStrategyHandler(handlerDependencies);
 const thankYouHandler = new ThankYouHandler(handlerDependencies);
 const rollHatsHandler = new RollHatsHandler(handlerDependencies);
+const hatsStatsHandler = new HatsStatsHandler(handlerDependencies);
+const zbucksTopupHandler = new ZBucksTopupHandler(handlerDependencies);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -87,7 +89,9 @@ const handlers = {
   [zoltraakHandler.name]: zoltraakHandler,
   [survivalStrategyHandler.name]: survivalStrategyHandler,
   [thankYouHandler.name]: thankYouHandler,
-  [rollHatsHandler.name]: rollHatsHandler
+  [rollHatsHandler.name]: rollHatsHandler,
+  [hatsStatsHandler.name]: hatsStatsHandler,
+  [zbucksTopupHandler.name]: zbucksTopupHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {

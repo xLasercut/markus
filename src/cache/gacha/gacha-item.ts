@@ -12,6 +12,14 @@ abstract class AbstractGachaItem {
     this._id = id;
   }
 
+  public get id(): string {
+    return this._id;
+  }
+
+  public get name(): string {
+    return this._name;
+  }
+
   protected _getStars(): string {
     if (this._rarity > 5) {
       return (
