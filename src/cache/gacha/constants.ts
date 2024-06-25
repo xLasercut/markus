@@ -35,6 +35,8 @@ const SIX_STARS: AbstractGachaItem[] = [
 
 const FIVE_STAR_PITY = 90;
 
+const NUMBER_OF_DAILY_QUESTIONS = 5;
+
 const ALL_GACHA_ITEMS = THREE_STARS.concat(FOUR_STARS).concat(FIVE_STARS).concat(SIX_STARS);
 
 const TOPUP_CHART = {
@@ -53,5 +55,6 @@ export {
   SIX_STARS,
   FIVE_STAR_PITY,
   ALL_GACHA_ITEMS,
-  TOPUP_CHART
+  TOPUP_CHART,
+  NUMBER_OF_DAILY_QUESTIONS
 };

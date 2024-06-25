@@ -9,7 +9,12 @@ const COLORS = {
 
 const REACTIONS = {
   BACK: '⬅️',
-  FORWARD: '➡️'
+  FORWARD: '➡️',
+  ONE: '1️⃣',
+  TWO: '2️⃣',
+  THREE: '3️⃣',
+  FOUR: '4️⃣',
+  MONEY: '💰'
 } as const;
 
 const POST_TYPES = {
