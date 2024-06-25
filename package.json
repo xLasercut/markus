@@ -9,23 +9,26 @@
     "dev": "ts-node src/index.ts",
     "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "format:check": "prettier 'src/**/*.ts' --check",
-    "gacha:test": "ts-node tools/gacha-test.ts"
+    "gacha:test": "ts-node tools/gacha-test.ts",
+    "bootstrap": "ts-node tools/bootstrap.ts"
   },
   "author": "xLasercut",
   "license": "MIT",
   "repository": "https://github.com/xLasercut/ashal-market-bot",
   "dependencies": {
     "axios": "^1.6.8",
+    "better-sqlite3": "^11.0.0",
     "discord.js": "^14.15.2",
     "lunr": "^2.3.9",
     "node-cron": "^3.0.3",
+    "node-html-to-image": "^4.0.0",
     "typescript": "^5.4.5",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "zod": "^3.23.8",
-    "node-html-to-image": "^4.0.0"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.10",
     "@types/lunr": "^2.3.7",
     "@types/node": "^20.12.11",
     "@types/node-cron": "^3.0.11",

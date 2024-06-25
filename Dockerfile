@@ -12,6 +12,7 @@ RUN apt update -y \
   libpangocairo-1.0-0 libstdc++6 libuuid1 libx11-6 libx11-xcb1 libxcb-dri3-0 libxcb1 \
   libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxkbcommon0 \
   libxrandr2 libxrender1 libxshmfence1 libxss1 libxtst6 \
+  sqlite3 \
  && mkdir ${WORK_DIR}
 
 RUN npm install -g pnpm
