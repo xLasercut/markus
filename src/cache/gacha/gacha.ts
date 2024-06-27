@@ -9,6 +9,7 @@ import {
   ALL_GACHA_ITEMS,
   FIVE_STAR_PITY,
   FIVE_STARS,
+  FOUR_STAR_PITY,
   FOUR_STARS,
   SIX_STARS,
   THREE_STARS
@@ -35,64 +36,61 @@ class GachaRoller {
     this._template = fs.readFileSync(path.join(GACHA_IMAGE_DIR, 'index.html'), 'utf-8');
   }
 
-  protected _doSingleRoll(fiveStarPity: number): AbstractGachaItem {
+  protected _doSingleRoll(fiveStarPity: number, fourStarPity: number): AbstractGachaItem {
     const roll = Math.floor(Math.random() * 10000);
 
     if (roll <= 10) {
       return getRandomItem(SIX_STARS);
     }
 
-    if (roll <= 160 || fiveStarPity === FIVE_STAR_PITY) {
+    if (roll <= 160 || fiveStarPity >= FIVE_STAR_PITY) {
       return getRandomItem(FIVE_STARS);
     }
 
-    if (roll <= 1300) {
+    if (roll <= 1300 || fourStarPity >= FOUR_STAR_PITY) {
       return getRandomItem(FOUR_STARS);
     }
 
     return getRandomItem(THREE_STARS);
   }
 
-  protected _doTenRoll(currentPity: number) {
+  protected _doTenRoll(currentFiveStarPity: number, currentFourStarPity: number) {
     const items: AbstractGachaItem[] = [];
     const itemCounts: Record<string, number> = {};
 
-    let resetPity = false;
-    let resetPityCount = 0;
+    let fiveStarPity = currentFiveStarPity;
+    let fourStarPity = currentFourStarPity;
     for (let i = 1; i < 11; i++) {
-      const fiveStarPity = currentPity + i;
-      const item = this._doSingleRoll(fiveStarPity);
+      fiveStarPity += 1;
+      fourStarPity += 1;
+      const item = this._doSingleRoll(fiveStarPity, fourStarPity);
 
       if (!(item.id in itemCounts)) {
         itemCounts[item.id] = 0;
       }
       itemCounts[item.id] += 1;
 
-      if (fiveStarPity === FIVE_STAR_PITY || item.rarity === 5) {
-        resetPity = true;
-        resetPityCount = 10 - i;
+      if (item.rarity === 5) {
+        fiveStarPity = 0;
+      }
+
+      if (item.rarity === 4) {
+        fourStarPity = 0;
       }
 
       items.push(item);
     }
 
-    if (resetPity) {
-      return {
-        items: items.sort((a, b) => b.rarity - a.rarity),
-        fiveStarPity: resetPityCount,
-        itemCounts: itemCounts
-      };
-    }
-
     return {
       items: items.sort((a, b) => b.rarity - a.rarity),
-      fiveStarPity: currentPity + 10,
+      fiveStarPity: fiveStarPity,
+      fourStarPity: fourStarPity,
       itemCounts: itemCounts
     };
   }
 
-  public async roll(currentPity: number) {
-    const { items, fiveStarPity, itemCounts } = this._doTenRoll(currentPity);
+  public async roll(currentFiveStarPity: number, currentFourStarPity: number) {
+    const { items, ...rest } = this._doTenRoll(currentFiveStarPity, currentFourStarPity);
     const image = (await nodeHtmlToImage({
       html: this._template,
       content: {
@@ -108,8 +106,7 @@ class GachaRoller {
     return {
       image: image,
       items: items.map((item) => item.details),
-      fiveStarPity: fiveStarPity,
-      itemCounts: itemCounts
+      ...rest
     };
   }
 }
@@ -228,7 +225,12 @@ class GachaDatabase {
     });
   }
 
-  public updateCounts(discordId: string, fiveStarPity: number, itemCounts: Record<string, number>) {
+  public updateCounts(
+    discordId: string,
+    fiveStarPity: number,
+    fourStarPity: number,
+    itemCounts: Record<string, number>
+  ) {
     const items: string[] = [];
     for (const key in itemCounts) {
       items.push(`${key} = ${key} + @${key}`);
@@ -238,13 +240,15 @@ class GachaDatabase {
       SET
         gems = gems - 1600,
         five_star_pity = @fiveStarPity,
+        four_star_pity = @fourStarPity,
         ${items.join(',\n')}
       WHERE id = @id
     `;
     this._db.prepare(sql).run({
       ...itemCounts,
       id: discordId,
-      fiveStarPity: fiveStarPity
+      fiveStarPity: fiveStarPity,
+      fourStarPity: fourStarPity
     });
   }
 }
