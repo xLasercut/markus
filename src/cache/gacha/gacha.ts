@@ -169,7 +169,7 @@ class GachaDatabase {
         const sql = `ALTER TABLE user_stats ADD ${item.id} integer default 0 not null;`;
         this._db.prepare(sql).run();
       } catch (e) {
-        this._logger.error(e.stack);
+        this._logger.error(e);
       }
     }
   }
