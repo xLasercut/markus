@@ -53,10 +53,11 @@ class RollHatsHandler extends AbstractCommandHandler {
     }
 
     this._db.setRollLock(discordId, true);
-    const { image, items, fiveStarPity, itemCounts } = await this._roller.roll(
-      userStat.five_star_pity
+    const { image, items, fiveStarPity, fourStarPity, itemCounts } = await this._roller.roll(
+      userStat.five_star_pity,
+      userStat.four_star_pity
     );
-    this._db.updateCounts(discordId, fiveStarPity, itemCounts);
+    this._db.updateCounts(discordId, fiveStarPity, fourStarPity, itemCounts);
     const imageAttachment = new AttachmentBuilder(image, { name: 'gacha-image.png' });
     const fieldOne = items.slice(0, 5);
     const fieldTwo = items.slice(5);
@@ -345,7 +346,7 @@ class GachaDailyHandler extends AbstractCommandHandler {
 
     let currentQuestionNumber = 0;
     let currentQuestion = questions[currentQuestionNumber];
-    let fabrics = 0;
+    let fabrics = 1600;
 
     const message = await interaction.editReply(
       this._generateQuestionResponse(currentQuestion, fabrics)
@@ -463,7 +464,8 @@ class GachaHelpHandler extends AbstractCommandHandler {
               'Your Z-Bucks bank balance is shown on the hats stats screen. You can incur up to -1000 ZB debt before unable to top up. You can earn 100 ZB every day through dailies.\n' +
               '\n' +
               '**Daily quiz:**\n' +
-              'Each day, you can earn up to 3200 Fabrics as well as 100 ZB. To answer the question, click the corresponding reaction numbers. If you get a question wrong, you will only earn half the Fabrics. You can cash out Fabrics by clicking the money bag reaction.\n' +
+              'Each day, you can earn up to 4800 Fabrics as well as 100 ZB.\n' +
+              'To answer the question, click the corresponding reaction numbers. If you get a question wrong, you will only earn half the Fabrics. You can cash out Fabrics by clicking the money bag reaction.\n' +
               'You will earn 100 ZB guaranteed.\n' +
               'Daily quiz resets daily at midnight UTC.\n' +
               '\n' +
