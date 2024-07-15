@@ -60,6 +60,7 @@ class GachaRoller {
 
     let fiveStarPity = currentFiveStarPity;
     let fourStarPity = currentFourStarPity;
+    let fabulousPoints = 0;
     for (let i = 1; i < 11; i++) {
       fiveStarPity += 1;
       fourStarPity += 1;
@@ -79,13 +80,15 @@ class GachaRoller {
       }
 
       items.push(item);
+      fabulousPoints += item.fabulousPoints;
     }
 
     return {
       items: items.sort((a, b) => b.rarity - a.rarity),
       fiveStarPity: fiveStarPity,
       fourStarPity: fourStarPity,
-      itemCounts: itemCounts
+      itemCounts: itemCounts,
+      fabulousPoints: fabulousPoints
     };
   }
 
@@ -115,7 +118,8 @@ const STATEMENTS = {
   SELECT_BY_DISCORD_ID: 'SELECT_BY_DISCORD_ID',
   CREATE_NEW_RECORD: 'CREATE_NEW_RECORD',
   TOP_UP: 'TOP_UP',
-  DAILY: 'DAILY'
+  DAILY: 'DAILY',
+  GET_HIGHSCORES: 'GET_HIGHSCORES'
 };
 
 const RAW_STATEMENTS = {
@@ -143,6 +147,13 @@ const RAW_STATEMENTS = {
       gems = gems + @gems,
       last_daily_date = @lastDailyDate
     WHERE id = @id
+  `,
+  [STATEMENTS.GET_HIGHSCORES]: `
+    SELECT * FROM
+      user_stats
+    ORDER BY
+      fabulous_points DESC
+    LIMIT 10
   `
 };
 
@@ -150,7 +161,6 @@ class GachaDatabase {
   protected _config: TConfig;
   protected _logger: Logger;
   protected _rollLocks: Record<string, boolean> = {};
-  protected _help: string;
   protected _db: SqliteDb;
   protected _statements: StatementFactory;
 
@@ -160,10 +170,9 @@ class GachaDatabase {
     this._db = new Database(path.join(config.GACHA_DATA_DIR, 'user.db'));
     this._db.pragma('journal_mode = WAL');
     this._statements = new StatementFactory(this._db, RAW_STATEMENTS);
-    this._initItemColumns();
   }
 
-  protected _initItemColumns() {
+  public updateDbSchema() {
     for (const item of ALL_GACHA_ITEMS) {
       try {
         const sql = `ALTER TABLE user_stats ADD ${item.id} integer default 0 not null;`;
@@ -229,7 +238,8 @@ class GachaDatabase {
     discordId: string,
     fiveStarPity: number,
     fourStarPity: number,
-    itemCounts: Record<string, number>
+    itemCounts: Record<string, number>,
+    fabulousPoints: number
   ) {
     const items: string[] = [];
     for (const key in itemCounts) {
@@ -241,6 +251,7 @@ class GachaDatabase {
         gems = gems - 1600,
         five_star_pity = @fiveStarPity,
         four_star_pity = @fourStarPity,
+        fabulous_points = fabulous_points + @fabulousPoints,
         ${items.join(',\n')}
       WHERE id = @id
     `;
@@ -248,8 +259,16 @@ class GachaDatabase {
       ...itemCounts,
       id: discordId,
       fiveStarPity: fiveStarPity,
-      fourStarPity: fourStarPity
+      fourStarPity: fourStarPity,
+      fabulousPoints: fabulousPoints
     });
+  }
+
+  public getHighscores(): TDbGachaUserStat[] {
+    const statement = this._statements.getStatement(STATEMENTS.GET_HIGHSCORES);
+    const response = statement.all();
+
+    return response.map((item) => DbGachaUserStat.parse(item));
   }
 }
 

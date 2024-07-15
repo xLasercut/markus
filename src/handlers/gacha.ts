@@ -53,11 +53,9 @@ class RollHatsHandler extends AbstractCommandHandler {
     }
 
     this._db.setRollLock(discordId, true);
-    const { image, items, fiveStarPity, fourStarPity, itemCounts } = await this._roller.roll(
-      userStat.five_star_pity,
-      userStat.four_star_pity
-    );
-    this._db.updateCounts(discordId, fiveStarPity, fourStarPity, itemCounts);
+    const { image, items, fiveStarPity, fourStarPity, itemCounts, fabulousPoints } =
+      await this._roller.roll(userStat.five_star_pity, userStat.four_star_pity);
+    this._db.updateCounts(discordId, fiveStarPity, fourStarPity, itemCounts, fabulousPoints);
     const imageAttachment = new AttachmentBuilder(image, { name: 'gacha-image.png' });
     const fieldOne = items.slice(0, 5);
     const fieldTwo = items.slice(5);
@@ -161,11 +159,13 @@ class HatsStatsHandler extends AbstractCommandHandler {
             { name: 'Fabrics', value: `${userStat.gems}`, inline: true },
             {
               name: 'Z-Bucks Spent',
-              value: `${userStat.money_spent} ZB (${this._getZBucksTitle(userStat.money_spent)})`,
+              value: `${userStat.money_spent} ZB`,
               inline: true
             },
             { name: 'Z-Bucks in Bank', value: `${userStat.money_in_bank} ZB`, inline: true },
             { name: 'Five Star Pity', value: `${userStat.five_star_pity}`, inline: true },
+            { name: 'Title', value: this._getZBucksTitle(userStat.money_spent), inline: true },
+            { name: 'FP', value: `${userStat.fabulous_points}`, inline: true },
             {
               name: '[6★]',
               value: `${this._formatItemCounts(userStat, SIX_STARS)}`,
@@ -452,6 +452,7 @@ class GachaHelpHandler extends AbstractCommandHandler {
               '`/hats_stats` - Show your gacha inventory and stats\n' +
               '`/zbucks_topup` - Buy Fabrics bundles using Z-Bucks\n' +
               '`/gacha_daily` - Daily quiz to earn Fabrics and Z-Bucks\n' +
+              '`/hats_rank` - Display player rankings\n' +
               '\n' +
               '**Currencies:**\n' +
               '`Fabrics`: The currency used for rolling (equivalent of Primogems/Stellar Jades).\n' +
@@ -469,6 +470,13 @@ class GachaHelpHandler extends AbstractCommandHandler {
               'You will earn 100 ZB guaranteed.\n' +
               'Daily quiz resets daily at midnight UTC.\n' +
               '\n' +
+              '**Rankings:**\n' +
+              'Rankings are determined by Fabulous Points (FP). These are awarded for every hat you get:\n' +
+              '[6★]: 2000\n' +
+              '[5★]: 100\n' +
+              '[4★]: 15\n' +
+              '[4★]: 1\n' +
+              '\n' +
               '**Rates:**\n' +
               '[6★]: 0.1%\n' +
               '[5★]: 1.6%\n' +
@@ -485,10 +493,59 @@ class GachaHelpHandler extends AbstractCommandHandler {
   }
 }
 
+class HatsRankHandler extends AbstractCommandHandler {
+  protected _command = simpleCommand('hats_rank', 'Show the biggest lucksaccs');
+  protected _db: GachaDatabase;
+
+  constructor(dependencies: THandlerDependencies) {
+    super(dependencies);
+    this._db = dependencies.gachaDatabase;
+  }
+
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
+    await interaction.deferReply();
+    const players = this._db.getHighscores();
+
+    let rank = 1;
+    const output = [];
+
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i];
+      if (i > 0 && player.fabulous_points < players[i - 1].fabulous_points) {
+        rank++;
+      }
+
+      const user = await this._client.users.fetch(player.id);
+
+      output.push(`Rank **[${this._formatRank(rank)}]** - ${user.displayName}`);
+    }
+
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.INFO)
+          .setTitle('Lucksaccs')
+          .setDescription(output.join('\n'))
+      ]
+    };
+
+    await interaction.editReply(response);
+  }
+
+  protected _formatRank(rank: number): string {
+    if (rank < 10) {
+      return `0${rank}`;
+    }
+
+    return `${rank}`;
+  }
+}
+
 export {
   RollHatsHandler,
   HatsStatsHandler,
   ZBucksTopupHandler,
   GachaDailyHandler,
-  GachaHelpHandler
+  GachaHelpHandler,
+  HatsRankHandler
 };

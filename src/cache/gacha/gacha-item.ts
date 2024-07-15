@@ -5,11 +5,16 @@ abstract class AbstractGachaItem {
   protected _image: string;
   protected _name: string;
   protected _id: string;
+  protected _fabulousPoints: number;
 
   constructor(id: string, name: string) {
     this._image = loadImageToString(id);
     this._name = name;
     this._id = id;
+  }
+
+  public get fabulousPoints(): number {
+    return this._fabulousPoints;
   }
 
   public get id(): string {
@@ -49,18 +54,22 @@ abstract class AbstractGachaItem {
 
 class ThreeStarGachaItem extends AbstractGachaItem {
   protected _rarity: number = 3;
+  protected _fabulousPoints: number = 1;
 }
 
 class FourStarGachaItem extends AbstractGachaItem {
   protected _rarity: number = 4;
+  protected _fabulousPoints: number = 15;
 }
 
 class FiveStarGachaItem extends AbstractGachaItem {
   protected _rarity: number = 5;
+  protected _fabulousPoints: number = 100;
 }
 
 class SixStarGachaItem extends AbstractGachaItem {
   protected _rarity: number = 6;
+  protected _fabulousPoints: number = 2000;
 }
 
 export {

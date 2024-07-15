@@ -36,7 +36,8 @@ const DbGachaUser = z.object({
   money_in_bank: z.number(),
   five_star_pity: z.number(),
   four_star_pity: z.number(),
-  last_daily_date: z.string().trim().nullable()
+  last_daily_date: z.string().trim().nullable(),
+  fabulous_points: z.number()
 });
 
 const DbGachaUserStat = DbGachaUser.merge(DbGachaSixStarItems)

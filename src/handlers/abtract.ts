@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, Client } from 'discord.js';
 import { TConfig, TDiscordCommand } from '../types';
 import { THandlerDependencies } from '../interfaces/handler';
 import { Logger } from 'winston';
@@ -9,6 +9,7 @@ abstract class AbstractCommandHandler {
   protected _allowedUsers: string[];
   protected _config: TConfig;
   protected _logger: Logger;
+  protected _client: Client;
 
   constructor(
     dependencies: THandlerDependencies,
@@ -19,6 +20,7 @@ abstract class AbstractCommandHandler {
     this._allowedUsers = allowedUsers;
     this._config = dependencies.config;
     this._logger = dependencies.logger;
+    this._client = dependencies.client;
   }
 
   get name(): string {

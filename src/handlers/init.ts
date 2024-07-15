@@ -1,5 +1,5 @@
 import { PingHandler } from './ping';
-import { logger } from '../app/init';
+import { client, logger } from '../app/init';
 import { THandlerDependencies } from '../interfaces/handler';
 import { CONFIG } from '../app/config';
 import {
@@ -36,10 +36,12 @@ import { AdminSetImageHandler } from './admin/set-image';
 import {
   GachaDailyHandler,
   GachaHelpHandler,
+  HatsRankHandler,
   HatsStatsHandler,
   RollHatsHandler,
   ZBucksTopupHandler
 } from './gacha';
+import { AdminGachaDbUpdateHandler } from './admin/gacha';
 
 const handlerDependencies: THandlerDependencies = {
   logger: logger,
@@ -48,7 +50,8 @@ const handlerDependencies: THandlerDependencies = {
   itemCache: itemCache,
   gachaRoller: gachaRoller,
   gachaDatabase: gachaDatabase,
-  gachaQuizDatabase: gachaQuizDatabase
+  gachaQuizDatabase: gachaQuizDatabase,
+  client: client
 };
 
 const pingHandler = new PingHandler(handlerDependencies);
@@ -79,6 +82,8 @@ const hatsStatsHandler = new HatsStatsHandler(handlerDependencies);
 const zbucksTopupHandler = new ZBucksTopupHandler(handlerDependencies);
 const gachaDailyHandler = new GachaDailyHandler(handlerDependencies);
 const gachaHelpHandler = new GachaHelpHandler(handlerDependencies);
+const adminGachaDbUpdateHandler = new AdminGachaDbUpdateHandler(handlerDependencies);
+const hatsRankHandler = new HatsRankHandler(handlerDependencies);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -108,7 +113,9 @@ const handlers = {
   [hatsStatsHandler.name]: hatsStatsHandler,
   [zbucksTopupHandler.name]: zbucksTopupHandler,
   [gachaDailyHandler.name]: gachaDailyHandler,
-  [gachaHelpHandler.name]: gachaHelpHandler
+  [gachaHelpHandler.name]: gachaHelpHandler,
+  [adminGachaDbUpdateHandler.name]: adminGachaDbUpdateHandler,
+  [hatsRankHandler.name]: hatsRankHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {
