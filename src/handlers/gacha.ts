@@ -517,7 +517,7 @@ class HatsRankHandler extends AbstractCommandHandler {
 
       const user = await this._client.users.fetch(player.id);
 
-      output.push(`Rank **[${this._formatRank(rank)}]** - ${user.displayName}`);
+      output.push(`Rank **[${this._formatRank(rank)}]** - ${user.displayName} - ${player.fabulous_points} FP`);
     }
 
     const response: InteractionReplyOptions = {
