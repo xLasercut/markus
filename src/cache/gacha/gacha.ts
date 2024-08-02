@@ -216,6 +216,20 @@ class GachaDatabase {
     return lastDailyDate >= currentDate;
   }
 
+  public dailyResetTime(): string {
+    const resetTime = moment.utc().add(1, 'days').startOf('day');
+    const currentTime = moment.utc();
+    const diff = resetTime.diff(currentTime) / 1000;
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = Math.floor((diff % 3600) % 60);
+
+    const hDisplay = h > 0 ? h + (h == 1 ? ' hour, ' : ' hours, ') : '';
+    const mDisplay = m > 0 ? m + (m == 1 ? ' minute, ' : ' minutes, ') : '';
+    const sDisplay = s > 0 ? s + (s == 1 ? ' second' : ' seconds') : '';
+    return hDisplay + mDisplay + sDisplay;
+  }
+
   public topUp(discordId: string, moneySpent: number, gemsAdded: number) {
     const statement = this._statements.getStatement(STATEMENTS.TOP_UP);
     statement.run({
