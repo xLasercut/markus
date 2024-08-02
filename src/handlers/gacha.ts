@@ -47,7 +47,7 @@ class RollHatsHandler extends AbstractCommandHandler {
 
     if (userStat.gems < 1600) {
       await interaction.editReply(
-        'You do not have enough Fabrics to roll. Use `/gacha_help` for more details.'
+        `You do not have enough Fabrics to roll.\nYou currently have ${userStat.gems} Fabrics.\nUse \`/gacha_help\` for more details.`
       );
       return;
     }
@@ -336,7 +336,7 @@ class GachaDailyHandler extends AbstractCommandHandler {
 
     if (this._db.doneDaily(discordId)) {
       await interaction.editReply(
-        'You have done daily quiz today. Daily quiz resets at midnight UTC. Use `/gacha_help` for more details.'
+        `You have done daily quiz today. Daily quiz resets in ${this._db.dailyResetTime()}. Use \`/gacha_help\` for more details.`
       );
       return;
     }
@@ -475,7 +475,7 @@ class GachaHelpHandler extends AbstractCommandHandler {
               '[6★]: 2000\n' +
               '[5★]: 100\n' +
               '[4★]: 15\n' +
-              '[4★]: 1\n' +
+              '[3★]: 1\n' +
               '\n' +
               '**Rates:**\n' +
               '[6★]: 0.1%\n' +
@@ -517,7 +517,9 @@ class HatsRankHandler extends AbstractCommandHandler {
 
       const user = await this._client.users.fetch(player.id);
 
-      output.push(`Rank **[${this._formatRank(rank)}]** - ${user.displayName}`);
+      output.push(
+        `Rank **[${this._formatRank(rank)}]** - ${user.displayName} - ${player.fabulous_points} FP`
+      );
     }
 
     const response: InteractionReplyOptions = {
