@@ -21,6 +21,7 @@ WORKDIR ${WORK_DIR}
 
 COPY ./package.json ${WORK_DIR}/package.json
 COPY ./pnpm-lock.yaml ${WORK_DIR}/pnpm-lock.yaml
+COPY ./pnpm-workspace.yaml ${WORK_DIR}/pnpm-workspace.yaml
 
 RUN pnpm install
 
