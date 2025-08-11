@@ -118,7 +118,7 @@ const handlers = {
   [gachaHelpHandler.name]: gachaHelpHandler,
   [adminGachaDbUpdateHandler.name]: adminGachaDbUpdateHandler,
   [hatsRankHandler.name]: hatsRankHandler,
-  [subarashiiHandler.name]: subarashiiHandler,
+  [subarashiiHandler.name]: subarashiiHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {
