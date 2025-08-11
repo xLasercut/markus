@@ -27,7 +27,8 @@ import {
   SurvivalStrategyHandler,
   ThankYouHandler,
   WakuWakuHandler,
-  ZoltraakHandler
+  ZoltraakHandler,
+  SubarashiiHandler
 } from './anime';
 import { ItemSearchHandler } from './search';
 import { AdminUpdateCacheHandler } from './admin/update-cache';
@@ -84,6 +85,7 @@ const gachaDailyHandler = new GachaDailyHandler(handlerDependencies);
 const gachaHelpHandler = new GachaHelpHandler(handlerDependencies);
 const adminGachaDbUpdateHandler = new AdminGachaDbUpdateHandler(handlerDependencies);
 const hatsRankHandler = new HatsRankHandler(handlerDependencies);
+const subarashiiHandler = new SubarashiiHandler(handlerDependencies);
 
 const handlers = {
   [pingHandler.name]: pingHandler,
@@ -115,7 +117,8 @@ const handlers = {
   [gachaDailyHandler.name]: gachaDailyHandler,
   [gachaHelpHandler.name]: gachaHelpHandler,
   [adminGachaDbUpdateHandler.name]: adminGachaDbUpdateHandler,
-  [hatsRankHandler.name]: hatsRankHandler
+  [hatsRankHandler.name]: hatsRankHandler,
+  [subarashiiHandler.name]: subarashiiHandler
 };
 
 const commands = Object.values(handlers).map((handler) => {
