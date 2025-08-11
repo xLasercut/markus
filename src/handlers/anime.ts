@@ -194,6 +194,27 @@ class ThankYouHandler extends AbstractCommandHandler {
   }
 }
 
+class SubarashiiHandler extends AbstractCommandHandler {
+  protected _command = optionalUserPingCommand('subarashii', '素晴らしい!');
+
+  protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
+    const user: User = interaction.options.getUser('user');
+    const response: InteractionReplyOptions = {
+      embeds: [
+        new EmbedBuilder()
+          .setColor('#9167b7')
+          .setTitle('素晴らしい!')
+          .setImage('https://i.imgur.com/2U01Nw5.png')
+      ]
+    };
+    if (user) {
+      response.content = `Hey <@${user.id}>`;
+    }
+
+    await interaction.reply(response);
+  }
+}
+
 export {
   DontGetAttachedHandler,
   AnimeStreamAlertHandler,
@@ -202,5 +223,6 @@ export {
   AtomicHandler,
   ZoltraakHandler,
   SurvivalStrategyHandler,
-  ThankYouHandler
+  ThankYouHandler,
+  SubarashiiHandler
 };
