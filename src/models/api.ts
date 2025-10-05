@@ -38,16 +38,10 @@ const ItemApiResponse = z.object({
   posts: z.array(Item)
 });
 
-const ImgurApiResponseImage = z.object({
-  id: z.string().trim().min(1),
-  link: z.string().trim().min(1)
-});
-
-const ImgurApiResponse = z.object({
-  data: z.object({
-    id: z.string().trim().min(1),
-    images: z.array(ImgurApiResponseImage)
+const GithubImageResponse = z.array(
+  z.object({
+    download_url: z.string().trim()
   })
-});
+);
 
-export { Item, ItemApiResponse, UserItemApiResponse, UserItem, ImgurApiResponse };
+export { Item, ItemApiResponse, UserItemApiResponse, UserItem, GithubImageResponse };

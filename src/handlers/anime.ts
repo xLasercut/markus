@@ -5,7 +5,7 @@ import {
   User
 } from 'discord.js';
 import { AbstractCommandHandler } from './abtract';
-import { COLORS } from '../constants';
+import { COLORS, MEME_IMAGES_BASE_URL } from '../constants';
 import { AnimeCache } from '../cache/anime';
 import { mandatoryToggleActionCommand, optionalUserPingCommand, simpleCommand } from './command';
 import { THandlerDependencies } from '../interfaces/handler';
@@ -72,7 +72,9 @@ class SosuHandler extends AbstractCommandHandler {
 
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const response: InteractionReplyOptions = {
-      embeds: [new EmbedBuilder().setImage('https://i.imgur.com/4UClTI0.jpg').setColor(COLORS.INFO)]
+      embeds: [
+        new EmbedBuilder().setImage(`${MEME_IMAGES_BASE_URL}/sosu.jpg`).setColor(COLORS.INFO)
+      ]
     };
     await interaction.reply(response);
   }
@@ -86,7 +88,7 @@ class WakuWakuHandler extends AbstractCommandHandler {
       embeds: [
         new EmbedBuilder()
           .setTitle('WAKU WAKU')
-          .setImage('https://i.imgur.com/a2WpfN2.jpg')
+          .setImage(`${MEME_IMAGES_BASE_URL}/waku-waku.jpg`)
           .setColor(COLORS.INFO)
       ]
     };
@@ -129,7 +131,7 @@ class ZoltraakHandler extends AbstractCommandHandler {
         new EmbedBuilder()
           .setColor(COLORS.INFO)
           .setTitle('PEW PEW!')
-          .setImage('https://i.imgur.com/5w6cEvZ.gif')
+          .setImage(`${MEME_IMAGES_BASE_URL}/zoltraak.gif`)
       ]
     };
     if (user) {
@@ -183,7 +185,7 @@ class ThankYouHandler extends AbstractCommandHandler {
         new EmbedBuilder()
           .setColor(COLORS.INFO)
           .setTitle('Thank you so much!')
-          .setImage('https://i.imgur.com/JfqTFoU.png')
+          .setImage(`${MEME_IMAGES_BASE_URL}/thankyou.png`)
       ]
     };
     if (user) {
@@ -204,7 +206,7 @@ class SubarashiiHandler extends AbstractCommandHandler {
         new EmbedBuilder()
           .setColor('#9167b7')
           .setTitle('素晴らしい!')
-          .setImage('https://i.imgur.com/2U01Nw5.png')
+          .setImage(`${MEME_IMAGES_BASE_URL}/subarashii.png`)
       ]
     };
     if (user) {

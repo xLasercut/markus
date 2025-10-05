@@ -1,5 +1,5 @@
 import { AbstractCommandHandler } from './abtract';
-import { COLORS } from '../constants';
+import { COLORS, MEME_IMAGES_BASE_URL } from '../constants';
 import {
   ChatInputCommandInteraction,
   EmbedBuilder,
@@ -15,7 +15,7 @@ class PtrHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
-        new EmbedBuilder().setImage('https://i.imgur.com/X7aB8pQ.png').setColor(COLORS.SUCCESS)
+        new EmbedBuilder().setImage(`${MEME_IMAGES_BASE_URL}/ptr.png`).setColor(COLORS.SUCCESS)
       ]
     });
   }
@@ -101,7 +101,7 @@ class RatioHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const response: InteractionReplyOptions = {
       embeds: [
-        new EmbedBuilder().setImage('https://i.imgur.com/4XwCRWU.gif').setColor(COLORS.PRIMARY)
+        new EmbedBuilder().setImage(`${MEME_IMAGES_BASE_URL}/ratio.gif`).setColor(COLORS.PRIMARY)
       ]
     };
     await interaction.reply(response);
