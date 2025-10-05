@@ -33,11 +33,6 @@ const DiscordConfig = z.object({
   ANIME_ROLE_ID: MandatoryString
 });
 
-const ImgurConfig = z.object({
-  IMGUR_CLIENT_ID: MandatoryString,
-  IMGUR_ALBUM_ID: MandatoryString
-});
-
 const GachaConfig = z.object({
   GACHA_DATA_DIR: OptionalString(GACHA_DATA_DIR)
 });
@@ -51,9 +46,6 @@ const GeneralConfig = z.object({
   LOG_LEVEL: OptionalString('warn')
 });
 
-const Config = GeneralConfig.merge(ImgurConfig)
-  .merge(DiscordConfig)
-  .merge(ApiConfig)
-  .merge(GachaConfig);
+const Config = GeneralConfig.merge(DiscordConfig).merge(ApiConfig).merge(GachaConfig);
 
 export { Config };

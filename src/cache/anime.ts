@@ -2,17 +2,18 @@ import { getRandomItem, shuffleArray } from '../helper';
 import { Logger } from 'winston';
 import { TAtomic } from '../interfaces/anime-cache';
 import axios from 'axios';
-import { ImgurApiResponse } from '../models/api';
+import { GithubImageResponse } from '../models/api';
 import { TConfig } from '../types';
+import { MEME_IMAGES_BASE_URL } from '../constants';
 
 const ATOMIC_IMAGES: TAtomic[] = [
   {
     title: 'ᵃᵗᵒᵐⁱᶜ',
     image: 'https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif'
   },
-  { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/ZhmtllT.jpg' },
-  { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/8VNgF3X.png' },
-  { title: 'ᵃᵗᵒᵐⁱᶜ', image: 'https://i.imgur.com/THvN4ln.gif' }
+  { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: `${MEME_IMAGES_BASE_URL}/all-range-atomic.jpg` },
+  { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: `${MEME_IMAGES_BASE_URL}/recovery-atomic.png` },
+  { title: 'ᵃᵗᵒᵐⁱᶜ', image: `${MEME_IMAGES_BASE_URL}/im-atomic.gif` }
 ];
 
 class AnimeCache {
@@ -31,16 +32,12 @@ class AnimeCache {
 
   public async startCache() {
     this._logger.info('loading anime cache...');
-    const headers = {
-      Authorization: `Client-ID ${this._config.IMGUR_CLIENT_ID}`
-    };
     const response = await axios.get(
-      `https://api.imgur.com/3/album/${this._config.IMGUR_ALBUM_ID}`,
-      { headers: headers }
+      `https://api.github.com/repos/xLasercut/server-images/contents/dont-get-attached`
     );
-    const parsedResponse = ImgurApiResponse.parse(response.data);
-    this._dontGetAttachedImages = parsedResponse.data.images.map((image) => {
-      return image.link;
+    const parsedResponse = GithubImageResponse.parse(response.data);
+    this._dontGetAttachedImages = parsedResponse.map((image) => {
+      return image.download_url;
     });
     this._dontGetAttachedImagesToSend = shuffleArray<string>(this._dontGetAttachedImages);
     this._logger.info('anime cache load complete');
