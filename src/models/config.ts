@@ -37,6 +37,11 @@ const GachaConfig = z.object({
   GACHA_DATA_DIR: OptionalString(GACHA_DATA_DIR)
 });
 
+const ImgchestConfig = z.object({
+  IMGCHEST_API_TOKEN: MandatoryString,
+  IMGCHEST_POST_ID: MandatoryString
+});
+
 const GeneralConfig = z.object({
   CACHE_REFRESH_RATE: OptionalString('*/10 * * * *'),
   AUTO_POST_RATE: OptionalString('5 */12 * * *'),
@@ -46,6 +51,9 @@ const GeneralConfig = z.object({
   LOG_LEVEL: OptionalString('warn')
 });
 
-const Config = GeneralConfig.merge(DiscordConfig).merge(ApiConfig).merge(GachaConfig);
+const Config = GeneralConfig.merge(DiscordConfig)
+  .merge(ApiConfig)
+  .merge(GachaConfig)
+  .merge(ImgchestConfig);
 
 export { Config };

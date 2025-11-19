@@ -22,7 +22,4 @@ const POST_TYPES = {
   SELL: 'sell'
 } as const;
 
-const MEME_IMAGES_BASE_URL =
-  'https://raw.githubusercontent.com/xLasercut/server-images/master/memes';
-
-export { COLORS, REACTIONS, POST_TYPES, MEME_IMAGES_BASE_URL };
+export { COLORS, REACTIONS, POST_TYPES };
