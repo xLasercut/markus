@@ -5,7 +5,7 @@ import {
   User
 } from 'discord.js';
 import { AbstractCommandHandler } from './abtract';
-import { COLORS, MEME_IMAGES_BASE_URL } from '../constants';
+import { COLORS } from '../constants';
 import { AnimeCache } from '../cache/anime';
 import { mandatoryToggleActionCommand, optionalUserPingCommand, simpleCommand } from './command';
 import { THandlerDependencies } from '../interfaces/handler';
@@ -73,7 +73,9 @@ class SosuHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const response: InteractionReplyOptions = {
       embeds: [
-        new EmbedBuilder().setImage(`${MEME_IMAGES_BASE_URL}/sosu.jpg`).setColor(COLORS.INFO)
+        new EmbedBuilder()
+          .setImage(`https://cdn.imgchest.com/files/fa0170e6d98c.jpg`)
+          .setColor(COLORS.INFO)
       ]
     };
     await interaction.reply(response);
@@ -88,7 +90,7 @@ class WakuWakuHandler extends AbstractCommandHandler {
       embeds: [
         new EmbedBuilder()
           .setTitle('WAKU WAKU')
-          .setImage(`${MEME_IMAGES_BASE_URL}/waku-waku.jpg`)
+          .setImage(`https://cdn.imgchest.com/files/1b3c82fd0c94.jpg`)
           .setColor(COLORS.INFO)
       ]
     };
@@ -131,7 +133,7 @@ class ZoltraakHandler extends AbstractCommandHandler {
         new EmbedBuilder()
           .setColor(COLORS.INFO)
           .setTitle('PEW PEW!')
-          .setImage(`${MEME_IMAGES_BASE_URL}/zoltraak.gif`)
+          .setImage(`https://cdn.imgchest.com/files/50e1d1b38d1e.gif`)
       ]
     };
     if (user) {
@@ -185,7 +187,7 @@ class ThankYouHandler extends AbstractCommandHandler {
         new EmbedBuilder()
           .setColor(COLORS.INFO)
           .setTitle('Thank you so much!')
-          .setImage(`${MEME_IMAGES_BASE_URL}/thankyou.png`)
+          .setImage(`https://cdn.imgchest.com/files/f676fcf30dca.png`)
       ]
     };
     if (user) {
@@ -206,7 +208,7 @@ class SubarashiiHandler extends AbstractCommandHandler {
         new EmbedBuilder()
           .setColor('#9167b7')
           .setTitle('素晴らしい!')
-          .setImage(`${MEME_IMAGES_BASE_URL}/subarashii.png`)
+          .setImage(`https://cdn.imgchest.com/files/a280defbb294.png`)
       ]
     };
     if (user) {

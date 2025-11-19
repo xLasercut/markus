@@ -2,18 +2,17 @@ import { getRandomItem, shuffleArray } from '../helper';
 import { Logger } from 'winston';
 import { TAtomic } from '../interfaces/anime-cache';
 import axios from 'axios';
-import { GithubImageResponse } from '../models/api';
+import { ImgchestApiResponse } from '../models/api';
 import { TConfig } from '../types';
-import { MEME_IMAGES_BASE_URL } from '../constants';
 
 const ATOMIC_IMAGES: TAtomic[] = [
   {
     title: 'ᵃᵗᵒᵐⁱᶜ',
     image: 'https://media.tenor.com/8tIYSYOsxtcAAAAC/i-am-atomic-eminence-in-shadow.gif'
   },
-  { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: `${MEME_IMAGES_BASE_URL}/all-range-atomic.jpg` },
-  { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: `${MEME_IMAGES_BASE_URL}/recovery-atomic.png` },
-  { title: 'ᵃᵗᵒᵐⁱᶜ', image: `${MEME_IMAGES_BASE_URL}/im-atomic.gif` }
+  { title: 'THE ALL RANGE...\nᵃᵗᵒᵐⁱᶜ', image: `https://cdn.imgchest.com/files/ff54a6ea7c76.jpg` },
+  { title: 'RECOVERY ᵃᵗᵒᵐⁱᶜ', image: `https://cdn.imgchest.com/files/5a89613e40cc.png` },
+  { title: 'ᵃᵗᵒᵐⁱᶜ', image: `https://cdn.imgchest.com/files/98ec99b0f5be.gif` }
 ];
 
 class AnimeCache {
@@ -33,11 +32,17 @@ class AnimeCache {
   public async startCache() {
     this._logger.info('loading anime cache...');
     const response = await axios.get(
-      `https://api.github.com/repos/xLasercut/server-images/contents/dont-get-attached`
+      `https://api.imgchest.com/v1/post/${this._config.IMGCHEST_POST_ID}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this._config.IMGCHEST_API_TOKEN}`
+        }
+      }
     );
-    const parsedResponse = GithubImageResponse.parse(response.data);
-    this._dontGetAttachedImages = parsedResponse.map((image) => {
-      return image.download_url;
+    const parsedResponse = ImgchestApiResponse.parse(response.data);
+    this._dontGetAttachedImages = parsedResponse.data.images.map((image) => {
+      return image.link;
     });
     this._dontGetAttachedImagesToSend = shuffleArray<string>(this._dontGetAttachedImages);
     this._logger.info('anime cache load complete');

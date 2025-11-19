@@ -1,5 +1,5 @@
 import { AbstractCommandHandler } from './abtract';
-import { COLORS, MEME_IMAGES_BASE_URL } from '../constants';
+import { COLORS } from '../constants';
 import {
   ChatInputCommandInteraction,
   EmbedBuilder,
@@ -15,7 +15,9 @@ class PtrHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
-        new EmbedBuilder().setImage(`${MEME_IMAGES_BASE_URL}/ptr.png`).setColor(COLORS.SUCCESS)
+        new EmbedBuilder()
+          .setImage(`https://cdn.imgchest.com/files/11f304ee85e2.png`)
+          .setColor(COLORS.SUCCESS)
       ]
     });
   }
@@ -101,7 +103,9 @@ class RatioHandler extends AbstractCommandHandler {
   protected async _runWorkflow(interaction: ChatInputCommandInteraction): Promise<void> {
     const response: InteractionReplyOptions = {
       embeds: [
-        new EmbedBuilder().setImage(`${MEME_IMAGES_BASE_URL}/ratio.gif`).setColor(COLORS.PRIMARY)
+        new EmbedBuilder()
+          .setImage(`https://cdn.imgchest.com/files/db31fa2c31cf.gif`)
+          .setColor(COLORS.PRIMARY)
       ]
     };
     await interaction.reply(response);
