@@ -1,3 +1,6 @@
+allowBuilds:
+  better-sqlite3: true
+  puppeteer: true
 onlyBuiltDependencies:
   - better-sqlite3
   - puppeteer
